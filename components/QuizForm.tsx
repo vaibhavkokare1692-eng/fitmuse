@@ -1,0 +1,714 @@
+"use client";
+
+import { AnimatePresence, motion } from "framer-motion";
+import {
+  ArrowRight,
+  CalendarRange,
+  Palette,
+  Ruler,
+  SlidersHorizontal,
+  Sparkles,
+  User,
+} from "lucide-react";
+import { useRouter } from "next/navigation";
+import {
+  useState,
+  useSyncExternalStore,
+  useTransition,
+  type ChangeEvent,
+  type FormEvent,
+} from "react";
+import {
+  aestheticOptions,
+  bodyTypeOptions,
+  budgetRangeOptions,
+  commonSizes,
+  defaultQuizValues,
+  fitPreferenceOptions,
+  occasionOptions,
+  stylePreferenceOptions,
+} from "@/data/mock-data";
+import {
+  buildResultsSearch,
+  readStoredQuizAnswers,
+  writeStoredQuizAnswers,
+} from "@/lib/local-storage";
+import { formatCurrency, formatOptionLabel } from "@/lib/utils";
+import { buildOutfitRecommendations } from "@/utils/outfitMatcher";
+import type { QuizAnswers } from "@/types";
+
+const quizSteps = [
+  {
+    title: "Style profile",
+    description: "A few details to make the styling brief feel personal from the first screen.",
+    icon: User,
+  },
+  {
+    title: "Measurements",
+    description: "Sizing cues help FitMuse steer toward pieces that are more likely to land well.",
+    icon: Ruler,
+  },
+  {
+    title: "Aesthetic",
+    description: "Choose the overall vibe you want your outfits to reflect.",
+    icon: Palette,
+  },
+  {
+    title: "Occasion and budget",
+    description: "Set the moment and the spend range so the recommendations stay realistic.",
+    icon: CalendarRange,
+  },
+  {
+    title: "Fit and colors",
+    description: "Add your fit preference, color direction, and stores you already like.",
+    icon: SlidersHorizontal,
+  },
+  {
+    title: "Review",
+    description: "Check the summary and generate your outfit pack.",
+    icon: Sparkles,
+  },
+] as const;
+
+function getStepError(stepIndex: number, values: QuizAnswers) {
+  if (stepIndex === 0) {
+    if (!values.name.trim() || !values.stylePreference || !values.location.trim()) {
+      return "Add your name, style preference, and location so FitMuse can start with a clear brief.";
+    }
+  }
+
+  if (stepIndex === 1) {
+    if (!values.height.trim() || !values.topSize || !values.bottomSize || !values.shoeSize.trim()) {
+      return "Add your core measurement details before moving forward.";
+    }
+  }
+
+  if (stepIndex === 2 && !values.aesthetic) {
+    return "Pick one aesthetic so the outfit pack has a clear visual direction.";
+  }
+
+  if (stepIndex === 3 && (!values.occasion || !values.budgetRange)) {
+    return "Choose an occasion and budget so the results stay useful and realistic.";
+  }
+
+  if (stepIndex === 4 && !values.fitPreference) {
+    return "Choose how you like clothes to fit so the looks feel closer to your taste.";
+  }
+
+  return null;
+}
+
+export function QuizForm() {
+  const router = useRouter();
+  const isClient = useSyncExternalStore(() => () => undefined, () => true, () => false);
+  const [isPending, startTransition] = useTransition();
+  const [currentStep, setCurrentStep] = useState(0);
+  const [stepError, setStepError] = useState<string | null>(null);
+  const [formValues, setFormValues] = useState<QuizAnswers>(() =>
+    typeof window === "undefined"
+      ? defaultQuizValues
+      : { ...defaultQuizValues, ...(readStoredQuizAnswers() ?? {}) },
+  );
+  const previewLooks = buildOutfitRecommendations(formValues, 3);
+  const progress = ((currentStep + 1) / quizSteps.length) * 100;
+
+  function handleChange(
+    event: ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>,
+  ) {
+    const { name, value } = event.target;
+    setStepError(null);
+    setFormValues((current) => ({ ...current, [name]: value }));
+  }
+
+  function updateValue(name: keyof QuizAnswers, value: string) {
+    setStepError(null);
+    setFormValues((current) => ({ ...current, [name]: value }));
+  }
+
+  function goToStep(nextStep: number) {
+    setStepError(null);
+    setCurrentStep(Math.max(0, Math.min(nextStep, quizSteps.length - 1)));
+  }
+
+  function handleNext() {
+    const error = getStepError(currentStep, formValues);
+
+    if (error) {
+      setStepError(error);
+      return;
+    }
+
+    goToStep(currentStep + 1);
+  }
+
+  function handleSubmit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+
+    const error = getStepError(currentStep, formValues);
+
+    if (error) {
+      setStepError(error);
+      return;
+    }
+
+    writeStoredQuizAnswers(formValues);
+    const search = buildResultsSearch(formValues);
+
+    startTransition(() => {
+      router.push(`/results?${search}`);
+    });
+  }
+
+  if (!isClient) {
+    return (
+      <div className="grid gap-6 xl:grid-cols-[0.84fr_1.16fr]">
+        <aside className="dark-panel p-6 sm:p-8">
+          <p className="eyebrow !mb-0 text-accent-3">Style quiz</p>
+          <h2 className="mt-4 text-4xl text-white sm:text-5xl">Loading your saved brief...</h2>
+        </aside>
+        <div className="glass-panel p-6 sm:p-8">
+          <div className="animate-pulse-soft rounded-[1.8rem] bg-white/70 p-6">
+            <div className="h-4 w-28 rounded-full bg-foreground/10" />
+            <div className="mt-4 h-12 rounded-[1rem] bg-foreground/6" />
+            <div className="mt-3 h-12 rounded-[1rem] bg-foreground/6" />
+            <div className="mt-3 h-12 rounded-[1rem] bg-foreground/6" />
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <form onSubmit={handleSubmit} className="grid gap-6 xl:grid-cols-[0.82fr_1.18fr]">
+      <aside className="dark-panel flex flex-col gap-8 overflow-hidden p-6 sm:p-8">
+        <div>
+          <p className="eyebrow !mb-0 text-accent-3">Style quiz</p>
+          <h2 className="mt-4 text-4xl leading-tight text-white sm:text-5xl">
+            Build your creator styling brief.
+          </h2>
+          <p className="mt-4 max-w-xl text-white/72">
+            Six quick steps. Save once. Reuse anytime you want new looks.
+          </p>
+        </div>
+
+        <div>
+          <div className="flex items-center justify-between gap-4">
+            <p className="text-sm font-medium text-white/72">
+              Step {currentStep + 1} of {quizSteps.length}
+            </p>
+            <p className="text-sm font-medium text-white/72">{Math.round(progress)}%</p>
+          </div>
+          <div className="progress-track mt-3 bg-white/12">
+            <div className="h-full rounded-full bg-white" style={{ width: `${progress}%` }} />
+          </div>
+        </div>
+
+        <div className="grid gap-3">
+          {quizSteps.map((step, index) => {
+            const Icon = step.icon;
+            const isActive = index === currentStep;
+            const isComplete = index < currentStep;
+
+            return (
+              <button
+                key={step.title}
+                type="button"
+                onClick={() => goToStep(index)}
+                className={`flex items-center gap-4 rounded-[1.5rem] border px-4 py-4 text-left ${
+                  isActive
+                    ? "border-white/24 bg-white/14"
+                    : "border-white/10 bg-white/6 hover:border-white/18 hover:bg-white/10"
+                }`}
+              >
+                <span
+                  className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-full ${
+                    isActive || isComplete ? "bg-white text-foreground" : "bg-white/10 text-white"
+                  }`}
+                >
+                  <Icon size={18} />
+                </span>
+                <div>
+                  <p className="text-sm font-semibold text-white">{step.title}</p>
+                  <p className="mt-1 text-sm leading-6 text-white/66">{step.description}</p>
+                </div>
+              </button>
+            );
+          })}
+        </div>
+
+        {previewLooks[0] ? (
+          <div className="rounded-[1.7rem] border border-white/12 bg-white/10 p-5">
+            <p className="mini-label !text-white/64">Preview look</p>
+            <h3 className="mt-3 text-3xl text-white">{previewLooks[0].name}</h3>
+            <div className="mt-4 flex flex-wrap gap-2">
+              <span className="rounded-full bg-white/12 px-3 py-2 text-sm text-white/92">
+                {formatOptionLabel(previewLooks[0].aesthetic)}
+              </span>
+              <span className="rounded-full bg-white/12 px-3 py-2 text-sm text-white/92">
+                {formatCurrency(previewLooks[0].totalPrice)}
+              </span>
+            </div>
+            <p className="mt-4 text-sm leading-6 text-white/74">
+              {previewLooks[0].creatorUseCase}
+            </p>
+          </div>
+        ) : null}
+      </aside>
+
+      <div className="glass-panel p-6 sm:p-8">
+        <div className="max-w-3xl">
+          <p className="mini-label">Current step</p>
+          <h3 className="mt-2 text-4xl text-foreground sm:text-5xl">
+            {quizSteps[currentStep].title}
+          </h3>
+          <p className="mt-4 max-w-2xl">{quizSteps[currentStep].description}</p>
+        </div>
+
+        {stepError ? (
+          <div className="mt-6 rounded-[1.4rem] border border-accent/20 bg-accent/8 px-4 py-3 text-sm text-foreground">
+            {stepError}
+          </div>
+        ) : null}
+
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={quizSteps[currentStep].title}
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -12 }}
+            transition={{ duration: 0.32, ease: [0.22, 1, 0.36, 1] }}
+            className="mt-8"
+          >
+            {currentStep === 0 ? (
+              <div className="grid gap-5 md:grid-cols-2">
+                <div className="md:col-span-2">
+                  <p className="mini-label">Step 1</p>
+                  <p className="mt-2 max-w-2xl text-sm">
+                    This becomes the saved profile FitMuse uses on future visits.
+                  </p>
+                </div>
+
+                <div>
+                  <label htmlFor="name" className="field-label">
+                    Name
+                  </label>
+                  <input
+                    id="name"
+                    name="name"
+                    value={formValues.name}
+                    onChange={handleChange}
+                    className="field"
+                    placeholder="Ava"
+                  />
+                </div>
+
+                <div>
+                  <label htmlFor="stylePreference" className="field-label">
+                    Gender or style preference
+                  </label>
+                  <select
+                    id="stylePreference"
+                    name="stylePreference"
+                    value={formValues.stylePreference}
+                    onChange={handleChange}
+                    className="field"
+                  >
+                    <option value="">Choose one</option>
+                    {stylePreferenceOptions.map((option) => (
+                      <option key={option} value={option}>
+                        {formatOptionLabel(option)}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div className="md:col-span-2">
+                  <label htmlFor="location" className="field-label">
+                    Country or location
+                  </label>
+                  <input
+                    id="location"
+                    name="location"
+                    value={formValues.location}
+                    onChange={handleChange}
+                    className="field"
+                    placeholder="United States"
+                  />
+                </div>
+              </div>
+            ) : null}
+
+            {currentStep === 1 ? (
+              <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
+                {[
+                  ["height", "Height", "5'6\""],
+                  ["weight", "Weight", "135 lb"],
+                  ["chestBust", "Chest / bust", "34 in"],
+                  ["waist", "Waist", "27 in"],
+                  ["hips", "Hips", "38 in"],
+                  ["shoeSize", "Shoe size", "8"],
+                ].map(([name, label, placeholder]) => (
+                  <div key={name}>
+                    <label htmlFor={name} className="field-label">
+                      {label}
+                    </label>
+                    <input
+                      id={name}
+                      name={name}
+                      value={formValues[name as keyof QuizAnswers]}
+                      onChange={handleChange}
+                      className="field"
+                      placeholder={placeholder}
+                    />
+                  </div>
+                ))}
+
+                <div>
+                  <label htmlFor="topSize" className="field-label">
+                    Usual top size
+                  </label>
+                  <select
+                    id="topSize"
+                    name="topSize"
+                    value={formValues.topSize}
+                    onChange={handleChange}
+                    className="field"
+                  >
+                    <option value="">Choose size</option>
+                    {commonSizes.map((option) => (
+                      <option key={option} value={option}>
+                        {option}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div>
+                  <label htmlFor="bottomSize" className="field-label">
+                    Usual bottom size
+                  </label>
+                  <select
+                    id="bottomSize"
+                    name="bottomSize"
+                    value={formValues.bottomSize}
+                    onChange={handleChange}
+                    className="field"
+                  >
+                    <option value="">Choose size</option>
+                    {commonSizes.map((option) => (
+                      <option key={option} value={option}>
+                        {option}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div>
+                  <label htmlFor="bodyType" className="field-label">
+                    Body type
+                  </label>
+                  <select
+                    id="bodyType"
+                    name="bodyType"
+                    value={formValues.bodyType}
+                    onChange={handleChange}
+                    className="field"
+                  >
+                    <option value="">Optional</option>
+                    {bodyTypeOptions.map((option) => (
+                      <option key={option} value={option}>
+                        {option}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+            ) : null}
+
+            {currentStep === 2 ? (
+              <div className="grid gap-6">
+                <div>
+                  <label className="field-label">Choose your aesthetic</label>
+                  <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
+                    {aestheticOptions.map((option) => {
+                      const selected = formValues.aesthetic === option;
+
+                      return (
+                        <button
+                          key={option}
+                          type="button"
+                          onClick={() => updateValue("aesthetic", option)}
+                          className={`rounded-[1.4rem] border px-4 py-4 text-left text-sm font-medium ${
+                            selected
+                              ? "border-foreground bg-foreground text-white"
+                              : "border-line/70 bg-white/80 text-foreground hover:border-accent hover:text-accent"
+                          }`}
+                        >
+                          {formatOptionLabel(option)}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              </div>
+            ) : null}
+
+            {currentStep === 3 ? (
+              <div className="grid gap-6">
+                <div>
+                  <label className="field-label">Main occasion</label>
+                  <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-5">
+                    {occasionOptions.map((option) => {
+                      const selected = formValues.occasion === option;
+
+                      return (
+                        <button
+                          key={option}
+                          type="button"
+                          onClick={() => updateValue("occasion", option)}
+                          className={`rounded-[1.4rem] border px-4 py-4 text-left text-sm font-medium ${
+                            selected
+                              ? "border-foreground bg-foreground text-white"
+                              : "border-line/70 bg-white/80 text-foreground hover:border-accent hover:text-accent"
+                          }`}
+                        >
+                          {formatOptionLabel(option)}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                <div>
+                  <label className="field-label">Budget range</label>
+                  <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
+                    {budgetRangeOptions.map((option) => {
+                      const selected = formValues.budgetRange === option;
+
+                      return (
+                        <button
+                          key={option}
+                          type="button"
+                          onClick={() => updateValue("budgetRange", option)}
+                          className={`rounded-[1.4rem] border px-4 py-4 text-left text-sm font-medium ${
+                            selected
+                              ? "border-foreground bg-foreground text-white"
+                              : "border-line/70 bg-white/80 text-foreground hover:border-accent hover:text-accent"
+                          }`}
+                        >
+                          {formatOptionLabel(option)}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              </div>
+            ) : null}
+
+            {currentStep === 4 ? (
+              <div className="grid gap-6">
+                <div>
+                  <label className="field-label">Fit preference</label>
+                  <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+                    {fitPreferenceOptions.map((option) => {
+                      const selected = formValues.fitPreference === option;
+
+                      return (
+                        <button
+                          key={option}
+                          type="button"
+                          onClick={() => updateValue("fitPreference", option)}
+                          className={`rounded-[1.4rem] border px-4 py-4 text-left text-sm font-medium ${
+                            selected
+                              ? "border-foreground bg-foreground text-white"
+                              : "border-line/70 bg-white/80 text-foreground hover:border-accent hover:text-accent"
+                          }`}
+                        >
+                          {formatOptionLabel(option)}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                <div className="grid gap-5 md:grid-cols-2">
+                  <div>
+                    <label htmlFor="preferredColors" className="field-label">
+                      Preferred colors
+                    </label>
+                    <textarea
+                      id="preferredColors"
+                      name="preferredColors"
+                      value={formValues.preferredColors}
+                      onChange={handleChange}
+                      className="field min-h-28"
+                      placeholder="cream, espresso, sage"
+                    />
+                  </div>
+
+                  <div>
+                    <label htmlFor="avoidColors" className="field-label">
+                      Colors to avoid
+                    </label>
+                    <textarea
+                      id="avoidColors"
+                      name="avoidColors"
+                      value={formValues.avoidColors}
+                      onChange={handleChange}
+                      className="field min-h-28"
+                      placeholder="neon green"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label htmlFor="storesLike" className="field-label">
+                    Stores you like
+                  </label>
+                  <input
+                    id="storesLike"
+                    name="storesLike"
+                    value={formValues.storesLike}
+                    onChange={handleChange}
+                    className="field"
+                    placeholder="Zara, Mango, ASOS"
+                  />
+                </div>
+              </div>
+            ) : null}
+
+            {currentStep === 5 ? (
+              <div className="grid gap-6">
+                <div className="grid gap-5 lg:grid-cols-[0.96fr_1.04fr]">
+                  <div className="soft-card">
+                    <p className="mini-label">Review your brief</p>
+                    <h4 className="mt-3 text-3xl text-foreground">
+                      {formValues.name ? `${formValues.name}'s FitMuse profile` : "Your FitMuse profile"}
+                    </h4>
+
+                    <div className="mt-5 flex flex-wrap gap-2">
+                      {[
+                        formValues.aesthetic,
+                        formValues.occasion,
+                        formValues.budgetRange,
+                        formValues.fitPreference,
+                        formValues.location,
+                      ]
+                        .filter(Boolean)
+                        .map((item) => (
+                          <span key={item} className="chip">
+                            {formatOptionLabel(item)}
+                          </span>
+                        ))}
+                    </div>
+
+                    <div className="mt-5 grid gap-3 sm:grid-cols-2">
+                      {[
+                        { label: "Height", value: formValues.height },
+                        { label: "Top size", value: formValues.topSize },
+                        { label: "Bottom size", value: formValues.bottomSize },
+                        { label: "Shoe size", value: formValues.shoeSize },
+                        { label: "Preferred colors", value: formValues.preferredColors || "Open palette" },
+                        { label: "Stores", value: formValues.storesLike || "Open to all" },
+                      ].map((item) => (
+                        <div key={item.label} className="note-card">
+                          <p className="mini-label">{item.label}</p>
+                          <p className="mt-2 text-sm text-foreground">{item.value}</p>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="hero-card overflow-hidden p-4">
+                    {previewLooks[0] ? (
+                      <>
+                        <div className="rounded-[1.8rem] bg-gradient-to-br from-[#274650] via-[#6f857b] to-[#ead8c1] p-5 text-white">
+                          <p className="mini-label !text-white/70">Top preview look</p>
+                          <h4 className="mt-3 text-3xl text-white">{previewLooks[0].name}</h4>
+                          <p className="mt-3 text-sm leading-6 text-white/80">
+                            {previewLooks[0].fitNote}
+                          </p>
+                          <div className="mt-4 flex flex-wrap gap-2">
+                            <span className="rounded-full bg-white/14 px-3 py-2 text-sm text-white">
+                              {formatOptionLabel(previewLooks[0].occasion)}
+                            </span>
+                            <span className="rounded-full bg-white/14 px-3 py-2 text-sm text-white">
+                              {formatCurrency(previewLooks[0].totalPrice)}
+                            </span>
+                          </div>
+                        </div>
+
+                        <div className="mt-4 grid gap-3">
+                          {[
+                            previewLooks[0].items.top.name,
+                            previewLooks[0].items.bottom.name,
+                            previewLooks[0].items.shoes.name,
+                            previewLooks[0].items.accessory.name,
+                            previewLooks[0].items.outerwear?.name,
+                          ]
+                            .filter(Boolean)
+                            .map((item) => (
+                              <div
+                                key={item}
+                                className="rounded-[1.25rem] border border-line/70 bg-background/82 px-4 py-3 text-sm text-foreground"
+                              >
+                                {item}
+                              </div>
+                            ))}
+                        </div>
+                      </>
+                    ) : (
+                      <div className="soft-card">
+                        <p className="mini-label">Preview</p>
+                        <h4 className="mt-3 text-2xl text-foreground">
+                          Add a few more details to preview your looks.
+                        </h4>
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                <div className="grid gap-4 md:grid-cols-3">
+                  {previewLooks.map((look, index) => (
+                    <div
+                      key={look.id}
+                      className="rounded-[1.5rem] border border-line/70 bg-white/82 p-4"
+                    >
+                      <p className="mini-label">Look {index + 1}</p>
+                      <h4 className="mt-2 text-2xl text-foreground">{look.name}</h4>
+                      <p className="mt-2 text-sm">{look.creatorUseCase}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ) : null}
+          </motion.div>
+        </AnimatePresence>
+
+        <div className="mt-8 flex flex-col gap-4 border-t border-line/60 pt-6 sm:flex-row sm:items-center sm:justify-between">
+          <button
+            type="button"
+            onClick={() => goToStep(currentStep - 1)}
+            className="cta-secondary"
+            disabled={currentStep === 0}
+          >
+            Back
+          </button>
+
+          {currentStep < quizSteps.length - 1 ? (
+            <button type="button" onClick={handleNext} className="cta-primary">
+              <span className="flex items-center gap-2">
+                Next
+                <ArrowRight size={15} />
+              </span>
+            </button>
+          ) : (
+            <button type="submit" className="cta-primary min-w-56" disabled={isPending}>
+              {isPending ? "Generating your looks..." : "Generate My Looks"}
+            </button>
+          )}
+        </div>
+      </div>
+    </form>
+  );
+}
