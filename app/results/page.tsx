@@ -1,32 +1,28 @@
 import type { Metadata } from "next";
-import { Suspense } from "react";
 import { ResultsView } from "@/components/ResultsView";
+import type { QuizAnswers } from "@/types";
 
 export const metadata: Metadata = {
   title: "Looks",
 };
 
-function ResultsFallback() {
-  return (
-    <div className="shell section-space">
-      <div className="glass-panel p-8 sm:p-10">
-        <p className="eyebrow">Loading results</p>
-        <h1 className="text-4xl text-foreground sm:text-5xl">
-          Preparing your creator-ready outfits.
-        </h1>
-        <p className="mt-4 max-w-2xl">
-          We are reading your style quiz answers from localStorage and the URL so this page stays
-          easy to share and deploy as a static site.
-        </p>
-      </div>
-    </div>
-  );
+type ResultsPageProps = {
+  searchParams?: Promise<Record<string, string | string[] | undefined>>;
+};
+
+function flattenSearchParams(
+  params: Record<string, string | string[] | undefined>,
+): Partial<Record<keyof QuizAnswers, string>> {
+  return Object.fromEntries(
+    Object.entries(params).map(([key, value]) => [
+      key,
+      Array.isArray(value) ? value[0] ?? "" : value ?? "",
+    ]),
+  ) as Partial<Record<keyof QuizAnswers, string>>;
 }
 
-export default function ResultsPage() {
-  return (
-    <Suspense fallback={<ResultsFallback />}>
-      <ResultsView />
-    </Suspense>
-  );
+export default async function ResultsPage({ searchParams }: ResultsPageProps) {
+  const resolvedSearchParams = searchParams ? await searchParams : {};
+
+  return <ResultsView searchParamsObject={flattenSearchParams(resolvedSearchParams)} />;
 }

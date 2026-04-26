@@ -4,7 +4,6 @@ import Link from "next/link";
 import { motion } from "framer-motion";
 import { Bookmark, FunnelX, Sparkles } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { RecommendationCard } from "@/components/RecommendationCard";
 import {
@@ -48,13 +47,12 @@ function mergeAnswers(primary: QuizAnswers, secondary?: QuizAnswers | null) {
   } as QuizAnswers;
 }
 
-export function ResultsView() {
-  const searchParams = useSearchParams();
-  const searchParamsObject = Object.fromEntries(searchParams.entries()) as Partial<
-    Record<keyof QuizAnswers, string>
-  >;
-
-  return <ResultsContent key={searchParams.toString()} searchParamsObject={searchParamsObject} />;
+export function ResultsView({
+  searchParamsObject = {},
+}: {
+  searchParamsObject?: Partial<Record<keyof QuizAnswers, string>>;
+}) {
+  return <ResultsContent searchParamsObject={searchParamsObject} />;
 }
 
 function ResultsContent({
@@ -63,26 +61,43 @@ function ResultsContent({
   searchParamsObject: Partial<Record<keyof QuizAnswers, string>>;
 }) {
   const router = useRouter();
-  const [isHydrated, setIsHydrated] = useState(false);
   const [storedAnswers, setStoredAnswers] = useState<QuizAnswers | null>(null);
   const [savedIds, setSavedIds] = useState<string[]>([]);
 
   useEffect(() => {
     setStoredAnswers(readStoredQuizAnswers());
     setSavedIds(readSavedLookIds());
-    setIsHydrated(true);
   }, []);
 
   const paramAnswers = normalizeQuizAnswers(searchParamsObject);
   const mergedAnswers = mergeAnswers(paramAnswers, storedAnswers);
-  const quizAnswers = isHydrated && hasQuizAnswers(mergedAnswers) ? mergedAnswers : null;
+  const quizAnswers = hasQuizAnswers(mergedAnswers) ? mergedAnswers : null;
   const [filters, setFilters] = useState<ResultFilters>(() => ({
-    aesthetic: quizAnswers?.aesthetic || "all",
-    occasion: quizAnswers?.occasion || "all",
-    budgetRange: quizAnswers?.budgetRange || "",
-    fitPreference: quizAnswers?.fitPreference || "all",
+    aesthetic: paramAnswers.aesthetic || "all",
+    occasion: paramAnswers.occasion || "all",
+    budgetRange: paramAnswers.budgetRange || "",
+    fitPreference: paramAnswers.fitPreference || "all",
     store: "all",
   }));
+
+  useEffect(() => {
+    if (!quizAnswers) {
+      return;
+    }
+
+    setFilters((current) => ({
+      ...current,
+      aesthetic:
+        current.aesthetic === "all" ? quizAnswers.aesthetic || "all" : current.aesthetic,
+      occasion:
+        current.occasion === "all" ? quizAnswers.occasion || "all" : current.occasion,
+      budgetRange: current.budgetRange || quizAnswers.budgetRange || "",
+      fitPreference:
+        current.fitPreference === "all"
+          ? quizAnswers.fitPreference || "all"
+          : current.fitPreference,
+    }));
+  }, [quizAnswers]);
 
   function updateFilter<K extends keyof ResultFilters>(key: K, value: ResultFilters[K]) {
     setFilters((current) => ({ ...current, [key]: value }));
@@ -102,22 +117,6 @@ function ResultsContent({
   function startNewQuiz() {
     clearStoredQuizAnswers();
     router.push("/quiz");
-  }
-
-  if (!isHydrated) {
-    return (
-      <div className="shell section-space">
-        <div className="glass-panel p-8 sm:p-10">
-          <p className="eyebrow">Loading results</p>
-          <h1 className="text-4xl text-foreground sm:text-5xl">
-            Preparing your creator-ready outfit pack.
-          </h1>
-          <p className="mt-4 max-w-2xl">
-            FitMuse is reading your saved style brief and building the first round of looks.
-          </p>
-        </div>
-      </div>
-    );
   }
 
   if (!quizAnswers) {

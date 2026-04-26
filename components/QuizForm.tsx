@@ -101,7 +101,7 @@ function getStepError(stepIndex: number, values: QuizAnswers) {
 export function QuizForm() {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
-  const [isHydrated, setIsHydrated] = useState(false);
+  const [hasStoredBrief, setHasStoredBrief] = useState(false);
   const [showSavedBriefPrompt, setShowSavedBriefPrompt] = useState(false);
   const [currentStep, setCurrentStep] = useState(0);
   const [stepError, setStepError] = useState<string | null>(null);
@@ -112,12 +112,12 @@ export function QuizForm() {
 
     if (stored && hasQuizAnswers(stored)) {
       setFormValues(stored);
+      setHasStoredBrief(true);
       setShowSavedBriefPrompt(true);
     } else {
       setFormValues(emptyQuizAnswers());
+      setHasStoredBrief(false);
     }
-
-    setIsHydrated(true);
   }, []);
 
   const previewLooks = buildOutfitRecommendations(formValues, 3);
@@ -180,25 +180,6 @@ export function QuizForm() {
     startTransition(() => {
       router.push(`/results?${search}`);
     });
-  }
-
-  if (!isHydrated) {
-    return (
-      <div className="grid gap-6 xl:grid-cols-[0.84fr_1.16fr]">
-        <aside className="dark-panel p-6 sm:p-8">
-          <p className="eyebrow !mb-0 text-accent-3">Style quiz</p>
-          <h2 className="mt-4 text-4xl text-white sm:text-5xl">Loading your saved brief...</h2>
-        </aside>
-        <div className="glass-panel p-6 sm:p-8">
-          <div className="animate-pulse-soft rounded-[1.8rem] bg-white/70 p-6">
-            <div className="h-4 w-28 rounded-full bg-foreground/10" />
-            <div className="mt-4 h-12 rounded-[1rem] bg-foreground/6" />
-            <div className="mt-3 h-12 rounded-[1rem] bg-foreground/6" />
-            <div className="mt-3 h-12 rounded-[1rem] bg-foreground/6" />
-          </div>
-        </div>
-      </div>
-    );
   }
 
   if (showSavedBriefPrompt) {
@@ -349,9 +330,9 @@ export function QuizForm() {
           <p className="mt-4 max-w-2xl">{quizSteps[currentStep].description}</p>
           <div className="mt-5 flex flex-wrap gap-3">
             <span className="rounded-full border border-line/70 bg-white/82 px-4 py-2 text-sm text-foreground">
-              {hasQuizAnswers(readStoredQuizAnswers()) ? "Saved brief loaded" : "Fresh brief"}
+              {hasStoredBrief ? "Saved brief loaded" : "Fresh brief"}
             </span>
-            {hasQuizAnswers(readStoredQuizAnswers()) ? (
+            {hasStoredBrief ? (
               <button type="button" onClick={startNewBrief} className="cta-secondary">
                 Start new brief
               </button>
