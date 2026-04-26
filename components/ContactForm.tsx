@@ -24,17 +24,28 @@ export function ContactForm() {
     event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
   ) {
     const { name, value } = event.target;
+    setIsSubmitted(false);
     setFormState((current) => ({ ...current, [name]: value }));
   }
 
   function handleCheckboxChange(event: ChangeEvent<HTMLInputElement>) {
+    setIsSubmitted(false);
     setFormState((current) => ({ ...current, isCreator: event.target.checked }));
+  }
+
+  function submitDemoMessage() {
+    if (!formState.name.trim() || !formState.email.trim() || !formState.message.trim()) {
+      setIsSubmitted(false);
+      return;
+    }
+
+    setIsSubmitted(true);
+    setFormState(initialState);
   }
 
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    setIsSubmitted(true);
-    setFormState(initialState);
+    submitDemoMessage();
   }
 
   return (
@@ -97,18 +108,18 @@ export function ContactForm() {
       </label>
 
       <div className="mt-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <button type="submit" className="cta-primary min-w-40">
+        <button type="submit" className="cta-primary min-w-40" data-testid="contact-submit-button">
           Send message
         </button>
-        {isSubmitted ? (
-          <p className="text-sm text-accent-2">
-            Thanks — this demo keeps messages local for now.
-          </p>
-        ) : (
-          <p className="text-sm text-muted">
-            This MVP keeps submission local, so there is no backend dependency yet.
-          </p>
-        )}
+        <div aria-live="polite" className="min-h-6">
+          {isSubmitted ? (
+            <p className="text-sm text-accent-2">Thanks - this demo keeps messages local for now.</p>
+          ) : (
+            <p className="text-sm text-muted">
+              This MVP keeps submission local, so there is no backend dependency yet.
+            </p>
+          )}
+        </div>
       </div>
     </form>
   );

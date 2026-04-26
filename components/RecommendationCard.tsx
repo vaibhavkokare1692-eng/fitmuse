@@ -106,6 +106,8 @@ export function RecommendationCard({
             <button
               type="button"
               onClick={() => onToggleSave(recommendation.id)}
+              aria-pressed={saved}
+              data-testid={`save-look-${recommendation.id}`}
               className={`rounded-full border px-3 py-2 text-sm font-semibold backdrop-blur-sm ${
                 saved
                   ? "border-white/18 bg-white/16 text-white"
@@ -114,7 +116,7 @@ export function RecommendationCard({
             >
               <span className="flex items-center gap-2">
                 <Bookmark size={14} />
-                {saved ? "Saved" : "Save"}
+                {saved ? "Saved" : "Save look"}
               </span>
             </button>
           </div>
@@ -194,14 +196,13 @@ export function RecommendationCard({
         </div>
 
         <div className="mt-6 flex flex-wrap gap-3">
-          <button
-            type="button"
-            className="cta-secondary"
-            onClick={() => onToggleSave(recommendation.id)}
-          >
-            {saved ? "Remove saved" : "Save"}
-          </button>
           <ShoppingLinksButton />
+        </div>
+
+        <div aria-live="polite" data-testid={`save-status-${recommendation.id}`} className="mt-3 min-h-6">
+          {saved ? (
+            <p className="text-sm font-medium text-accent-2">Saved to your looks</p>
+          ) : null}
         </div>
       </div>
     </motion.article>

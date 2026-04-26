@@ -8,19 +8,19 @@ export const metadata: Metadata = {
 export default function QuizPage() {
   return (
     <div className="shell section-space">
-      <section className="mb-10 grid gap-6 xl:grid-cols-[1.02fr_0.98fr] xl:items-end">
+      <section className="mb-6 grid gap-5 xl:mb-10 xl:grid-cols-[1.02fr_0.98fr] xl:items-end">
         <div>
           <p className="eyebrow">Style quiz</p>
-          <h1 className="max-w-4xl text-5xl leading-[0.96] text-foreground sm:text-6xl">
+          <h1 className="max-w-4xl text-4xl leading-[0.98] text-foreground sm:text-6xl">
             Tell FitMuse your vibe, your fit, and your budget.
           </h1>
-          <p className="mt-5 max-w-2xl text-lg leading-8">
+          <p className="mt-4 max-w-2xl text-base leading-7 sm:text-lg sm:leading-8">
             A premium multi-step brief that turns body data, aesthetics, occasions, and budget into
             creator-ready outfit recommendations.
           </p>
         </div>
 
-        <div className="grid gap-4 sm:grid-cols-3">
+        <div className="hidden gap-4 xl:grid xl:grid-cols-3">
           {[
             { label: "Fast to finish", value: "6 steps" },
             { label: "Inputs covered", value: "Measurements + style" },

@@ -13,6 +13,7 @@ import {
 import { useRouter } from "next/navigation";
 import {
   useEffect,
+  useRef,
   useState,
   useTransition,
   type ChangeEvent,
@@ -100,6 +101,7 @@ function getStepError(stepIndex: number, values: QuizAnswers) {
 
 export function QuizForm() {
   const router = useRouter();
+  const formSurfaceRef = useRef<HTMLDivElement | null>(null);
   const [isPending, startTransition] = useTransition();
   const [hasStoredBrief, setHasStoredBrief] = useState(false);
   const [showSavedBriefPrompt, setShowSavedBriefPrompt] = useState(false);
@@ -119,6 +121,16 @@ export function QuizForm() {
       setHasStoredBrief(false);
     }
   }, []);
+
+  useEffect(() => {
+    if (typeof window === "undefined" || showSavedBriefPrompt) {
+      return;
+    }
+
+    if (window.innerWidth < 1280) {
+      formSurfaceRef.current?.scrollIntoView({ block: "start", behavior: "smooth" });
+    }
+  }, [currentStep, showSavedBriefPrompt]);
 
   const previewLooks = buildOutfitRecommendations(formValues, 3);
   const progress = ((currentStep + 1) / quizSteps.length) * 100;
@@ -246,7 +258,7 @@ export function QuizForm() {
 
   return (
     <form onSubmit={handleSubmit} className="grid gap-6 xl:grid-cols-[0.82fr_1.18fr]">
-      <aside className="dark-panel flex flex-col gap-8 overflow-hidden p-6 sm:p-8">
+      <aside className="order-2 hidden flex-col gap-8 overflow-hidden p-6 sm:p-8 xl:order-1 xl:flex dark-panel">
         <div>
           <p className="eyebrow !mb-0 text-accent-3">Style quiz</p>
           <h2 className="mt-4 text-4xl leading-tight text-white sm:text-5xl">
@@ -321,14 +333,16 @@ export function QuizForm() {
         ) : null}
       </aside>
 
-      <div className="glass-panel p-6 sm:p-8">
+      <div ref={formSurfaceRef} className="order-1 glass-panel p-5 pb-40 sm:p-8 sm:pb-8 xl:order-2">
         <div className="max-w-3xl">
           <p className="mini-label">Current step</p>
-          <h3 className="mt-2 text-4xl text-foreground sm:text-5xl">
+          <h3 className="mt-2 text-3xl text-foreground sm:text-5xl">
             {quizSteps[currentStep].title}
           </h3>
-          <p className="mt-4 max-w-2xl">{quizSteps[currentStep].description}</p>
-          <div className="mt-5 flex flex-wrap gap-3">
+          <p className="mt-3 max-w-2xl text-sm leading-6 sm:mt-4 sm:text-base sm:leading-7">
+            {quizSteps[currentStep].description}
+          </p>
+          <div className="mt-4 flex flex-wrap gap-3">
             <span className="rounded-full border border-line/70 bg-white/82 px-4 py-2 text-sm text-foreground">
               {hasStoredBrief ? "Saved brief loaded" : "Fresh brief"}
             </span>
@@ -341,7 +355,10 @@ export function QuizForm() {
         </div>
 
         {stepError ? (
-          <div className="mt-6 rounded-[1.4rem] border border-accent/20 bg-accent/8 px-4 py-3 text-sm text-foreground">
+          <div
+            aria-live="polite"
+            className="mt-6 rounded-[1.4rem] border border-accent/20 bg-accent/8 px-4 py-3 text-sm text-foreground"
+          >
             {stepError}
           </div>
         ) : null}
@@ -353,7 +370,7 @@ export function QuizForm() {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -12 }}
             transition={{ duration: 0.32, ease: [0.22, 1, 0.36, 1] }}
-            className="mt-8"
+            className="mt-6 sm:mt-8"
           >
             {currentStep === 0 ? (
               <div className="grid gap-5 md:grid-cols-2">
@@ -761,25 +778,36 @@ export function QuizForm() {
           </motion.div>
         </AnimatePresence>
 
-        <div className="mt-8 flex flex-col gap-4 border-t border-line/60 pt-6 sm:flex-row sm:items-center sm:justify-between">
+        <div className="fixed inset-x-4 bottom-12 z-40 flex flex-col gap-4 rounded-[1.5rem] border border-line/70 bg-[rgba(252,247,242,0.94)] p-4 shadow-[0_18px_36px_rgba(27,21,19,0.12)] backdrop-blur-sm sm:static sm:mt-8 sm:flex-row sm:items-center sm:justify-between sm:rounded-none sm:border-t sm:border-x-0 sm:border-b-0 sm:bg-transparent sm:p-0 sm:pt-6 sm:shadow-none sm:backdrop-blur-0">
           <button
             type="button"
             onClick={() => goToStep(currentStep - 1)}
             className="cta-secondary"
+            data-testid="quiz-back-button"
             disabled={currentStep === 0}
           >
             Back
           </button>
 
           {currentStep < quizSteps.length - 1 ? (
-            <button type="button" onClick={handleNext} className="cta-primary">
+            <button
+              type="button"
+              onClick={handleNext}
+              className="cta-primary"
+              data-testid="quiz-next-button"
+            >
               <span className="flex items-center gap-2">
                 Next
                 <ArrowRight size={15} />
               </span>
             </button>
           ) : (
-            <button type="submit" className="cta-primary min-w-56" disabled={isPending}>
+            <button
+              type="submit"
+              className="cta-primary min-w-56"
+              data-testid="quiz-submit-button"
+              disabled={isPending}
+            >
               {isPending ? "Generating your looks..." : "Generate My Looks"}
             </button>
           )}
