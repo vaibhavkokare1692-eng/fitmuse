@@ -102,8 +102,7 @@ export function ContactForm() {
         </button>
         {isSubmitted ? (
           <p className="text-sm text-accent-2">
-            Demo message received. A real version would connect this form to email, CRM, or creator
-            partnership workflows.
+            Thanks — this demo keeps messages local for now.
           </p>
         ) : (
           <p className="text-sm text-muted">
