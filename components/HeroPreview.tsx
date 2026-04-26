@@ -1,5 +1,6 @@
-import { Bookmark, ExternalLink, SlidersHorizontal, Sparkles } from "lucide-react";
+import { Bookmark, SlidersHorizontal, Sparkles } from "lucide-react";
 import { formatCurrency } from "@/lib/utils";
+import { ShoppingLinksButton } from "@/components/ShoppingLinksButton";
 import type { Outfit } from "@/types";
 
 type HeroPreviewProps = {
@@ -88,12 +89,7 @@ export function HeroPreview({ outfit }: HeroPreviewProps) {
                 <button type="button" className="cta-secondary">
                   Save
                 </button>
-                <a href={outfit.links.top} target="_blank" rel="noreferrer" className="cta-primary">
-                  <span className="flex items-center gap-2">
-                    Shop look
-                    <ExternalLink size={14} />
-                  </span>
-                </a>
+                <ShoppingLinksButton />
               </div>
             </div>
           </div>

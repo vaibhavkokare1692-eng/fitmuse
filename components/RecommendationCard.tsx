@@ -1,8 +1,9 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Bookmark, ExternalLink } from "lucide-react";
+import { Bookmark } from "lucide-react";
 import { formatCurrency, formatOptionLabel } from "@/lib/utils";
+import { ShoppingLinksButton } from "@/components/ShoppingLinksButton";
 import type { OutfitRecommendation } from "@/types";
 
 type RecommendationCardProps = {
@@ -200,12 +201,7 @@ export function RecommendationCard({
           >
             {saved ? "Remove saved" : "Save"}
           </button>
-          <a href={recommendation.shopUrl} target="_blank" rel="noreferrer" className="cta-primary">
-            <span className="flex items-center gap-2">
-              Shop look
-              <ExternalLink size={14} />
-            </span>
-          </a>
+          <ShoppingLinksButton />
         </div>
       </div>
     </motion.article>

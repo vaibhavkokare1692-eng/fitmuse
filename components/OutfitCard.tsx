@@ -2,8 +2,9 @@
 
 import { motion } from "framer-motion";
 import { useState } from "react";
-import { Bookmark, ExternalLink } from "lucide-react";
+import { Bookmark } from "lucide-react";
 import { formatCurrency } from "@/lib/utils";
+import { ShoppingLinksButton } from "@/components/ShoppingLinksButton";
 import type { Outfit } from "@/types";
 
 type OutfitCardProps = {
@@ -170,12 +171,7 @@ export function OutfitCard({ outfit, rank, compact = false }: OutfitCardProps) {
           >
             {saved ? "Saved" : "Save"}
           </button>
-          <a href={outfit.links.top} target="_blank" rel="noreferrer" className="cta-primary">
-            <span className="flex items-center gap-2">
-              Shop look
-              <ExternalLink size={14} />
-            </span>
-          </a>
+          <ShoppingLinksButton />
         </div>
       </div>
     </motion.article>
