@@ -61,12 +61,17 @@ function ResultsContent({
   searchParamsObject: Partial<Record<keyof QuizAnswers, string>>;
 }) {
   const router = useRouter();
+  const [, setIsLoadingBrief] = useState(true);
   const [storedAnswers, setStoredAnswers] = useState<QuizAnswers | null>(null);
   const [savedIds, setSavedIds] = useState<string[]>([]);
 
   useEffect(() => {
-    setStoredAnswers(readStoredQuizAnswers());
-    setSavedIds(readSavedLookIds());
+    try {
+      setStoredAnswers(readStoredQuizAnswers());
+      setSavedIds(readSavedLookIds());
+    } finally {
+      setIsLoadingBrief(false);
+    }
   }, []);
 
   const paramAnswers = useMemo(

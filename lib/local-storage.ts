@@ -144,6 +144,7 @@ export function readStoredQuizAnswers() {
 
     return hasQuizAnswers(normalized) ? normalized : null;
   } catch {
+    window.localStorage.removeItem(QUIZ_STORAGE_KEY);
     return null;
   }
 }
@@ -179,11 +180,13 @@ export function readSavedLookIds() {
     const parsed = JSON.parse(raw) as unknown;
 
     if (!Array.isArray(parsed)) {
+      window.localStorage.removeItem(SAVED_LOOKS_STORAGE_KEY);
       return [];
     }
 
     return parsed.filter((entry): entry is string => typeof entry === "string");
   } catch {
+    window.localStorage.removeItem(SAVED_LOOKS_STORAGE_KEY);
     return [];
   }
 }
