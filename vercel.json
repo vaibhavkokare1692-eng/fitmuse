@@ -1,3 +1,5 @@
 {
-  "outputDirectory": "out"
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "framework": "nextjs",
+  "outputDirectory": null
 }
