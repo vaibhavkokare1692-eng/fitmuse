@@ -4,7 +4,7 @@ import Link from "next/link";
 import { motion } from "framer-motion";
 import { Bookmark, FunnelX, Sparkles } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { RecommendationCard } from "@/components/RecommendationCard";
 import {
   aestheticOptions,
@@ -69,9 +69,18 @@ function ResultsContent({
     setSavedIds(readSavedLookIds());
   }, []);
 
-  const paramAnswers = normalizeQuizAnswers(searchParamsObject);
-  const mergedAnswers = mergeAnswers(paramAnswers, storedAnswers);
-  const quizAnswers = hasQuizAnswers(mergedAnswers) ? mergedAnswers : null;
+  const paramAnswers = useMemo(
+    () => normalizeQuizAnswers(searchParamsObject),
+    [searchParamsObject],
+  );
+  const mergedAnswers = useMemo(
+    () => mergeAnswers(paramAnswers, storedAnswers),
+    [paramAnswers, storedAnswers],
+  );
+  const quizAnswers = useMemo(
+    () => (hasQuizAnswers(mergedAnswers) ? mergedAnswers : null),
+    [mergedAnswers],
+  );
   const [filters, setFilters] = useState<ResultFilters>(() => ({
     aesthetic: paramAnswers.aesthetic || "all",
     occasion: paramAnswers.occasion || "all",
@@ -80,24 +89,43 @@ function ResultsContent({
     store: "all",
   }));
 
+  const quizAesthetic = quizAnswers?.aesthetic ?? "";
+  const quizOccasion = quizAnswers?.occasion ?? "";
+  const quizBudgetRange = quizAnswers?.budgetRange ?? "";
+  const quizFitPreference = quizAnswers?.fitPreference ?? "";
+  const hasQuizFilterDefaults = Boolean(
+    quizAesthetic || quizOccasion || quizBudgetRange || quizFitPreference,
+  );
+
   useEffect(() => {
-    if (!quizAnswers) {
+    if (!hasQuizFilterDefaults) {
       return;
     }
 
-    setFilters((current) => ({
-      ...current,
-      aesthetic:
-        current.aesthetic === "all" ? quizAnswers.aesthetic || "all" : current.aesthetic,
-      occasion:
-        current.occasion === "all" ? quizAnswers.occasion || "all" : current.occasion,
-      budgetRange: current.budgetRange || quizAnswers.budgetRange || "",
-      fitPreference:
-        current.fitPreference === "all"
-          ? quizAnswers.fitPreference || "all"
-          : current.fitPreference,
-    }));
-  }, [quizAnswers]);
+    setFilters((current) => {
+      const next = {
+        ...current,
+        aesthetic: current.aesthetic === "all" ? quizAesthetic || "all" : current.aesthetic,
+        occasion: current.occasion === "all" ? quizOccasion || "all" : current.occasion,
+        budgetRange: current.budgetRange || quizBudgetRange || "",
+        fitPreference:
+          current.fitPreference === "all"
+            ? quizFitPreference || "all"
+            : current.fitPreference,
+      };
+
+      if (
+        next.aesthetic === current.aesthetic &&
+        next.occasion === current.occasion &&
+        next.budgetRange === current.budgetRange &&
+        next.fitPreference === current.fitPreference
+      ) {
+        return current;
+      }
+
+      return next;
+    });
+  }, [hasQuizFilterDefaults, quizAesthetic, quizBudgetRange, quizFitPreference, quizOccasion]);
 
   function updateFilter<K extends keyof ResultFilters>(key: K, value: ResultFilters[K]) {
     setFilters((current) => ({ ...current, [key]: value }));
