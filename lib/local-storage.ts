@@ -156,6 +156,14 @@ export function writeStoredQuizAnswers(answers: QuizAnswers) {
   window.localStorage.setItem(QUIZ_STORAGE_KEY, JSON.stringify(answers));
 }
 
+export function clearStoredQuizAnswers() {
+  if (typeof window === "undefined") {
+    return;
+  }
+
+  window.localStorage.removeItem(QUIZ_STORAGE_KEY);
+}
+
 export function readSavedLookIds() {
   if (typeof window === "undefined") {
     return [];
@@ -186,4 +194,12 @@ export function writeSavedLookIds(ids: string[]) {
   }
 
   window.localStorage.setItem(SAVED_LOOKS_STORAGE_KEY, JSON.stringify(ids));
+}
+
+export function clearSavedLookIds() {
+  if (typeof window === "undefined") {
+    return;
+  }
+
+  window.localStorage.removeItem(SAVED_LOOKS_STORAGE_KEY);
 }

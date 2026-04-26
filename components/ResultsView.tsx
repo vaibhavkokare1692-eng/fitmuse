@@ -3,8 +3,9 @@
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { Bookmark, FunnelX, Sparkles } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { useSearchParams } from "next/navigation";
-import { useState, useSyncExternalStore } from "react";
+import { useEffect, useState } from "react";
 import { RecommendationCard } from "@/components/RecommendationCard";
 import {
   aestheticOptions,
@@ -13,7 +14,13 @@ import {
   occasionOptions,
 } from "@/data/mock-data";
 import { products } from "@/data/products";
-import { normalizeQuizAnswers, readSavedLookIds, readStoredQuizAnswers, writeSavedLookIds } from "@/lib/local-storage";
+import {
+  clearStoredQuizAnswers,
+  normalizeQuizAnswers,
+  readSavedLookIds,
+  readStoredQuizAnswers,
+  writeSavedLookIds,
+} from "@/lib/local-storage";
 import { formatCurrency, formatOptionLabel } from "@/lib/utils";
 import { buildOutfitRecommendations, budgetLabelFromCap, hasQuizAnswers } from "@/utils/outfitMatcher";
 import type { QuizAnswers } from "@/types";
@@ -41,14 +48,6 @@ function mergeAnswers(primary: QuizAnswers, secondary?: QuizAnswers | null) {
   } as QuizAnswers;
 }
 
-function getClientSnapshot() {
-  return true;
-}
-
-function getServerSnapshot() {
-  return false;
-}
-
 export function ResultsView() {
   const searchParams = useSearchParams();
   const searchParamsObject = Object.fromEntries(searchParams.entries()) as Partial<
@@ -63,14 +62,20 @@ function ResultsContent({
 }: {
   searchParamsObject: Partial<Record<keyof QuizAnswers, string>>;
 }) {
-  const isClient = useSyncExternalStore(() => () => undefined, getClientSnapshot, getServerSnapshot);
-  const storedAnswers = isClient ? readStoredQuizAnswers() : null;
+  const router = useRouter();
+  const [isHydrated, setIsHydrated] = useState(false);
+  const [storedAnswers, setStoredAnswers] = useState<QuizAnswers | null>(null);
+  const [savedIds, setSavedIds] = useState<string[]>([]);
+
+  useEffect(() => {
+    setStoredAnswers(readStoredQuizAnswers());
+    setSavedIds(readSavedLookIds());
+    setIsHydrated(true);
+  }, []);
+
   const paramAnswers = normalizeQuizAnswers(searchParamsObject);
   const mergedAnswers = mergeAnswers(paramAnswers, storedAnswers);
-  const quizAnswers = hasQuizAnswers(mergedAnswers) ? mergedAnswers : null;
-  const [savedIds, setSavedIds] = useState<string[]>(() =>
-    typeof window === "undefined" ? [] : readSavedLookIds(),
-  );
+  const quizAnswers = isHydrated && hasQuizAnswers(mergedAnswers) ? mergedAnswers : null;
   const [filters, setFilters] = useState<ResultFilters>(() => ({
     aesthetic: quizAnswers?.aesthetic || "all",
     occasion: quizAnswers?.occasion || "all",
@@ -94,7 +99,12 @@ function ResultsContent({
     });
   }
 
-  if (!isClient) {
+  function startNewQuiz() {
+    clearStoredQuizAnswers();
+    router.push("/quiz");
+  }
+
+  if (!isHydrated) {
     return (
       <div className="shell section-space">
         <div className="glass-panel p-8 sm:p-10">
@@ -185,6 +195,7 @@ function ResultsContent({
             </span>
             <span className="pill">{formatOptionLabel(activeAnswers.occasion || "daily wear")}</span>
             <span className="pill">{budgetLabelFromCap(activeAnswers.budgetRange)}</span>
+            <span className="pill">{formatOptionLabel(activeAnswers.fitPreference || "regular")}</span>
           </div>
 
           <div>
@@ -264,6 +275,9 @@ function ResultsContent({
             </Link>
             <button type="button" className="cta-secondary" onClick={resetFilters}>
               Reset filters
+            </button>
+            <button type="button" className="cta-secondary" onClick={startNewQuiz}>
+              Start New Quiz
             </button>
           </div>
         </motion.div>

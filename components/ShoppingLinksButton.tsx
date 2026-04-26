@@ -13,7 +13,7 @@ export function ShoppingLinksButton({
   const [showMessage, setShowMessage] = useState(false);
 
   return (
-    <div className="flex flex-col items-start gap-2">
+    <div className="relative flex flex-col items-start gap-2">
       <button
         type="button"
         className={className}
@@ -27,9 +27,9 @@ export function ShoppingLinksButton({
       </button>
 
       {showMessage ? (
-        <p className="rounded-full border border-line/70 bg-white/88 px-3 py-2 text-xs text-foreground">
-          Shopping links coming soon.
-        </p>
+        <div className="max-w-xs rounded-[1.2rem] border border-line/70 bg-white/94 px-4 py-3 text-xs leading-5 text-foreground shadow-[0_16px_32px_rgba(27,21,19,0.08)]">
+          Shopping links coming soon. This MVP uses mock products for now.
+        </div>
       ) : null}
     </div>
   );

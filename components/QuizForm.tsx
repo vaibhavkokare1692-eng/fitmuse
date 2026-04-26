@@ -12,8 +12,8 @@ import {
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import {
+  useEffect,
   useState,
-  useSyncExternalStore,
   useTransition,
   type ChangeEvent,
   type FormEvent,
@@ -23,18 +23,18 @@ import {
   bodyTypeOptions,
   budgetRangeOptions,
   commonSizes,
-  defaultQuizValues,
   fitPreferenceOptions,
   occasionOptions,
   stylePreferenceOptions,
 } from "@/data/mock-data";
 import {
   buildResultsSearch,
+  clearStoredQuizAnswers,
   readStoredQuizAnswers,
   writeStoredQuizAnswers,
 } from "@/lib/local-storage";
 import { formatCurrency, formatOptionLabel } from "@/lib/utils";
-import { buildOutfitRecommendations } from "@/utils/outfitMatcher";
+import { buildOutfitRecommendations, emptyQuizAnswers, hasQuizAnswers } from "@/utils/outfitMatcher";
 import type { QuizAnswers } from "@/types";
 
 const quizSteps = [
@@ -100,15 +100,26 @@ function getStepError(stepIndex: number, values: QuizAnswers) {
 
 export function QuizForm() {
   const router = useRouter();
-  const isClient = useSyncExternalStore(() => () => undefined, () => true, () => false);
   const [isPending, startTransition] = useTransition();
+  const [isHydrated, setIsHydrated] = useState(false);
+  const [showSavedBriefPrompt, setShowSavedBriefPrompt] = useState(false);
   const [currentStep, setCurrentStep] = useState(0);
   const [stepError, setStepError] = useState<string | null>(null);
-  const [formValues, setFormValues] = useState<QuizAnswers>(() =>
-    typeof window === "undefined"
-      ? defaultQuizValues
-      : { ...defaultQuizValues, ...(readStoredQuizAnswers() ?? {}) },
-  );
+  const [formValues, setFormValues] = useState<QuizAnswers>(emptyQuizAnswers);
+
+  useEffect(() => {
+    const stored = readStoredQuizAnswers();
+
+    if (stored && hasQuizAnswers(stored)) {
+      setFormValues(stored);
+      setShowSavedBriefPrompt(true);
+    } else {
+      setFormValues(emptyQuizAnswers());
+    }
+
+    setIsHydrated(true);
+  }, []);
+
   const previewLooks = buildOutfitRecommendations(formValues, 3);
   const progress = ((currentStep + 1) / quizSteps.length) * 100;
 
@@ -128,6 +139,18 @@ export function QuizForm() {
   function goToStep(nextStep: number) {
     setStepError(null);
     setCurrentStep(Math.max(0, Math.min(nextStep, quizSteps.length - 1)));
+  }
+
+  function startNewBrief() {
+    clearStoredQuizAnswers();
+    setCurrentStep(0);
+    setStepError(null);
+    setFormValues(emptyQuizAnswers());
+    setShowSavedBriefPrompt(false);
+  }
+
+  function continueSavedBrief() {
+    setShowSavedBriefPrompt(false);
   }
 
   function handleNext() {
@@ -159,7 +182,7 @@ export function QuizForm() {
     });
   }
 
-  if (!isClient) {
+  if (!isHydrated) {
     return (
       <div className="grid gap-6 xl:grid-cols-[0.84fr_1.16fr]">
         <aside className="dark-panel p-6 sm:p-8">
@@ -172,6 +195,68 @@ export function QuizForm() {
             <div className="mt-4 h-12 rounded-[1rem] bg-foreground/6" />
             <div className="mt-3 h-12 rounded-[1rem] bg-foreground/6" />
             <div className="mt-3 h-12 rounded-[1rem] bg-foreground/6" />
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (showSavedBriefPrompt) {
+    return (
+      <div className="grid gap-6 xl:grid-cols-[0.84fr_1.16fr]">
+        <aside className="dark-panel flex flex-col gap-6 p-6 sm:p-8">
+          <div>
+            <p className="eyebrow !mb-0 text-accent-3">Saved brief found</p>
+            <h2 className="mt-4 text-4xl leading-tight text-white sm:text-5xl">
+              Pick up where you left off or start fresh.
+            </h2>
+            <p className="mt-4 max-w-xl text-white/72">
+              FitMuse found a saved style brief in this browser.
+            </p>
+          </div>
+
+          <div className="rounded-[1.7rem] border border-white/12 bg-white/10 p-5">
+            <p className="mini-label !text-white/64">Saved summary</p>
+            <div className="mt-4 flex flex-wrap gap-2">
+              {[formValues.aesthetic, formValues.occasion, formValues.budgetRange, formValues.fitPreference]
+                .filter(Boolean)
+                .map((item) => (
+                  <span key={item} className="rounded-full bg-white/12 px-3 py-2 text-sm text-white/92">
+                    {formatOptionLabel(item)}
+                  </span>
+                ))}
+            </div>
+            <p className="mt-4 text-sm leading-6 text-white/74">
+              {formValues.name ? `${formValues.name}'s saved FitMuse brief is ready to continue.` : "Your saved FitMuse brief is ready to continue."}
+            </p>
+          </div>
+        </aside>
+
+        <div className="glass-panel p-6 sm:p-8">
+          <div className="grid gap-5 lg:grid-cols-2">
+            <button
+              type="button"
+              onClick={continueSavedBrief}
+              className="rounded-[1.8rem] border border-line/70 bg-white/82 p-6 text-left transition hover:-translate-y-0.5 hover:border-accent hover:shadow-[0_18px_36px_rgba(27,21,19,0.08)]"
+            >
+              <p className="mini-label">Recommended</p>
+              <h3 className="mt-3 text-3xl text-foreground">Continue saved brief</h3>
+              <p className="mt-3 text-sm leading-6 text-foreground">
+                Open the saved multi-step quiz with your previous answers already filled in.
+              </p>
+            </button>
+
+            <button
+              type="button"
+              onClick={startNewBrief}
+              className="rounded-[1.8rem] border border-line/70 bg-background/84 p-6 text-left transition hover:-translate-y-0.5 hover:border-accent hover:shadow-[0_18px_36px_rgba(27,21,19,0.08)]"
+            >
+              <p className="mini-label">Fresh start</p>
+              <h3 className="mt-3 text-3xl text-foreground">Start new brief</h3>
+              <p className="mt-3 text-sm leading-6 text-foreground">
+                Clear the saved quiz answers in this browser and begin a new styling brief.
+              </p>
+            </button>
           </div>
         </div>
       </div>
@@ -262,6 +347,16 @@ export function QuizForm() {
             {quizSteps[currentStep].title}
           </h3>
           <p className="mt-4 max-w-2xl">{quizSteps[currentStep].description}</p>
+          <div className="mt-5 flex flex-wrap gap-3">
+            <span className="rounded-full border border-line/70 bg-white/82 px-4 py-2 text-sm text-foreground">
+              {hasQuizAnswers(readStoredQuizAnswers()) ? "Saved brief loaded" : "Fresh brief"}
+            </span>
+            {hasQuizAnswers(readStoredQuizAnswers()) ? (
+              <button type="button" onClick={startNewBrief} className="cta-secondary">
+                Start new brief
+              </button>
+            ) : null}
+          </div>
         </div>
 
         {stepError ? (
