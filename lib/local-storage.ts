@@ -6,6 +6,7 @@ import type {
   Occasion,
   OutfitRecommendation,
   QuizAnswers,
+  SavedLookSnapshot,
   StylePreference,
 } from "@/types";
 
@@ -209,6 +210,75 @@ export function clearSavedLookIds() {
   window.localStorage.removeItem(SAVED_LOOKS_STORAGE_KEY);
 }
 
+function normalizeSavedLookSnapshot(entry: unknown): SavedLookSnapshot | null {
+  if (!entry || typeof entry !== "object") {
+    return null;
+  }
+
+  const savedLook = entry as Partial<SavedLookSnapshot & OutfitRecommendation>;
+
+  if (typeof savedLook.id !== "string" || typeof savedLook.name !== "string") {
+    return null;
+  }
+
+  if (!savedLook.items || !savedLook.colorPalette || !Array.isArray(savedLook.matchReasons)) {
+    return null;
+  }
+
+  return {
+    ...(savedLook as OutfitRecommendation),
+    savedAt:
+      typeof savedLook.savedAt === "string" && savedLook.savedAt
+        ? savedLook.savedAt
+        : new Date().toISOString(),
+    stylePreference:
+      typeof savedLook.stylePreference === "string" ? savedLook.stylePreference : "",
+    briefSummary:
+      savedLook.briefSummary && typeof savedLook.briefSummary === "object"
+        ? {
+            name:
+              typeof savedLook.briefSummary.name === "string"
+                ? savedLook.briefSummary.name
+                : "",
+            stylePreference:
+              typeof savedLook.briefSummary.stylePreference === "string"
+                ? savedLook.briefSummary.stylePreference
+                : "",
+            location:
+              typeof savedLook.briefSummary.location === "string"
+                ? savedLook.briefSummary.location
+                : "",
+            aesthetic:
+              typeof savedLook.briefSummary.aesthetic === "string"
+                ? savedLook.briefSummary.aesthetic
+                : "",
+            occasion:
+              typeof savedLook.briefSummary.occasion === "string"
+                ? savedLook.briefSummary.occasion
+                : "",
+            budgetRange:
+              typeof savedLook.briefSummary.budgetRange === "string"
+                ? savedLook.briefSummary.budgetRange
+                : "",
+            fitPreference:
+              typeof savedLook.briefSummary.fitPreference === "string"
+                ? savedLook.briefSummary.fitPreference
+                : "",
+            preferredColors: Array.isArray(savedLook.briefSummary.preferredColors)
+              ? savedLook.briefSummary.preferredColors.filter(
+                  (value): value is string => typeof value === "string",
+                )
+              : [],
+            storesLike: Array.isArray(savedLook.briefSummary.storesLike)
+              ? savedLook.briefSummary.storesLike.filter(
+                  (value): value is string => typeof value === "string",
+                )
+              : [],
+          }
+        : undefined,
+  };
+}
+
 export function readSavedLooks() {
   if (typeof window === "undefined") {
     return [];
@@ -228,21 +298,22 @@ export function readSavedLooks() {
       return [];
     }
 
-    return parsed.filter((entry): entry is OutfitRecommendation => {
-      if (!entry || typeof entry !== "object") {
-        return false;
-      }
+    const normalized = parsed
+      .map((entry) => normalizeSavedLookSnapshot(entry))
+      .filter(Boolean) as SavedLookSnapshot[];
 
-      const savedLook = entry as Partial<OutfitRecommendation>;
-      return typeof savedLook.id === "string" && typeof savedLook.name === "string";
-    });
+    if (normalized.length !== parsed.length) {
+      window.localStorage.setItem(SAVED_LOOK_DETAILS_STORAGE_KEY, JSON.stringify(normalized));
+    }
+
+    return normalized;
   } catch {
     window.localStorage.removeItem(SAVED_LOOK_DETAILS_STORAGE_KEY);
     return [];
   }
 }
 
-export function writeSavedLooks(looks: OutfitRecommendation[]) {
+export function writeSavedLooks(looks: SavedLookSnapshot[]) {
   if (typeof window === "undefined") {
     return;
   }

@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { SlidersHorizontal, Sparkles } from "lucide-react";
+import { SlidersHorizontal, Sparkles, X } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { RecommendationCard } from "@/components/RecommendationCard";
@@ -16,11 +16,10 @@ import { products } from "@/data/products";
 import {
   clearStoredQuizAnswers,
   normalizeQuizAnswers,
-  readSavedLookIds,
   readSavedLooks,
   readStoredQuizAnswers,
-  writeSavedLooks,
   writeSavedLookIds,
+  writeSavedLooks,
   writeStoredQuizAnswers,
 } from "@/lib/local-storage";
 import { formatCurrency, formatOptionLabel, splitCommaSeparated } from "@/lib/utils";
@@ -33,6 +32,7 @@ import type {
   Occasion,
   OutfitRecommendation,
   QuizAnswers,
+  SavedLookSnapshot,
 } from "@/types";
 
 type ResultsViewProps = {
@@ -148,10 +148,7 @@ function getActiveFilterChips(filters: ResultsFilters) {
   ].filter(Boolean) as Array<{ label: string; value: string }>;
 }
 
-function sortRecommendations(
-  recommendations: OutfitRecommendation[],
-  sort: ResultsSort,
-) {
+function sortRecommendations(recommendations: OutfitRecommendation[], sort: ResultsSort) {
   const sorted = [...recommendations];
 
   sorted.sort((left, right) => {
@@ -181,12 +178,45 @@ function sortRecommendations(
   return sorted;
 }
 
+function buildSavedLookSnapshot(
+  recommendation: OutfitRecommendation,
+  answers: QuizAnswers | null,
+): SavedLookSnapshot {
+  return {
+    ...recommendation,
+    savedAt: new Date().toISOString(),
+    stylePreference: answers?.stylePreference ?? "",
+    briefSummary: {
+      name: answers?.name ?? "",
+      stylePreference: answers?.stylePreference ?? "",
+      location: answers?.location ?? "",
+      aesthetic: answers?.aesthetic ?? "",
+      occasion: answers?.occasion ?? "",
+      budgetRange: answers?.budgetRange ?? "",
+      fitPreference: answers?.fitPreference ?? "",
+      preferredColors: splitCommaSeparated(answers?.preferredColors),
+      storesLike: splitCommaSeparated(answers?.storesLike),
+    },
+  };
+}
+
+function formatSavedAt(savedAt: string) {
+  const date = new Date(savedAt);
+
+  if (Number.isNaN(date.getTime())) {
+    return "Saved recently";
+  }
+
+  return `Saved ${date.toLocaleDateString("en-US", {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+  })}`;
+}
+
 export function ResultsView({ searchParamsObject = {} }: ResultsViewProps) {
   const router = useRouter();
-  const searchSignature = useMemo(
-    () => JSON.stringify(searchParamsObject),
-    [searchParamsObject],
-  );
+  const searchSignature = useMemo(() => JSON.stringify(searchParamsObject), [searchParamsObject]);
   const searchAnswers = useMemo(() => {
     const normalized = normalizeQuizAnswers(
       JSON.parse(searchSignature) as Partial<Record<keyof QuizAnswers, string>>,
@@ -196,11 +226,11 @@ export function ResultsView({ searchParamsObject = {} }: ResultsViewProps) {
   }, [searchSignature]);
 
   const [quizAnswers, setQuizAnswers] = useState<QuizAnswers | null>(searchAnswers);
-  const [savedLookIds, setSavedLookIds] = useState<string[]>([]);
-  const [savedLooks, setSavedLooks] = useState<OutfitRecommendation[]>([]);
+  const [savedLooks, setSavedLooks] = useState<SavedLookSnapshot[]>([]);
   const [filters, setFilters] = useState<ResultsFilters>(buildBaseFilters(searchAnswers));
   const [sort, setSort] = useState<ResultsSort>("best-match");
   const [viewMode, setViewMode] = useState<ResultsViewMode>("all");
+  const [selectedSavedLookId, setSelectedSavedLookId] = useState<string | null>(null);
   const [highlightedLookId, setHighlightedLookId] = useState<string | null>(null);
   const [savedLooksMessage, setSavedLooksMessage] = useState("");
   const [pendingOpenSavedLookId, setPendingOpenSavedLookId] = useState<string | null>(null);
@@ -220,7 +250,6 @@ export function ResultsView({ searchParamsObject = {} }: ResultsViewProps) {
   }, [searchAnswers]);
 
   useEffect(() => {
-    setSavedLookIds(readSavedLookIds());
     setSavedLooks(readSavedLooks());
   }, []);
 
@@ -238,7 +267,6 @@ export function ResultsView({ searchParamsObject = {} }: ResultsViewProps) {
 
     const nextFilters = buildBaseFilters(quizAnswers);
     filtersSeedRef.current = nextKey;
-
     setFilters((current) => (sameFilters(current, nextFilters) ? current : nextFilters));
   }, [
     quizAnswers?.aesthetic,
@@ -301,17 +329,18 @@ export function ResultsView({ searchParamsObject = {} }: ResultsViewProps) {
     [filteredRecommendations, sort],
   );
 
-  const savedRecommendations = useMemo(() => {
-    const hydrated = savedLookIds
-      .map((id) => recommendationLookup.get(id) ?? savedLooks.find((savedLook) => savedLook.id === id))
-      .filter(Boolean) as OutfitRecommendation[];
+  const savedRecommendations = useMemo(
+    () =>
+      [...savedLooks].sort(
+        (left, right) =>
+          new Date(right.savedAt).getTime() - new Date(left.savedAt).getTime(),
+      ),
+    [savedLooks],
+  );
 
-    const uniqueHydrated = Array.from(
-      new Map(hydrated.map((recommendation) => [recommendation.id, recommendation])).values(),
-    );
-
-    return sortRecommendations(uniqueHydrated, "best-match");
-  }, [recommendationLookup, savedLookIds, savedLooks]);
+  const savedLookIds = useMemo(() => savedRecommendations.map((savedLook) => savedLook.id), [
+    savedRecommendations,
+  ]);
 
   const activeFilterChips = getActiveFilterChips(filters);
   const isClosestOnly =
@@ -319,6 +348,21 @@ export function ResultsView({ searchParamsObject = {} }: ResultsViewProps) {
     sortedRecommendations.every((recommendation) => recommendation.matchMode === "closest");
   const preferredColors = splitCommaSeparated(quizAnswers?.preferredColors);
   const preferredStores = splitCommaSeparated(quizAnswers?.storesLike);
+  const selectedSavedLook = useMemo(
+    () =>
+      selectedSavedLookId
+        ? savedRecommendations.find((savedLook) => savedLook.id === selectedSavedLookId) ?? null
+        : null,
+    [savedRecommendations, selectedSavedLookId],
+  );
+  const canViewSelectedSavedLookInCurrentResults = Boolean(
+    selectedSavedLook && recommendationLookup.has(selectedSavedLook.id),
+  );
+
+  function persistSavedLooks(next: SavedLookSnapshot[]) {
+    writeSavedLooks(next);
+    writeSavedLookIds(next.map((savedLook) => savedLook.id));
+  }
 
   function setTemporarySavedLooksMessage(message: string) {
     setSavedLooksMessage(message);
@@ -372,25 +416,27 @@ export function ResultsView({ searchParamsObject = {} }: ResultsViewProps) {
   }
 
   function toggleSave(id: string) {
-    const recommendation = recommendationLookup.get(id);
-
-    setSavedLookIds((current) => {
-      const next = current.includes(id)
-        ? current.filter((savedId) => savedId !== id)
-        : [...current, id];
-
-      writeSavedLookIds(next);
-      return next;
-    });
-
     setSavedLooks((current) => {
-      const next = current.some((savedLook) => savedLook.id === id)
-        ? current.filter((savedLook) => savedLook.id !== id)
-        : recommendation
-          ? [recommendation, ...current.filter((savedLook) => savedLook.id !== id)]
-          : current;
+      const alreadySaved = current.some((savedLook) => savedLook.id === id);
 
-      writeSavedLooks(next);
+      const next = alreadySaved
+        ? current.filter((savedLook) => savedLook.id !== id)
+        : (() => {
+            const recommendation = recommendationLookup.get(id);
+
+            if (!recommendation) {
+              return current;
+            }
+
+            const snapshot = buildSavedLookSnapshot(recommendation, quizAnswers);
+            return [snapshot, ...current.filter((savedLook) => savedLook.id !== id)];
+          })();
+
+      if (alreadySaved && selectedSavedLookId === id) {
+        setSelectedSavedLookId(null);
+      }
+
+      persistSavedLooks(next);
       return next;
     });
   }
@@ -402,50 +448,24 @@ export function ResultsView({ searchParamsObject = {} }: ResultsViewProps) {
     router.push("/quiz");
   }
 
-  function handleOpenSavedLook(recommendationId: string) {
-    setSavedLooksMessage("");
-    setViewMode("all");
-    setPendingOpenSavedLookId(recommendationId);
-
-    const baseFilters = buildBaseFilters(quizAnswers);
-    setFilters((current) => (sameFilters(current, baseFilters) ? current : baseFilters));
+  function handleOpenSavedLook(savedLookId: string) {
+    setSelectedSavedLookId(savedLookId);
   }
 
-  useEffect(() => {
-    if (savedLookIds.length === 0 || recommendationLookup.size === 0) {
+  function handleViewSavedLookInCurrentResults(savedLookId: string) {
+    if (!recommendationLookup.has(savedLookId)) {
+      setTemporarySavedLooksMessage("This saved look is not part of your current results set.");
       return;
     }
 
-    setSavedLooks((current) => {
-      const next = savedLookIds
-        .map((id) => recommendationLookup.get(id) ?? current.find((savedLook) => savedLook.id === id))
-        .filter(Boolean) as OutfitRecommendation[];
-
-      const uniqueNext = Array.from(
-        new Map(next.map((recommendation) => [recommendation.id, recommendation])).values(),
-      );
-
-      const changed =
-        uniqueNext.length !== current.length ||
-        uniqueNext.some((recommendation, index) => {
-          const currentRecommendation = current[index];
-
-          return (
-            recommendation.id !== currentRecommendation?.id ||
-            recommendation.name !== currentRecommendation?.name ||
-            recommendation.totalPrice !== currentRecommendation?.totalPrice ||
-            recommendation.confidenceScore !== currentRecommendation?.confidenceScore
-          );
-        });
-
-      if (!changed) {
-        return current;
-      }
-
-      writeSavedLooks(uniqueNext);
-      return uniqueNext;
+    setSelectedSavedLookId(null);
+    setViewMode("all");
+    setPendingOpenSavedLookId(savedLookId);
+    setFilters((current) => {
+      const next = buildBaseFilters(quizAnswers);
+      return sameFilters(current, next) ? current : next;
     });
-  }, [recommendationLookup, savedLookIds]);
+  }
 
   useEffect(() => {
     if (!pendingOpenSavedLookId || viewMode !== "all") {
@@ -464,11 +484,15 @@ export function ResultsView({ searchParamsObject = {} }: ResultsViewProps) {
       return;
     }
 
-    if (!recommendations.some((recommendation) => recommendation.id === pendingOpenSavedLookId)) {
-      setTemporarySavedLooksMessage("This saved look is not part of your current results set.");
-      setPendingOpenSavedLookId(null);
-    }
+    setTemporarySavedLooksMessage("This saved look is not part of your current results set.");
+    setPendingOpenSavedLookId(null);
   }, [pendingOpenSavedLookId, recommendations, sortedRecommendations, viewMode]);
+
+  useEffect(() => {
+    if (selectedSavedLookId && !savedLooks.some((savedLook) => savedLook.id === selectedSavedLookId)) {
+      setSelectedSavedLookId(null);
+    }
+  }, [savedLooks, selectedSavedLookId]);
 
   useEffect(() => {
     return () => {
@@ -926,30 +950,33 @@ export function ResultsView({ searchParamsObject = {} }: ResultsViewProps) {
           </div>
 
           <div className="mt-6 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-            {savedRecommendations.map((recommendation) => (
+            {savedRecommendations.map((savedLook) => (
               <div
-                key={`saved-${recommendation.id}`}
+                key={`saved-${savedLook.id}-${savedLook.savedAt}`}
                 className="rounded-[1.6rem] border border-line/70 bg-white/82 p-5 shadow-[0_18px_40px_rgba(27,21,19,0.06)]"
               >
                 <div className="flex flex-wrap gap-2">
-                  <span className="chip">{formatOptionLabel(recommendation.aesthetic)}</span>
-                  <span className="chip">{formatOptionLabel(recommendation.occasion)}</span>
+                  <span className="chip">{formatOptionLabel(savedLook.aesthetic)}</span>
+                  <span className="chip">{formatOptionLabel(savedLook.occasion)}</span>
+                  {savedLook.stylePreference ? (
+                    <span className="chip">{formatOptionLabel(savedLook.stylePreference)}</span>
+                  ) : null}
                 </div>
 
                 <div className="mt-4">
-                  <p className="mini-label">{recommendation.matchQualityLabel}</p>
-                  <h3 className="mt-2 text-2xl text-foreground">{recommendation.name}</h3>
+                  <p className="mini-label">{formatSavedAt(savedLook.savedAt)}</p>
+                  <h3 className="mt-2 text-2xl text-foreground">{savedLook.name}</h3>
                 </div>
 
                 <div className="mt-4 flex flex-wrap gap-2">
-                  <span className="chip">{formatCurrency(recommendation.totalPrice)}</span>
-                  <span className="chip">{recommendation.budgetMatchLabel}</span>
+                  <span className="chip">{formatCurrency(savedLook.totalPrice)}</span>
+                  <span className="chip">{savedLook.budgetMatchLabel}</span>
                 </div>
 
                 <div className="mt-4 flex flex-wrap items-center gap-2">
-                  {recommendation.colorPalette.slice(0, 4).map((color) => (
+                  {savedLook.colorPalette.slice(0, 4).map((color) => (
                     <span
-                      key={`${recommendation.id}-${color}`}
+                      key={`${savedLook.id}-${savedLook.savedAt}-${color}`}
                       className="inline-flex items-center gap-2 rounded-full border border-line/70 bg-background/72 px-3 py-2 text-xs font-medium text-foreground"
                     >
                       <span
@@ -964,16 +991,16 @@ export function ResultsView({ searchParamsObject = {} }: ResultsViewProps) {
                 <div className="mt-5 flex flex-wrap gap-3">
                   <button
                     type="button"
-                    onClick={() => handleOpenSavedLook(recommendation.id)}
-                    aria-label={`Open saved look: ${recommendation.name}`}
-                    data-testid={`open-saved-look-${recommendation.id}`}
+                    onClick={() => handleOpenSavedLook(savedLook.id)}
+                    aria-label={`Open saved look: ${savedLook.name}`}
+                    data-testid={`open-saved-look-${savedLook.id}`}
                     className="cta-primary"
                   >
                     Open Look
                   </button>
                   <button
                     type="button"
-                    onClick={() => toggleSave(recommendation.id)}
+                    onClick={() => toggleSave(savedLook.id)}
                     className="cta-secondary"
                   >
                     Unsave
@@ -997,6 +1024,182 @@ export function ResultsView({ searchParamsObject = {} }: ResultsViewProps) {
           </div>
         </div>
       )}
+
+      {selectedSavedLook ? (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#181311]/52 p-4 backdrop-blur-sm">
+          <div className="max-h-[90vh] w-full max-w-3xl overflow-y-auto rounded-[2rem] border border-line/70 bg-background p-6 shadow-[0_30px_80px_rgba(27,21,19,0.28)] sm:p-8">
+            <div className="flex items-start justify-between gap-4">
+              <div>
+                <p className="eyebrow !mb-0">Saved Look</p>
+                <h2 className="mt-3 text-3xl text-foreground sm:text-4xl">{selectedSavedLook.name}</h2>
+                <p className="mt-3 text-sm text-muted">{formatSavedAt(selectedSavedLook.savedAt)}</p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setSelectedSavedLookId(null)}
+                className="rounded-full border border-line/70 bg-white/82 p-3 text-foreground"
+                aria-label="Close saved look details"
+              >
+                <X size={18} />
+              </button>
+            </div>
+
+            <div className="mt-5 flex flex-wrap gap-2">
+              <span className="chip">{formatOptionLabel(selectedSavedLook.aesthetic)}</span>
+              <span className="chip">{formatOptionLabel(selectedSavedLook.occasion)}</span>
+              {selectedSavedLook.stylePreference ? (
+                <span className="chip">{formatOptionLabel(selectedSavedLook.stylePreference)}</span>
+              ) : null}
+              <span className="chip">{selectedSavedLook.budgetMatchLabel}</span>
+            </div>
+
+            <div className="mt-6 grid gap-4 sm:grid-cols-3">
+              <div className="rounded-[1.4rem] border border-line/70 bg-white/82 p-4">
+                <p className="mini-label">Total price</p>
+                <p className="mt-2 text-xl text-foreground">{formatCurrency(selectedSavedLook.totalPrice)}</p>
+              </div>
+              <div className="rounded-[1.4rem] border border-line/70 bg-white/82 p-4">
+                <p className="mini-label">Confidence</p>
+                <p className="mt-2 text-xl text-foreground">{selectedSavedLook.confidenceScore}%</p>
+              </div>
+              <div className="rounded-[1.4rem] border border-line/70 bg-white/82 p-4">
+                <p className="mini-label">Saved from brief</p>
+                <p className="mt-2 text-sm text-foreground">
+                  {selectedSavedLook.briefSummary?.aesthetic
+                    ? `${formatOptionLabel(selectedSavedLook.briefSummary.aesthetic)} / ${formatOptionLabel(selectedSavedLook.briefSummary.occasion || "")}`
+                    : "Saved from a previous FitMuse brief"}
+                </p>
+              </div>
+            </div>
+
+            <div className="mt-6 rounded-[1.5rem] border border-line/70 bg-white/78 p-5">
+              <p className="mini-label">Color palette</p>
+              <div className="mt-4 flex flex-wrap gap-2">
+                {selectedSavedLook.colorPalette.map((color) => (
+                  <span
+                    key={`modal-${selectedSavedLook.id}-${color}`}
+                    className="inline-flex items-center gap-2 rounded-full border border-line/70 bg-background/72 px-3 py-2 text-xs font-medium text-foreground"
+                  >
+                    <span
+                      className="h-3 w-3 rounded-full border border-black/10"
+                      style={{ backgroundColor: savedColorMap[color.toLowerCase()] ?? "#ddd2bf" }}
+                    />
+                    {formatOptionLabel(color)}
+                  </span>
+                ))}
+              </div>
+            </div>
+
+            <div className="mt-6 grid gap-3">
+              {(
+                [
+                  { label: "Top", value: selectedSavedLook.items.top.name },
+                  { label: "Bottom", value: selectedSavedLook.items.bottom.name },
+                  { label: "Shoes", value: selectedSavedLook.items.shoes.name },
+                  { label: "Accessory", value: selectedSavedLook.items.accessory.name },
+                  selectedSavedLook.items.outerwear
+                    ? { label: "Outerwear", value: selectedSavedLook.items.outerwear.name }
+                    : null,
+                ].filter(Boolean) as Array<{ label: string; value: string }>
+              ).map((item) => (
+                  <div
+                    key={item.label}
+                    className="flex items-center justify-between gap-3 rounded-[1.3rem] border border-line/70 bg-white/78 px-4 py-3"
+                  >
+                    <p className="mini-label">{item.label}</p>
+                    <p className="text-right text-sm text-foreground">{item.value}</p>
+                  </div>
+                ))}
+            </div>
+
+            <div className="mt-6 grid gap-4 md:grid-cols-2">
+              <div className="rounded-[1.5rem] border border-line/70 bg-white/78 p-5">
+                <p className="mini-label">Fit note</p>
+                <p className="mt-3 text-sm leading-6 text-foreground">{selectedSavedLook.fitNote}</p>
+              </div>
+              <div className="rounded-[1.5rem] border border-line/70 bg-white/78 p-5">
+                <p className="mini-label">Why it works</p>
+                <p className="mt-3 text-sm leading-6 text-foreground">{selectedSavedLook.whyItWorks}</p>
+              </div>
+            </div>
+
+            <div className="mt-6 rounded-[1.5rem] border border-line/70 bg-white/78 p-5">
+              <p className="mini-label">Creator use case</p>
+              <p className="mt-3 text-sm leading-6 text-foreground">{selectedSavedLook.creatorUseCase}</p>
+            </div>
+
+            <div className="mt-6 rounded-[1.5rem] border border-line/70 bg-white/78 p-5">
+              <p className="mini-label">Match reasons</p>
+              <div className="mt-3 flex flex-wrap gap-2">
+                {selectedSavedLook.matchReasons.map((reason) => (
+                  <span key={`${selectedSavedLook.id}-${reason}`} className="chip">
+                    {reason}
+                  </span>
+                ))}
+              </div>
+            </div>
+
+            {selectedSavedLook.briefSummary ? (
+              <div className="mt-6 rounded-[1.5rem] border border-line/70 bg-white/78 p-5">
+                <p className="mini-label">Original brief snapshot</p>
+                <div className="mt-3 flex flex-wrap gap-2">
+                  {selectedSavedLook.briefSummary.stylePreference ? (
+                    <span className="chip">
+                      {formatOptionLabel(selectedSavedLook.briefSummary.stylePreference)}
+                    </span>
+                  ) : null}
+                  {selectedSavedLook.briefSummary.aesthetic ? (
+                    <span className="chip">
+                      {formatOptionLabel(selectedSavedLook.briefSummary.aesthetic)}
+                    </span>
+                  ) : null}
+                  {selectedSavedLook.briefSummary.occasion ? (
+                    <span className="chip">
+                      {formatOptionLabel(selectedSavedLook.briefSummary.occasion)}
+                    </span>
+                  ) : null}
+                  {selectedSavedLook.briefSummary.budgetRange ? (
+                    <span className="chip">
+                      {formatOptionLabel(selectedSavedLook.briefSummary.budgetRange)}
+                    </span>
+                  ) : null}
+                  {selectedSavedLook.briefSummary.fitPreference ? (
+                    <span className="chip">
+                      {formatOptionLabel(selectedSavedLook.briefSummary.fitPreference)}
+                    </span>
+                  ) : null}
+                </div>
+              </div>
+            ) : null}
+
+            <div className="mt-8 flex flex-wrap gap-3">
+              <button
+                type="button"
+                onClick={() => setSelectedSavedLookId(null)}
+                className="cta-secondary"
+              >
+                Close
+              </button>
+              <button
+                type="button"
+                onClick={() => toggleSave(selectedSavedLook.id)}
+                className="cta-secondary"
+              >
+                Unsave
+              </button>
+              {canViewSelectedSavedLookInCurrentResults ? (
+                <button
+                  type="button"
+                  onClick={() => handleViewSavedLookInCurrentResults(selectedSavedLook.id)}
+                  className="cta-primary"
+                >
+                  View in current results
+                </button>
+              ) : null}
+            </div>
+          </div>
+        </div>
+      ) : null}
     </section>
   );
 }

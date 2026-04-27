@@ -182,6 +182,24 @@ export type OutfitRecommendation = {
   shopUrl: string;
 };
 
+export type SavedLookBriefSummary = {
+  name?: string;
+  stylePreference?: StylePreference | "";
+  location?: string;
+  aesthetic?: Aesthetic | "";
+  occasion?: Occasion | "";
+  budgetRange?: BudgetRange | "";
+  fitPreference?: FitPreference | "";
+  preferredColors?: string[];
+  storesLike?: string[];
+};
+
+export type SavedLookSnapshot = OutfitRecommendation & {
+  savedAt: string;
+  stylePreference?: StylePreference | "";
+  briefSummary?: SavedLookBriefSummary;
+};
+
 export type Outfit = {
   id: string;
   name: string;
