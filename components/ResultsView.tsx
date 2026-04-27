@@ -40,6 +40,7 @@ type ResultsViewProps = {
 };
 
 type ResultsSort = "best-match" | "lowest-price" | "highest-confidence" | "creator-ready";
+type ResultsViewMode = "all" | "saved";
 
 type ResultsFilters = {
   aesthetic: Aesthetic | "";
@@ -76,6 +77,33 @@ const sortOptions: Array<{ value: ResultsSort; label: string }> = [
   { value: "highest-confidence", label: "Highest confidence" },
   { value: "creator-ready", label: "Creator-ready" },
 ];
+
+const savedColorMap: Record<string, string> = {
+  cream: "#efe3d1",
+  camel: "#be9774",
+  espresso: "#5e4438",
+  charcoal: "#43444a",
+  stone: "#b4aa9c",
+  silver: "#c8cdd6",
+  taupe: "#9a8475",
+  black: "#1d1919",
+  white: "#f8f4ee",
+  sage: "#90a393",
+  oatmeal: "#d8cfbe",
+  blue: "#6782a1",
+  navy: "#35445d",
+  slate: "#70808d",
+  "soft white": "#f1ece5",
+  beige: "#d9ccb7",
+  tan: "#c09268",
+  gold: "#d4b36b",
+  plum: "#7a4e66",
+  olive: "#68745d",
+  bone: "#e7ddd1",
+  sand: "#cab49a",
+  chocolate: "#6c5244",
+  ecru: "#e7dcc7",
+};
 
 function buildBaseFilters(answers: QuizAnswers | null): ResultsFilters {
   return {
@@ -166,11 +194,13 @@ export function ResultsView({ searchParamsObject = {} }: ResultsViewProps) {
 
     return hasQuizAnswers(normalized) ? normalized : null;
   }, [searchSignature]);
+
   const [quizAnswers, setQuizAnswers] = useState<QuizAnswers | null>(searchAnswers);
   const [savedLookIds, setSavedLookIds] = useState<string[]>([]);
   const [savedLooks, setSavedLooks] = useState<OutfitRecommendation[]>([]);
   const [filters, setFilters] = useState<ResultsFilters>(buildBaseFilters(searchAnswers));
   const [sort, setSort] = useState<ResultsSort>("best-match");
+  const [viewMode, setViewMode] = useState<ResultsViewMode>("all");
   const [highlightedLookId, setHighlightedLookId] = useState<string | null>(null);
   const [savedLooksMessage, setSavedLooksMessage] = useState("");
   const [pendingOpenSavedLookId, setPendingOpenSavedLookId] = useState<string | null>(null);
@@ -238,6 +268,7 @@ export function ResultsView({ searchParamsObject = {} }: ResultsViewProps) {
     () => (effectiveAnswers ? buildOutfitRecommendations(effectiveAnswers, 10) : []),
     [effectiveAnswers],
   );
+
   const recommendationLookup = useMemo(
     () => new Map(recommendations.map((recommendation) => [recommendation.id, recommendation])),
     [recommendations],
@@ -373,20 +404,11 @@ export function ResultsView({ searchParamsObject = {} }: ResultsViewProps) {
 
   function handleOpenSavedLook(recommendationId: string) {
     setSavedLooksMessage("");
+    setViewMode("all");
+    setPendingOpenSavedLookId(recommendationId);
 
-    if (highlightLookCard(recommendationId)) {
-      return;
-    }
-
-    if (recommendations.some((recommendation) => recommendation.id === recommendationId)) {
-      const baseFilters = buildBaseFilters(quizAnswers);
-      setPendingOpenSavedLookId(recommendationId);
-      setFilters((current) => (sameFilters(current, baseFilters) ? current : baseFilters));
-      setTemporarySavedLooksMessage("Cleared filters to reopen your saved look.");
-      return;
-    }
-
-    setTemporarySavedLooksMessage("This saved look is not part of your current results set.");
+    const baseFilters = buildBaseFilters(quizAnswers);
+    setFilters((current) => (sameFilters(current, baseFilters) ? current : baseFilters));
   }
 
   useEffect(() => {
@@ -426,18 +448,27 @@ export function ResultsView({ searchParamsObject = {} }: ResultsViewProps) {
   }, [recommendationLookup, savedLookIds]);
 
   useEffect(() => {
-    if (!pendingOpenSavedLookId) {
+    if (!pendingOpenSavedLookId || viewMode !== "all") {
       return;
     }
 
-    if (!sortedRecommendations.some((recommendation) => recommendation.id === pendingOpenSavedLookId)) {
+    if (sortedRecommendations.some((recommendation) => recommendation.id === pendingOpenSavedLookId)) {
+      if (highlightLookCard(pendingOpenSavedLookId)) {
+        setPendingOpenSavedLookId(null);
+      }
+
       return;
     }
 
-    if (highlightLookCard(pendingOpenSavedLookId)) {
+    if (recommendations.length === 0) {
+      return;
+    }
+
+    if (!recommendations.some((recommendation) => recommendation.id === pendingOpenSavedLookId)) {
+      setTemporarySavedLooksMessage("This saved look is not part of your current results set.");
       setPendingOpenSavedLookId(null);
     }
-  }, [pendingOpenSavedLookId, sortedRecommendations]);
+  }, [pendingOpenSavedLookId, recommendations, sortedRecommendations, viewMode]);
 
   useEffect(() => {
     return () => {
@@ -474,301 +505,471 @@ export function ResultsView({ searchParamsObject = {} }: ResultsViewProps) {
 
   return (
     <section className="grid gap-6">
-      <div className="grid gap-6 xl:grid-cols-[0.9fr_1.1fr]">
-        <motion.div
-          initial={{ opacity: 0, y: 18 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
-          className="dark-panel flex h-full flex-col gap-6 p-6 sm:p-8"
-        >
+      <div className="glass-panel p-4 sm:p-5">
+        <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
           <div>
-            <p className="eyebrow !mb-0 text-accent-3">Your Style Brief</p>
-            <h1 className="mt-4 text-4xl leading-tight text-white sm:text-5xl">
-              Styled for:{" "}
-              {[quizAnswers.aesthetic, quizAnswers.occasion, quizAnswers.budgetRange]
-                .filter(Boolean)
-                .map(formatOptionLabel)
-                .join(" • ")}
+            <p className="eyebrow !mb-0">Results</p>
+            <h1 className="mt-3 text-3xl text-foreground sm:text-4xl">
+              {viewMode === "all" ? "All Looks" : "Saved Looks"}
             </h1>
-            <p className="mt-4 max-w-2xl text-white/72">
-              {quizAnswers.fitPreference
-                ? `FitMuse is ranking looks around your ${formatOptionLabel(quizAnswers.fitPreference)} fit preference.`
-                : "FitMuse is prioritizing creator-ready looks around your style brief."}
+            <p className="mt-2 max-w-2xl text-sm leading-6 text-muted">
+              {viewMode === "all"
+                ? "Browse your ranked outfit recommendations, then save the looks worth comparing later."
+                : "Looks you saved in this browser."}
             </p>
+          </div>
 
-            <div className="mt-5 grid gap-3 sm:grid-cols-2">
-              {[
-                { label: "Aesthetic", value: quizAnswers.aesthetic || "Open" },
-                { label: "Occasion", value: quizAnswers.occasion || "Open" },
-                { label: "Budget", value: quizAnswers.budgetRange || "Flexible" },
-                { label: "Fit preference", value: quizAnswers.fitPreference || "Open" },
-              ].map((item) => (
-                <div key={item.label} className="rounded-[1.35rem] border border-white/12 bg-white/10 p-4">
-                  <p className="mini-label !text-white/62">{item.label}</p>
-                  <p className="mt-2 text-sm text-white/92">{formatOptionLabel(item.value)}</p>
+          <div className="inline-flex w-full rounded-full border border-line/70 bg-background/72 p-1 sm:w-auto">
+            <button
+              type="button"
+              onClick={() => setViewMode("all")}
+              className={`flex-1 rounded-full px-4 py-3 text-sm font-semibold transition sm:flex-none ${
+                viewMode === "all"
+                  ? "bg-foreground text-white shadow-[0_10px_24px_rgba(27,21,19,0.14)]"
+                  : "text-foreground"
+              }`}
+            >
+              All Looks
+            </button>
+            <button
+              type="button"
+              onClick={() => setViewMode("saved")}
+              className={`flex-1 rounded-full px-4 py-3 text-sm font-semibold transition sm:flex-none ${
+                viewMode === "saved"
+                  ? "bg-foreground text-white shadow-[0_10px_24px_rgba(27,21,19,0.14)]"
+                  : "text-foreground"
+              }`}
+            >
+              Saved Looks
+              <span
+                className={`ml-2 rounded-full px-2 py-0.5 text-[11px] font-semibold ${
+                  viewMode === "saved" ? "bg-white/18 text-white" : "bg-white text-foreground"
+                }`}
+              >
+                {savedRecommendations.length}
+              </span>
+            </button>
+          </div>
+        </div>
+
+        <div className="mt-4 flex flex-wrap gap-2">
+          <span className="pill">
+            {savedRecommendations.length} saved {savedRecommendations.length === 1 ? "look" : "looks"}
+          </span>
+          {viewMode === "all" ? (
+            <span className="pill">{sortedRecommendations.length} ranked recommendations</span>
+          ) : null}
+        </div>
+
+        <div aria-live="polite" className="mt-4 min-h-6">
+          {savedLooksMessage ? (
+            <p className="text-sm font-medium text-accent-2">{savedLooksMessage}</p>
+          ) : null}
+        </div>
+      </div>
+
+      {viewMode === "all" ? (
+        <>
+          <div className="grid gap-6 xl:grid-cols-[0.9fr_1.1fr]">
+            <motion.div
+              initial={{ opacity: 0, y: 18 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
+              className="dark-panel flex h-full flex-col gap-6 p-6 sm:p-8"
+            >
+              <div>
+                <p className="eyebrow !mb-0 text-accent-3">Your Style Brief</p>
+                <h2 className="mt-4 text-4xl leading-tight text-white sm:text-5xl">
+                  Styled for:{" "}
+                  {[quizAnswers.aesthetic, quizAnswers.occasion, quizAnswers.budgetRange]
+                    .filter(Boolean)
+                    .map(formatOptionLabel)
+                    .join(" / ")}
+                </h2>
+                <p className="mt-4 max-w-2xl text-white/72">
+                  {quizAnswers.fitPreference
+                    ? `FitMuse is ranking looks around your ${formatOptionLabel(quizAnswers.fitPreference)} fit preference.`
+                    : "FitMuse is prioritizing creator-ready looks around your style brief."}
+                </p>
+
+                <div className="mt-5 grid gap-3 sm:grid-cols-2">
+                  {[
+                    { label: "Aesthetic", value: quizAnswers.aesthetic || "Open" },
+                    { label: "Occasion", value: quizAnswers.occasion || "Open" },
+                    { label: "Budget", value: quizAnswers.budgetRange || "Flexible" },
+                    { label: "Fit preference", value: quizAnswers.fitPreference || "Open" },
+                  ].map((item) => (
+                    <div key={item.label} className="rounded-[1.35rem] border border-white/12 bg-white/10 p-4">
+                      <p className="mini-label !text-white/62">{item.label}</p>
+                      <p className="mt-2 text-sm text-white/92">{formatOptionLabel(item.value)}</p>
+                    </div>
+                  ))}
                 </div>
-              ))}
-            </div>
-          </div>
-
-          <div className="grid gap-3 sm:grid-cols-2">
-            {[
-              { label: "Style preference", value: quizAnswers.stylePreference || "Open" },
-              { label: "Location", value: quizAnswers.location || "Not set" },
-              { label: "Top / bottom", value: `${quizAnswers.topSize || "?"} / ${quizAnswers.bottomSize || "?"}` },
-              { label: "Shoe size", value: quizAnswers.shoeSize || "Not set" },
-            ].map((item) => (
-              <div key={item.label} className="rounded-[1.35rem] border border-white/12 bg-white/10 p-4">
-                <p className="mini-label !text-white/62">{item.label}</p>
-                <p className="mt-2 text-sm text-white/92">{formatOptionLabel(item.value)}</p>
               </div>
-            ))}
+
+              <div className="grid gap-3 sm:grid-cols-2">
+                {[
+                  { label: "Style preference", value: quizAnswers.stylePreference || "Open" },
+                  { label: "Location", value: quizAnswers.location || "Not set" },
+                  {
+                    label: "Top / bottom",
+                    value: `${quizAnswers.topSize || "?"} / ${quizAnswers.bottomSize || "?"}`,
+                  },
+                  { label: "Shoe size", value: quizAnswers.shoeSize || "Not set" },
+                ].map((item) => (
+                  <div key={item.label} className="rounded-[1.35rem] border border-white/12 bg-white/10 p-4">
+                    <p className="mini-label !text-white/62">{item.label}</p>
+                    <p className="mt-2 text-sm text-white/92">{formatOptionLabel(item.value)}</p>
+                  </div>
+                ))}
+              </div>
+
+              <div className="rounded-[1.5rem] border border-white/12 bg-white/8 p-5">
+                <p className="mini-label !text-white/62">Color + store direction</p>
+                <div className="mt-4 flex flex-wrap gap-2">
+                  {(preferredColors.length > 0 ? preferredColors.slice(0, 4) : ["Open palette"]).map(
+                    (color) => (
+                      <span key={color} className="rounded-full bg-white/12 px-3 py-2 text-sm text-white/92">
+                        {formatOptionLabel(color)}
+                      </span>
+                    ),
+                  )}
+                </div>
+                <p className="mt-4 text-sm leading-6 text-white/72">
+                  {quizAnswers.storesLike
+                    ? `Preferred stores: ${quizAnswers.storesLike}.`
+                    : "No store lock-in yet, so FitMuse is mixing the strongest mock products across the catalog."}
+                </p>
+                <div className="mt-4 flex flex-wrap gap-2">
+                  {(preferredStores.length > 0 ? preferredStores.slice(0, 4) : ["Any store"]).map(
+                    (store) => (
+                      <span key={store} className="rounded-full bg-black/12 px-3 py-2 text-sm text-white/88">
+                        {store === "Any store" ? store : `Store: ${store}`}
+                      </span>
+                    ),
+                  )}
+                </div>
+              </div>
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0, y: 18 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.04, ease: [0.22, 1, 0.36, 1] }}
+              className="glass-panel p-6 sm:p-8"
+            >
+              <div className="flex flex-wrap items-start justify-between gap-4">
+                <div>
+                  <p className="eyebrow !mb-0">Refine your pack</p>
+                  <h2 className="mt-3 text-4xl text-foreground">Tune the recommendation mix.</h2>
+                  <p className="mt-3 max-w-2xl">
+                    Adjust the aesthetic, occasion, spend cap, store, or color-family direction without rebuilding your whole quiz.
+                  </p>
+                </div>
+                <button type="button" onClick={handleStartNewQuiz} className="cta-secondary">
+                  Start New Quiz
+                </button>
+              </div>
+
+              <div className="mt-6 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+                <div>
+                  <label htmlFor="results-aesthetic" className="mini-label">
+                    Aesthetic
+                  </label>
+                  <select
+                    id="results-aesthetic"
+                    value={filters.aesthetic}
+                    onChange={(event) =>
+                      handleFilterChange("aesthetic", event.target.value as ResultsFilters["aesthetic"])
+                    }
+                    className="filter-select mt-2"
+                  >
+                    <option value="">Any aesthetic</option>
+                    {allAestheticOptions.map((option) => (
+                      <option key={option} value={option}>
+                        {formatOptionLabel(option)}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div>
+                  <label htmlFor="results-occasion" className="mini-label">
+                    Occasion
+                  </label>
+                  <select
+                    id="results-occasion"
+                    value={filters.occasion}
+                    onChange={(event) =>
+                      handleFilterChange("occasion", event.target.value as ResultsFilters["occasion"])
+                    }
+                    className="filter-select mt-2"
+                  >
+                    <option value="">Any occasion</option>
+                    {allOccasionOptions.map((option) => (
+                      <option key={option} value={option}>
+                        {formatOptionLabel(option)}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div>
+                  <label htmlFor="results-budget" className="mini-label">
+                    Max budget
+                  </label>
+                  <select
+                    id="results-budget"
+                    value={filters.maxBudget}
+                    onChange={(event) =>
+                      handleFilterChange("maxBudget", event.target.value as ResultsFilters["maxBudget"])
+                    }
+                    className="filter-select mt-2"
+                  >
+                    <option value="">Flexible</option>
+                    {budgetRangeOptions.map((option) => (
+                      <option key={option} value={option}>
+                        {formatOptionLabel(option)}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div>
+                  <label htmlFor="results-fit" className="mini-label">
+                    Fit
+                  </label>
+                  <select
+                    id="results-fit"
+                    value={filters.fit}
+                    onChange={(event) =>
+                      handleFilterChange("fit", event.target.value as ResultsFilters["fit"])
+                    }
+                    className="filter-select mt-2"
+                  >
+                    <option value="">Any fit</option>
+                    {fitPreferenceOptions.map((option) => (
+                      <option key={option} value={option}>
+                        {formatOptionLabel(option)}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div>
+                  <label htmlFor="results-store" className="mini-label">
+                    Store
+                  </label>
+                  <select
+                    id="results-store"
+                    value={filters.store}
+                    onChange={(event) => handleFilterChange("store", event.target.value)}
+                    className="filter-select mt-2"
+                  >
+                    <option value="">Any store</option>
+                    {allStoreOptions.map((option) => (
+                      <option key={option} value={option}>
+                        {option}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div>
+                  <label htmlFor="results-color-family" className="mini-label">
+                    Color family
+                  </label>
+                  <select
+                    id="results-color-family"
+                    value={filters.colorFamily}
+                    onChange={(event) =>
+                      handleFilterChange("colorFamily", event.target.value as ResultsFilters["colorFamily"])
+                    }
+                    className="filter-select mt-2"
+                  >
+                    <option value="">Any color family</option>
+                    {allColorFamilyOptions.map((option) => (
+                      <option key={option} value={option}>
+                        {formatOptionLabel(option)}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+
+              <div className="mt-6 flex flex-wrap items-center gap-3">
+                <span className="pill">
+                  <SlidersHorizontal size={14} />
+                  {activeFilterChips.length} active filters
+                </span>
+                {activeFilterChips.map((chip) => (
+                  <span key={`${chip.label}-${chip.value}`} className="chip">
+                    {chip.label}: {chip.value}
+                  </span>
+                ))}
+                <button type="button" onClick={resetFiltersToBrief} className="cta-secondary">
+                  Reset to brief
+                </button>
+              </div>
+
+              <div className="mt-6 rounded-[1.5rem] border border-line/70 bg-background/70 p-4 sm:p-5">
+                <div className="flex flex-wrap items-center justify-between gap-3">
+                  <div>
+                    <p className="mini-label">Sort looks</p>
+                    <p className="mt-2 text-sm text-foreground">
+                      Keep the grid focused on the kind of result you want first.
+                    </p>
+                  </div>
+                  <select
+                    value={sort}
+                    onChange={(event) => setSort(event.target.value as ResultsSort)}
+                    className="filter-select max-w-xs"
+                  >
+                    {sortOptions.map((option) => (
+                      <option key={option.value} value={option.value}>
+                        {option.label}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+            </motion.div>
           </div>
 
-          <div className="rounded-[1.5rem] border border-white/12 bg-white/8 p-5">
-            <p className="mini-label !text-white/62">Color + store direction</p>
-            <div className="mt-4 flex flex-wrap gap-2">
-              {(preferredColors.length > 0
-                ? preferredColors.slice(0, 4)
-                : ["Open palette"]
-              ).map((color) => (
-                <span key={color} className="rounded-full bg-white/12 px-3 py-2 text-sm text-white/92">
-                  {formatOptionLabel(color)}
+          {isClosestOnly ? (
+            <div className="soft-card">
+              <div className="flex items-start gap-3">
+                <span className="mt-1 rounded-full bg-accent-4 p-3 text-accent-2">
+                  <Sparkles size={18} />
                 </span>
-              ))}
+                <div>
+                  <p className="mini-label">Closest matches</p>
+                  <h2 className="mt-3 text-3xl text-foreground">
+                    No perfect match yet - these are the closest looks to your style brief.
+                  </h2>
+                  <p className="mt-3 max-w-3xl">
+                    FitMuse is still prioritizing the strongest aesthetic, budget, and color overlap instead of leaving you with a blank page.
+                  </p>
+                </div>
+              </div>
             </div>
-            <p className="mt-4 text-sm leading-6 text-white/72">
-              {quizAnswers.storesLike
-                ? `Preferred stores: ${quizAnswers.storesLike}.`
-                : "No store lock-in yet, so FitMuse is mixing the strongest mock products across the catalog."}
-            </p>
-            <div className="mt-4 flex flex-wrap gap-2">
-              {(preferredStores.length > 0 ? preferredStores.slice(0, 4) : ["Any store"]).map((store) => (
-                <span key={store} className="rounded-full bg-black/12 px-3 py-2 text-sm text-white/88">
-                  {store === "Any store" ? store : `Store: ${store}`}
-                </span>
-              ))}
-            </div>
-          </div>
-        </motion.div>
+          ) : null}
 
-        <motion.div
-          initial={{ opacity: 0, y: 18 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.04, ease: [0.22, 1, 0.36, 1] }}
-          className="glass-panel p-6 sm:p-8"
-        >
-          <div className="flex flex-wrap items-start justify-between gap-4">
+          <div className="flex flex-wrap items-end justify-between gap-4">
             <div>
-              <p className="eyebrow !mb-0">Refine your pack</p>
-              <h2 className="mt-3 text-4xl text-foreground">Tune the recommendation mix.</h2>
+              <p className="eyebrow !mb-0">Results</p>
+              <h2 className="mt-3 text-4xl text-foreground">
+                {sortedRecommendations.length} creator-ready{" "}
+                {sortedRecommendations.length === 1 ? "look" : "looks"} ranked for your brief.
+              </h2>
               <p className="mt-3 max-w-2xl">
-                Adjust the aesthetic, occasion, spend cap, store, or color-family direction without rebuilding your whole quiz.
+                The engine is balancing fit, occasion, colors, stores, and spend range using the current mock catalog.
               </p>
             </div>
-            <button type="button" onClick={handleStartNewQuiz} className="cta-secondary">
-              Start New Quiz
+            <div className="flex flex-wrap gap-2">
+              <span className="pill">{sortOptions.find((option) => option.value === sort)?.label}</span>
+              {filters.maxBudget ? <span className="pill">{formatOptionLabel(filters.maxBudget)}</span> : null}
+            </div>
+          </div>
+
+          {sortedRecommendations.length === 0 ? (
+            <div className="glass-panel p-6 sm:p-8">
+              <p className="mini-label">No looks in current filter mix</p>
+              <h2 className="mt-3 text-4xl text-foreground">Try widening one filter to bring more looks back.</h2>
+              <p className="mt-4 max-w-2xl">
+                The recommendation engine still has mock inventory, but the current combination of store, color family, fit, and budget is too narrow.
+              </p>
+              <div className="mt-6">
+                <button type="button" onClick={resetFiltersToBrief} className="cta-primary">
+                  Reset to brief
+                </button>
+              </div>
+            </div>
+          ) : (
+            <>
+              <div className="grid gap-6 xl:grid-cols-2">
+                {sortedRecommendations.map((recommendation) => (
+                  <RecommendationCard
+                    key={recommendation.id}
+                    cardId={`look-${recommendation.id}`}
+                    highlighted={highlightedLookId === recommendation.id}
+                    recommendation={recommendation}
+                    saved={savedLookIds.includes(recommendation.id)}
+                    onToggleSave={toggleSave}
+                  />
+                ))}
+              </div>
+
+              <div className="rounded-[1.4rem] border border-line/70 bg-white/74 px-5 py-4">
+                <p className="text-sm leading-6 text-muted">
+                  FitMuse currently uses mock outfit data for demo purposes. Real product links and affiliate shopping feeds can be connected in a future version.
+                </p>
+              </div>
+            </>
+          )}
+        </>
+      ) : savedRecommendations.length > 0 ? (
+        <div className="hero-card p-5 sm:p-6">
+          <div className="flex flex-wrap items-start justify-between gap-4">
+            <div>
+              <p className="eyebrow !mb-0">Saved Looks</p>
+              <h2 className="mt-3 text-4xl text-foreground">
+                {savedRecommendations.length} saved {savedRecommendations.length === 1 ? "look" : "looks"}.
+              </h2>
+              <p className="mt-3 max-w-2xl text-sm leading-6 text-muted">
+                Looks you saved in this browser.
+              </p>
+            </div>
+            <button type="button" onClick={() => setViewMode("all")} className="cta-secondary">
+              View Recommendations
             </button>
           </div>
 
           <div className="mt-6 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-            <div>
-              <label htmlFor="results-aesthetic" className="mini-label">
-                Aesthetic
-              </label>
-              <select
-                id="results-aesthetic"
-                value={filters.aesthetic}
-                onChange={(event) =>
-                  handleFilterChange("aesthetic", event.target.value as ResultsFilters["aesthetic"])
-                }
-                className="filter-select mt-2"
-              >
-                <option value="">Any aesthetic</option>
-                {allAestheticOptions.map((option) => (
-                  <option key={option} value={option}>
-                    {formatOptionLabel(option)}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            <div>
-              <label htmlFor="results-occasion" className="mini-label">
-                Occasion
-              </label>
-              <select
-                id="results-occasion"
-                value={filters.occasion}
-                onChange={(event) =>
-                  handleFilterChange("occasion", event.target.value as ResultsFilters["occasion"])
-                }
-                className="filter-select mt-2"
-              >
-                <option value="">Any occasion</option>
-                {allOccasionOptions.map((option) => (
-                  <option key={option} value={option}>
-                    {formatOptionLabel(option)}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            <div>
-              <label htmlFor="results-budget" className="mini-label">
-                Max budget
-              </label>
-              <select
-                id="results-budget"
-                value={filters.maxBudget}
-                onChange={(event) =>
-                  handleFilterChange("maxBudget", event.target.value as ResultsFilters["maxBudget"])
-                }
-                className="filter-select mt-2"
-              >
-                <option value="">Flexible</option>
-                {budgetRangeOptions.map((option) => (
-                  <option key={option} value={option}>
-                    {formatOptionLabel(option)}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            <div>
-              <label htmlFor="results-fit" className="mini-label">
-                Fit
-              </label>
-              <select
-                id="results-fit"
-                value={filters.fit}
-                onChange={(event) =>
-                  handleFilterChange("fit", event.target.value as ResultsFilters["fit"])
-                }
-                className="filter-select mt-2"
-              >
-                <option value="">Any fit</option>
-                {fitPreferenceOptions.map((option) => (
-                  <option key={option} value={option}>
-                    {formatOptionLabel(option)}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            <div>
-              <label htmlFor="results-store" className="mini-label">
-                Store
-              </label>
-              <select
-                id="results-store"
-                value={filters.store}
-                onChange={(event) => handleFilterChange("store", event.target.value)}
-                className="filter-select mt-2"
-              >
-                <option value="">Any store</option>
-                {allStoreOptions.map((option) => (
-                  <option key={option} value={option}>
-                    {option}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            <div>
-              <label htmlFor="results-color-family" className="mini-label">
-                Color family
-              </label>
-              <select
-                id="results-color-family"
-                value={filters.colorFamily}
-                onChange={(event) =>
-                  handleFilterChange("colorFamily", event.target.value as ResultsFilters["colorFamily"])
-                }
-                className="filter-select mt-2"
-              >
-                <option value="">Any color family</option>
-                {allColorFamilyOptions.map((option) => (
-                  <option key={option} value={option}>
-                    {formatOptionLabel(option)}
-                  </option>
-                ))}
-              </select>
-            </div>
-          </div>
-
-          <div className="mt-6 flex flex-wrap items-center gap-3">
-            <span className="pill">
-              <SlidersHorizontal size={14} />
-              {activeFilterChips.length} active filters
-            </span>
-            {activeFilterChips.map((chip) => (
-              <span key={`${chip.label}-${chip.value}`} className="chip">
-                {chip.label}: {chip.value}
-              </span>
-            ))}
-            <button type="button" onClick={resetFiltersToBrief} className="cta-secondary">
-              Reset to brief
-            </button>
-          </div>
-
-          <div className="mt-6 rounded-[1.5rem] border border-line/70 bg-background/70 p-4 sm:p-5">
-            <div className="flex flex-wrap items-center justify-between gap-3">
-              <div>
-                <p className="mini-label">Sort looks</p>
-                <p className="mt-2 text-sm text-foreground">
-                  Keep the grid focused on the kind of result you want first.
-                </p>
-              </div>
-              <select
-                value={sort}
-                onChange={(event) => setSort(event.target.value as ResultsSort)}
-                className="filter-select max-w-xs"
-              >
-                {sortOptions.map((option) => (
-                  <option key={option.value} value={option.value}>
-                    {option.label}
-                  </option>
-                ))}
-              </select>
-            </div>
-          </div>
-        </motion.div>
-      </div>
-
-      {savedRecommendations.length > 0 ? (
-        <div className="hero-card p-5 sm:p-6">
-          <div className="flex flex-wrap items-center justify-between gap-4">
-            <div>
-              <p className="eyebrow !mb-0">Saved Looks</p>
-              <h2 className="mt-3 text-3xl text-foreground">
-                {savedRecommendations.length} saved {savedRecommendations.length === 1 ? "look" : "looks"} ready to revisit.
-              </h2>
-            </div>
-            <p className="text-sm">
-              Saved looks stay in this browser so you can compare before you shop later.
-            </p>
-          </div>
-
-          <div className="mt-5 grid gap-3 md:grid-cols-2 xl:grid-cols-3">
             {savedRecommendations.map((recommendation) => (
               <div
                 key={`saved-${recommendation.id}`}
-                className="rounded-[1.5rem] border border-line/70 bg-white/82 p-4"
+                className="rounded-[1.6rem] border border-line/70 bg-white/82 p-5 shadow-[0_18px_40px_rgba(27,21,19,0.06)]"
               >
-                <div className="flex items-start justify-between gap-3">
+                <div className="flex flex-wrap gap-2">
+                  <span className="chip">{formatOptionLabel(recommendation.aesthetic)}</span>
+                  <span className="chip">{formatOptionLabel(recommendation.occasion)}</span>
+                </div>
+
+                <div className="mt-4">
+                  <p className="mini-label">{recommendation.matchQualityLabel}</p>
+                  <h3 className="mt-2 text-2xl text-foreground">{recommendation.name}</h3>
+                </div>
+
+                <div className="mt-4 flex flex-wrap gap-2">
+                  <span className="chip">{formatCurrency(recommendation.totalPrice)}</span>
+                  <span className="chip">{recommendation.budgetMatchLabel}</span>
+                </div>
+
+                <div className="mt-4 flex flex-wrap items-center gap-2">
+                  {recommendation.colorPalette.slice(0, 4).map((color) => (
+                    <span
+                      key={`${recommendation.id}-${color}`}
+                      className="inline-flex items-center gap-2 rounded-full border border-line/70 bg-background/72 px-3 py-2 text-xs font-medium text-foreground"
+                    >
+                      <span
+                        className="h-3 w-3 rounded-full border border-black/10"
+                        style={{ backgroundColor: savedColorMap[color.toLowerCase()] ?? "#ddd2bf" }}
+                      />
+                      {formatOptionLabel(color)}
+                    </span>
+                  ))}
+                </div>
+
+                <div className="mt-5 flex flex-wrap gap-3">
                   <button
                     type="button"
                     onClick={() => handleOpenSavedLook(recommendation.id)}
                     aria-label={`Open saved look: ${recommendation.name}`}
                     data-testid={`open-saved-look-${recommendation.id}`}
-                    className="min-w-0 flex-1 rounded-[1.1rem] text-left transition hover:bg-background/70 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-2/70"
+                    className="cta-primary"
                   >
-                    <p className="mini-label">{recommendation.matchQualityLabel}</p>
-                    <h3 className="mt-2 text-2xl text-foreground">{recommendation.name}</h3>
-                    <p className="mt-2 text-sm text-muted">
-                      Open this saved look in your recommendation grid.
-                    </p>
+                    Open Look
                   </button>
                   <button
                     type="button"
@@ -778,92 +979,23 @@ export function ResultsView({ searchParamsObject = {} }: ResultsViewProps) {
                     Unsave
                   </button>
                 </div>
-                <div className="mt-4 flex flex-wrap gap-2">
-                  <span className="chip">{formatCurrency(recommendation.totalPrice)}</span>
-                  <span className="chip">{recommendation.budgetMatchLabel}</span>
-                </div>
               </div>
             ))}
           </div>
-
-          <div aria-live="polite" className="mt-4 min-h-6">
-            {savedLooksMessage ? (
-              <p className="text-sm font-medium text-accent-2">{savedLooksMessage}</p>
-            ) : null}
-          </div>
         </div>
-      ) : null}
-
-      {isClosestOnly ? (
-        <div className="soft-card">
-          <div className="flex items-start gap-3">
-            <span className="mt-1 rounded-full bg-accent-4 p-3 text-accent-2">
-              <Sparkles size={18} />
-            </span>
-            <div>
-              <p className="mini-label">Closest matches</p>
-              <h2 className="mt-3 text-3xl text-foreground">
-                No perfect match yet — these are the closest looks to your style brief.
-              </h2>
-              <p className="mt-3 max-w-3xl">
-                FitMuse is still prioritizing the strongest aesthetic, budget, and color overlap instead of leaving you with a blank page.
-              </p>
-            </div>
-          </div>
-        </div>
-      ) : null}
-
-      <div className="flex flex-wrap items-end justify-between gap-4">
-        <div>
-          <p className="eyebrow !mb-0">Results</p>
-          <h2 className="mt-3 text-4xl text-foreground">
-            {sortedRecommendations.length} creator-ready{" "}
-            {sortedRecommendations.length === 1 ? "look" : "looks"} ranked for your brief.
-          </h2>
-          <p className="mt-3 max-w-2xl">
-            The engine is balancing fit, occasion, colors, stores, and spend range using the current mock catalog.
-          </p>
-        </div>
-        <div className="flex flex-wrap gap-2">
-          <span className="pill">{sortOptions.find((option) => option.value === sort)?.label}</span>
-          {filters.maxBudget ? <span className="pill">{formatOptionLabel(filters.maxBudget)}</span> : null}
-        </div>
-      </div>
-
-      {sortedRecommendations.length === 0 ? (
+      ) : (
         <div className="glass-panel p-6 sm:p-8">
-          <p className="mini-label">No looks in current filter mix</p>
-          <h2 className="mt-3 text-4xl text-foreground">Try widening one filter to bring more looks back.</h2>
+          <p className="eyebrow">Saved Looks</p>
+          <h2 className="mt-3 text-4xl text-foreground">No saved looks yet.</h2>
           <p className="mt-4 max-w-2xl">
-            The recommendation engine still has mock inventory, but the current combination of store, color family, fit, and budget is too narrow.
+            Save outfits from your recommendations to compare them later.
           </p>
           <div className="mt-6">
-            <button type="button" onClick={resetFiltersToBrief} className="cta-primary">
-              Reset to brief
+            <button type="button" onClick={() => setViewMode("all")} className="cta-primary">
+              View Recommendations
             </button>
           </div>
         </div>
-      ) : (
-        <>
-          <div className="grid gap-6 xl:grid-cols-2">
-            {sortedRecommendations.map((recommendation) => (
-              <RecommendationCard
-                key={recommendation.id}
-                cardId={`look-${recommendation.id}`}
-                highlighted={highlightedLookId === recommendation.id}
-                recommendation={recommendation}
-                saved={savedLookIds.includes(recommendation.id)}
-                onToggleSave={toggleSave}
-              />
-            ))}
-          </div>
-
-          <div className="rounded-[1.4rem] border border-line/70 bg-white/74 px-5 py-4">
-            <p className="text-sm leading-6 text-muted">
-              FitMuse currently uses mock outfit data for demo purposes. Real product links and affiliate shopping feeds can be connected in a future version.
-            </p>
-          </div>
-        </>
       )}
     </section>
   );
