@@ -4,6 +4,7 @@ import type {
   Aesthetic,
   BudgetMatchLabel,
   BudgetRange,
+  ColorFamily,
   FitPreference,
   MatchQualityLabel,
   Occasion,
@@ -66,6 +67,51 @@ const fallbackOccasions: Record<Occasion, Occasion[]> = {
   "brand content": ["photoshoot", "reels", "office"],
 };
 
+const relatedFits: Record<FitPreference, FitPreference[]> = {
+  slim: ["classy", "regular"],
+  regular: ["slim", "relaxed", "classy"],
+  relaxed: ["regular", "oversized", "modest"],
+  oversized: ["relaxed", "trendy"],
+  modest: ["relaxed", "classy"],
+  classy: ["slim", "regular", "modest"],
+  trendy: ["oversized", "slim"],
+};
+
+const colorFamilyMap: Record<string, ColorFamily> = {
+  black: "monochrome",
+  white: "neutral",
+  cream: "neutral",
+  bone: "neutral",
+  ivory: "neutral",
+  ecru: "neutral",
+  oatmeal: "neutral",
+  stone: "neutral",
+  softwhite: "neutral",
+  "soft white": "neutral",
+  beige: "earth",
+  camel: "earth",
+  tan: "earth",
+  sand: "earth",
+  taupe: "earth",
+  mocha: "earth",
+  espresso: "earth",
+  chocolate: "earth",
+  sage: "earth",
+  olive: "earth",
+  blue: "cool",
+  slate: "cool",
+  navy: "cool",
+  charcoal: "cool",
+  silver: "metallic",
+  gold: "metallic",
+  pearl: "metallic",
+  pink: "pastel",
+  plum: "warm",
+  graphite: "monochrome",
+  grey: "monochrome",
+  gray: "monochrome",
+};
+
 function normalize(value?: string | null) {
   return value?.trim().toLowerCase() ?? "";
 }
@@ -85,6 +131,16 @@ function formatLabel(value?: string) {
         .join(" "),
     )
     .join(" / ");
+}
+
+function getPreferredColorFamilies(preferredColors: string[]) {
+  return Array.from(
+    new Set(
+      preferredColors
+        .map((color) => colorFamilyMap[normalize(color)])
+        .filter(Boolean) as ColorFamily[],
+    ),
+  );
 }
 
 export function budgetCapFromRange(range?: string | null) {
@@ -237,23 +293,52 @@ function fitScore(product: Product, fitPreference: FitPreference | "") {
     return { score: 0, reason: "" };
   }
 
+  if (product.fitType === fitPreference) {
+    return {
+      score: 5,
+      reason: product.fitType === fitPreference ? `Leans ${formatLabel(fitPreference)} like you asked` : "",
+    };
+  }
+
+  if (relatedFits[fitPreference]?.includes(product.fitType)) {
+    return {
+      score: 2,
+      reason: `Keeps a ${formatLabel(product.fitType)} silhouette close to your ${formatLabel(fitPreference)} preference`,
+    };
+  }
+
   return {
-    score: product.fitType === fitPreference ? 5 : -1,
-    reason: product.fitType === fitPreference ? `Leans ${formatLabel(fitPreference)} like you asked` : "",
+    score: -2,
+    reason: "",
   };
 }
 
 function colorScore(product: Product, preferredColors: string[], avoidedColors: string[]) {
+  const preferredFamilies = getPreferredColorFamilies(preferredColors);
   const matchedPreferredColors = product.colors.filter((color) =>
     preferredColors.includes(normalize(color)),
   );
   const matchedAvoidColors = product.colors.filter((color) =>
     avoidedColors.includes(normalize(color)),
   );
+  const matchedPreferredFamily = preferredFamilies.includes(product.colorFamily);
 
-  let score = matchedPreferredColors.length * 3 - matchedAvoidColors.length * 6;
+  let score = matchedPreferredColors.length * 4 - matchedAvoidColors.length * 7;
 
-  if (preferredColors.length > 0 && matchedPreferredColors.length === 0 && product.colorFamily === "neutral") {
+  if (matchedPreferredColors.length === 0 && matchedPreferredFamily) {
+    score += 2;
+  }
+
+  if (
+    preferredColors.length > 0 &&
+    matchedPreferredColors.length === 0 &&
+    !matchedPreferredFamily &&
+    product.colorFamily === "neutral"
+  ) {
+    score += 1;
+  }
+
+  if (avoidedColors.length > 0 && matchedAvoidColors.length === 0) {
     score += 1;
   }
 
@@ -264,6 +349,8 @@ function colorScore(product: Product, preferredColors: string[], avoidedColors: 
     reason:
       matchedPreferredColors.length > 0
         ? `Uses your preferred ${formatLabel(matchedPreferredColors[0])} palette`
+        : matchedPreferredFamily
+          ? `Stays inside your preferred ${formatLabel(product.colorFamily)} palette family`
         : "",
   };
 }
@@ -272,7 +359,7 @@ function storeScore(product: Product, preferredStores: string[]) {
   const matchedStores = preferredStores.filter((store) => normalize(product.store) === store);
 
   return {
-    score: matchedStores.length > 0 ? 4 : 0,
+    score: matchedStores.length > 0 ? 4 : preferredStores.length > 0 ? -1 : 0,
     matchedStores,
     reason: matchedStores.length > 0 ? `Pulls from a store you already like: ${product.store}` : "",
   };
@@ -285,15 +372,23 @@ function budgetScore(product: Product, budgetCap: number | null) {
     return { score: 0, reason: "" };
   }
 
+  if (product.price >= target * 0.55 && product.price <= target * 0.95) {
+    return { score: 5, reason: "Lands close to the ideal spend for this category" };
+  }
+
   if (product.price <= target) {
-    return { score: 4, reason: "Keeps the outfit budget realistic" };
+    return { score: 3, reason: "Keeps the outfit budget realistic" };
   }
 
-  if (product.price <= target * 1.18) {
-    return { score: 1, reason: "Still sits close to the spend target" };
+  if (product.price <= target * 1.12) {
+    return { score: 2, reason: "Still sits close to the spend target" };
   }
 
-  return { score: -5, reason: "" };
+  if (product.price <= target * 1.28) {
+    return { score: -1, reason: "" };
+  }
+
+  return { score: -6, reason: "" };
 }
 
 function scoreProduct(product: Product, answers: QuizAnswers): ScoredProduct {
@@ -475,6 +570,10 @@ function buildMatchReasons(
   const matchedStores = Array.from(
     new Set(productEntries.flatMap((entry) => entry.matchedStores)),
   );
+  const avoidedColors = splitCommaSeparated(answers.avoidColors);
+  const usesAvoidedColor = productEntries.some((entry) =>
+    entry.product.colors.some((color) => avoidedColors.includes(normalize(color))),
+  );
 
   if (answers.aesthetic) {
     const exactCount = productEntries.filter((entry) => entry.exactAesthetic).length;
@@ -496,6 +595,10 @@ function buildMatchReasons(
 
   if (matchedColors.length > 0) {
     reasons.add(`Uses your preferred ${formatLabel(matchedColors[0])} colors`);
+  }
+
+  if (avoidedColors.length > 0 && !usesAvoidedColor) {
+    reasons.add("Avoids the colors you wanted to skip");
   }
 
   if (matchedStores.length > 0) {
@@ -563,9 +666,22 @@ function buildOutfitRecommendation(
     (entry) => entry.exactAesthetic && entry.exactOccasion && entry.sizeExact,
   ).length;
   const matchMode: OutfitRecommendation["matchMode"] = exactCount >= 3 ? "exact" : "closest";
+  const allSizeMatched = productEntries.every((entry) => entry.sizeExact);
+  const exactAestheticCount = productEntries.filter((entry) => entry.exactAesthetic).length;
+  const exactOccasionCount = productEntries.filter((entry) => entry.exactOccasion).length;
+  const priceBufferScore =
+    budgetCap && totalPrice <= budgetCap
+      ? 3
+      : budgetCap && totalPrice <= budgetCap * 1.06
+        ? 1
+        : 0;
   const synergyScore =
     (new Set(items.map((item) => item.colorFamily)).size <= 3 ? 4 : 0) +
     (new Set(items.map((item) => item.store)).size >= 2 ? 2 : 0) +
+    (allSizeMatched ? 4 : 0) +
+    (exactAestheticCount >= 2 ? 4 : 0) +
+    (exactOccasionCount >= 2 ? 4 : 0) +
+    priceBufferScore +
     creatorAlignmentScore;
   const rawScore =
     productEntries.reduce((sum, entry) => sum + entry.score, 0) + synergyScore;
