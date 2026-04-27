@@ -2,10 +2,15 @@
 
 import { motion } from "framer-motion";
 import { Bookmark, ChevronDown } from "lucide-react";
-import { formatCurrency, formatOptionLabel } from "@/lib/utils";
+import {
+  formatAestheticLabel,
+  formatCurrency,
+  formatOptionLabel,
+  getUseCaseLabel,
+} from "@/lib/utils";
 import { OutfitVisual } from "@/components/OutfitVisual";
 import { ShoppingLinksButton } from "@/components/ShoppingLinksButton";
-import type { OutfitRecommendation } from "@/types";
+import type { OutfitRecommendation, StylePreference } from "@/types";
 
 type RecommendationCardProps = {
   recommendation: OutfitRecommendation;
@@ -13,6 +18,7 @@ type RecommendationCardProps = {
   onToggleSave: (id: string) => void;
   cardId?: string;
   highlighted?: boolean;
+  stylePreference?: StylePreference | "";
 };
 
 const colorMap: Record<string, string> = {
@@ -55,10 +61,6 @@ function getMatchBadgeClasses(label: OutfitRecommendation["matchQualityLabel"]) 
     return "bg-[#17363d] text-white";
   }
 
-  if (label === "Creator-ready") {
-    return "bg-foreground text-white";
-  }
-
   if (label === "Closest match") {
     return "bg-accent-3 text-foreground";
   }
@@ -67,11 +69,11 @@ function getMatchBadgeClasses(label: OutfitRecommendation["matchQualityLabel"]) 
 }
 
 function getBudgetBadgeClasses(label: OutfitRecommendation["budgetMatchLabel"]) {
-  if (label === "Under budget") {
+  if (label === "Within budget") {
     return "border-emerald-200/80 bg-emerald-50 text-emerald-900";
   }
 
-  if (label === "Over budget but strong match") {
+  if (label === "Over budget but strong style match") {
     return "border-amber-200/90 bg-amber-50 text-amber-900";
   }
 
@@ -84,13 +86,16 @@ export function RecommendationCard({
   onToggleSave,
   cardId,
   highlighted = false,
+  stylePreference = "",
 }: RecommendationCardProps) {
   const topReasons = recommendation.matchReasons.slice(0, 2);
   const itemRows = [
     { label: "Top", value: recommendation.items.top.name },
     { label: "Bottom", value: recommendation.items.bottom.name },
     { label: "Shoes", value: recommendation.items.shoes.name },
-    { label: "Accessory", value: recommendation.items.accessory.name },
+    recommendation.items.accessory
+      ? { label: "Accessory", value: recommendation.items.accessory.name }
+      : null,
     recommendation.items.outerwear
       ? { label: "Outerwear", value: recommendation.items.outerwear.name }
       : null,
@@ -99,7 +104,9 @@ export function RecommendationCard({
     { category: "top", name: recommendation.items.top.name },
     { category: "bottom", name: recommendation.items.bottom.name },
     { category: "shoes", name: recommendation.items.shoes.name },
-    { category: "accessory", name: recommendation.items.accessory.name },
+    recommendation.items.accessory
+      ? { category: "accessory", name: recommendation.items.accessory.name }
+      : null,
     recommendation.items.outerwear
       ? { category: "outerwear", name: recommendation.items.outerwear.name }
       : null,
@@ -125,7 +132,7 @@ export function RecommendationCard({
       <div className="flex items-start justify-between gap-3 px-2 pb-4">
         <div className="flex flex-wrap gap-2">
           <span className="rounded-full border border-line/70 bg-white px-3 py-2 text-[11px] font-semibold uppercase tracking-[0.22em] text-foreground">
-            {formatOptionLabel(recommendation.aesthetic)}
+            {formatAestheticLabel(recommendation.aesthetic, stylePreference)}
           </span>
           <span className="rounded-full border border-line/70 bg-background/86 px-3 py-2 text-[11px] font-semibold uppercase tracking-[0.22em] text-foreground">
             {formatOptionLabel(recommendation.occasion)}
@@ -251,7 +258,7 @@ export function RecommendationCard({
             </div>
             <div className="grid gap-3 md:grid-cols-2">
               <div className="note-card">
-                <p className="mini-label">Creator use case</p>
+                <p className="mini-label">{getUseCaseLabel(recommendation.occasion)}</p>
                 <p className="mt-2 text-sm leading-6 text-foreground">{recommendation.creatorUseCase}</p>
               </div>
               <div className="note-card">

@@ -1,5 +1,9 @@
 import { products } from "@/data/products";
-import { splitCommaSeparated } from "@/lib/utils";
+import {
+  formatAestheticLabel,
+  isCreatorOccasion,
+  splitCommaSeparated,
+} from "@/lib/utils";
 import type {
   Aesthetic,
   BudgetMatchLabel,
@@ -19,20 +23,25 @@ type ScoredProduct = {
   product: Product;
   score: number;
   exactAesthetic: boolean;
+  fallbackAesthetic: boolean;
   exactOccasion: boolean;
+  fallbackOccasion: boolean;
   sizeExact: boolean;
+  fitExact: boolean;
+  fitAligned: boolean;
   matchedPreferredColors: string[];
+  matchedPreferredFamily: boolean;
   matchedStores: string[];
   matchReasons: string[];
   creatorAlignmentScore: number;
 };
 
-const requiredCategories: ProductCategory[] = ["top", "bottom", "shoes", "accessory"];
+const coreCategories: ProductCategory[] = ["top", "bottom", "shoes"];
 const poolSizes: Record<ProductCategory, number> = {
-  top: 7,
-  bottom: 7,
-  shoes: 5,
-  accessory: 5,
+  top: 9,
+  bottom: 9,
+  shoes: 7,
+  accessory: 6,
   outerwear: 4,
 };
 
@@ -175,18 +184,18 @@ function budgetTargetForCategory(category: ProductCategory, budgetCap: number | 
   }
 
   if (category === "outerwear") {
-    return budgetCap * 0.3;
+    return budgetCap <= 200 ? budgetCap * 0.24 : budgetCap * 0.3;
   }
 
   if (category === "accessory") {
-    return budgetCap * 0.16;
+    return budgetCap <= 200 ? budgetCap * 0.1 : budgetCap * 0.16;
   }
 
   if (category === "shoes") {
-    return budgetCap * 0.24;
+    return budgetCap <= 200 ? budgetCap * 0.32 : budgetCap * 0.24;
   }
 
-  return budgetCap * 0.22;
+  return budgetCap <= 200 ? budgetCap * 0.28 : budgetCap * 0.22;
 }
 
 function getRequiredSize(product: Product, answers: QuizAnswers) {
@@ -244,7 +253,7 @@ function getTagSignal<T extends string>(
 
   if (tags.includes(selected)) {
     return {
-      score: 13,
+      score: 16,
       exact: true,
       matchedExact: true,
       matchedFallback: false,
@@ -256,7 +265,7 @@ function getTagSignal<T extends string>(
 
   if (tags.some((tag) => related.includes(tag))) {
     return {
-      score: 7,
+      score: 6,
       exact: false,
       matchedExact: false,
       matchedFallback: true,
@@ -265,7 +274,7 @@ function getTagSignal<T extends string>(
   }
 
   return {
-    score: -4,
+    score: -8,
     exact: false,
     matchedExact: false,
     matchedFallback: false,
@@ -278,39 +287,58 @@ function stylePreferenceScore(product: Product, preference: StylePreference | ""
     return { score: 0, reason: "" };
   }
 
-  const matches =
-    product.stylePreferences.includes(preference) ||
-    product.stylePreferences.includes("mixed / open to all");
+  const explicitMatch = product.stylePreferences.includes(preference);
+  const openToAll = product.stylePreferences.includes("mixed / open to all");
+
+  if (explicitMatch) {
+    return {
+      score: preference === "mixed / open to all" ? 2 : 7,
+      reason: "Supports your style preference",
+    };
+  }
+
+  if (openToAll) {
+    return {
+      score:
+        preference === "mixed / open to all" || preference === "androgynous" ? 2 : -8,
+      reason:
+        preference === "mixed / open to all" || preference === "androgynous"
+          ? "Keeps the styling open and flexible"
+          : "",
+    };
+  }
 
   return {
-    score: matches ? 3 : -2,
-    reason: matches ? "Supports your style preference" : "",
+    score:
+      preference === "mixed / open to all" || preference === "androgynous" ? -1 : -10,
+    reason: "",
   };
 }
 
 function fitScore(product: Product, fitPreference: FitPreference | "") {
   if (!fitPreference) {
-    return { score: 0, reason: "" };
+    return { score: 0, reason: "", exact: true, aligned: true };
   }
 
   if (product.fitType === fitPreference) {
     return {
-      score: 5,
-      reason: product.fitType === fitPreference ? `Leans ${formatLabel(fitPreference)} like you asked` : "",
+      score: 6,
+      reason: `Leans ${formatLabel(fitPreference)} like you asked`,
+      exact: true,
+      aligned: true,
     };
   }
 
   if (relatedFits[fitPreference]?.includes(product.fitType)) {
     return {
-      score: 2,
+      score: 3,
       reason: `Keeps a ${formatLabel(product.fitType)} silhouette close to your ${formatLabel(fitPreference)} preference`,
+      exact: false,
+      aligned: true,
     };
   }
 
-  return {
-    score: -2,
-    reason: "",
-  };
+  return { score: -3, reason: "", exact: false, aligned: false };
 }
 
 function colorScore(product: Product, preferredColors: string[], avoidedColors: string[]) {
@@ -323,10 +351,10 @@ function colorScore(product: Product, preferredColors: string[], avoidedColors: 
   );
   const matchedPreferredFamily = preferredFamilies.includes(product.colorFamily);
 
-  let score = matchedPreferredColors.length * 4 - matchedAvoidColors.length * 7;
+  let score = matchedPreferredColors.length * 5 - matchedAvoidColors.length * 10;
 
   if (matchedPreferredColors.length === 0 && matchedPreferredFamily) {
-    score += 2;
+    score += 3;
   }
 
   if (
@@ -346,6 +374,7 @@ function colorScore(product: Product, preferredColors: string[], avoidedColors: 
     score,
     matchedPreferredColors,
     matchedAvoidColors,
+    matchedPreferredFamily,
     reason:
       matchedPreferredColors.length > 0
         ? `Uses your preferred ${formatLabel(matchedPreferredColors[0])} palette`
@@ -359,7 +388,7 @@ function storeScore(product: Product, preferredStores: string[]) {
   const matchedStores = preferredStores.filter((store) => normalize(product.store) === store);
 
   return {
-    score: matchedStores.length > 0 ? 4 : preferredStores.length > 0 ? -1 : 0,
+    score: matchedStores.length > 0 ? 5 : preferredStores.length > 0 ? -2 : 0,
     matchedStores,
     reason: matchedStores.length > 0 ? `Pulls from a store you already like: ${product.store}` : "",
   };
@@ -372,23 +401,23 @@ function budgetScore(product: Product, budgetCap: number | null) {
     return { score: 0, reason: "" };
   }
 
-  if (product.price >= target * 0.55 && product.price <= target * 0.95) {
-    return { score: 5, reason: "Lands close to the ideal spend for this category" };
+  if (product.price >= target * 0.45 && product.price <= target * 0.95) {
+    return { score: 7, reason: "Lands close to the ideal spend for this category" };
   }
 
   if (product.price <= target) {
-    return { score: 3, reason: "Keeps the outfit budget realistic" };
+    return { score: 5, reason: "Keeps the outfit budget realistic" };
   }
 
-  if (product.price <= target * 1.12) {
+  if (product.price <= target * 1.08) {
     return { score: 2, reason: "Still sits close to the spend target" };
   }
 
-  if (product.price <= target * 1.28) {
-    return { score: -1, reason: "" };
+  if (product.price <= target * 1.18) {
+    return { score: -2, reason: "" };
   }
 
-  return { score: -6, reason: "" };
+  return { score: -10, reason: "" };
 }
 
 function scoreProduct(product: Product, answers: QuizAnswers): ScoredProduct {
@@ -396,13 +425,14 @@ function scoreProduct(product: Product, answers: QuizAnswers): ScoredProduct {
   const avoidedColors = splitCommaSeparated(answers.avoidColors);
   const preferredStores = splitCommaSeparated(answers.storesLike);
   const budgetCap = budgetCapFromRange(answers.budgetRange);
+  const aestheticLabel = formatAestheticLabel(answers.aesthetic, answers.stylePreference);
 
   const aestheticSignal = getTagSignal(
     answers.aesthetic,
     product.aestheticTags,
     fallbackAesthetics,
-    `Matches your ${formatLabel(answers.aesthetic)} aesthetic`,
-    `Leans close to your ${formatLabel(answers.aesthetic)} aesthetic`,
+    `Matches your ${aestheticLabel} aesthetic`,
+    `Leans close to your ${aestheticLabel} aesthetic`,
   );
   const occasionSignal = getTagSignal(
     answers.occasion,
@@ -447,8 +477,13 @@ function scoreProduct(product: Product, answers: QuizAnswers): ScoredProduct {
       creatorAlignmentScore,
     exactAesthetic: aestheticSignal.matchedExact,
     exactOccasion: occasionSignal.matchedExact,
+    fallbackAesthetic: aestheticSignal.matchedFallback,
+    fallbackOccasion: occasionSignal.matchedFallback,
     sizeExact: sizeSignal.exact,
+    fitExact: fitSignal.exact,
+    fitAligned: fitSignal.aligned,
     matchedPreferredColors: colorSignal.matchedPreferredColors,
+    matchedPreferredFamily: colorSignal.matchedPreferredFamily,
     matchedStores: storeSignal.matchedStores,
     matchReasons,
     creatorAlignmentScore,
@@ -471,13 +506,19 @@ function uniqueColorFamilies(items: Product[]) {
   return Array.from(new Set(items.map((item) => item.colorFamily)));
 }
 
-function buildName(aesthetic: Aesthetic, occasion: Occasion, index: number) {
+function buildName(
+  aesthetic: Aesthetic,
+  occasion: Occasion,
+  stylePreference: StylePreference | "",
+  index: number,
+) {
   const key = `${aesthetic}|${occasion}`;
   const names: Record<string, string> = {
     "old money|date": "Old Money Dinner Look",
     "streetwear|reels": "Streetwear Reel Fit",
     "minimalist|date": "Minimalist Coffee Date",
-    "clean girl|daily wear": "Clean Girl Everyday",
+    "clean girl|daily wear":
+      stylePreference === "feminine" ? "Clean Girl Everyday" : "Clean Minimal Everyday",
     "smart casual|college": "College Smart Casual Edit",
     "office|office": "Office Smart Casual",
     "party|party": "Party Night Outfit",
@@ -489,7 +530,8 @@ function buildName(aesthetic: Aesthetic, occasion: Occasion, index: number) {
     "gym casual|daily wear": "Gym Casual Everyday Set",
   };
 
-  const baseName = names[key] ?? `${formatLabel(aesthetic)} ${formatLabel(occasion)} Look`;
+  const baseAestheticLabel = formatAestheticLabel(aesthetic, stylePreference);
+  const baseName = names[key] ?? `${baseAestheticLabel} ${formatLabel(occasion)} Look`;
 
   return index === 0 ? baseName : `${baseName} ${index + 1}`;
 }
@@ -497,42 +539,42 @@ function buildName(aesthetic: Aesthetic, occasion: Occasion, index: number) {
 function buildBudgetMatch(totalPrice: number, budgetCap: number | null) {
   if (!budgetCap) {
     return {
-      label: "Close to budget" as BudgetMatchLabel,
+      label: "Near budget" as BudgetMatchLabel,
       note: "You left the budget flexible, so FitMuse prioritized overall match quality.",
     };
   }
 
-  if (totalPrice <= budgetCap * 0.92) {
+  if (totalPrice <= budgetCap) {
     return {
-      label: "Under budget" as BudgetMatchLabel,
-      note: `This look stays under your ${formatLabel(budgetLabelFromCap(budgetCap))} target.`,
+      label: "Within budget" as BudgetMatchLabel,
+      note: `This look stays inside your ${formatLabel(budgetLabelFromCap(budgetCap))} budget target.`,
     };
   }
 
-  if (totalPrice <= budgetCap * 1.05) {
+  if (totalPrice <= budgetCap * 1.08) {
     return {
-      label: "Close to budget" as BudgetMatchLabel,
+      label: "Near budget" as BudgetMatchLabel,
       note: `This look lands close to your ${formatLabel(budgetLabelFromCap(budgetCap))} budget target.`,
     };
   }
 
   return {
-    label: "Over budget but strong match" as BudgetMatchLabel,
-    note: `This look runs slightly over your ${formatLabel(budgetLabelFromCap(budgetCap))} target but scored as a stronger overall match.`,
+    label: "Over budget but strong style match" as BudgetMatchLabel,
+    note: `This look runs over your ${formatLabel(budgetLabelFromCap(budgetCap))} target, but the styling match scored strongly enough to keep it in the mix.`,
   };
 }
 
 function buildCreatorUseCase(occasion: Occasion) {
   const labels: Record<Occasion, string> = {
-    reels: "Best for creator reels and quick outfit content.",
-    photoshoot: "Best for styled photoshoots and editorial content days.",
-    date: "Best for dinner plans, soft-date content, and polished evenings.",
-    party: "Best for event nights, nightlife posts, and higher-energy content.",
-    college: "Best for campus days, coffee runs, and casual GRWM posts.",
-    office: "Best for polished office days and founder-style weekday content.",
-    travel: "Best for airport fits, city travel days, and transit vlogs.",
-    "wedding guest": "Best for elevated guest dressing with a realistic shopping path.",
-    "daily wear": "Best for everyday styling when you still want a complete look.",
+    reels: "Best for creator reels, transitions, and fast-turn content days.",
+    photoshoot: "Best for styled photoshoots, editorial sets, and campaign content.",
+    date: "Best for dinner dates, rooftop drinks, and polished evening plans.",
+    party: "Best for event nights, nightlife plans, and sharper going-out looks.",
+    college: "Best for campus days, coffee runs, and everyday student styling.",
+    office: "Works well for office days, client meetings, and smart casual work settings.",
+    travel: "Useful for airport days, travel transfers, and easy arrival looks.",
+    "wedding guest": "Best for guest dressing that still feels realistic to shop.",
+    "daily wear": "Best for everyday styling when you still want the look to feel complete.",
     "brand content": "Best for sponsor shoots, product seeding, and creator-ready brand moments.",
   };
 
@@ -558,7 +600,7 @@ function buildWhyItWorks(items: Product[], answers: QuizAnswers, matchedColors: 
     return `${formatLabel(matchedColors[0])} tones keep the outfit aligned to your brief while ${leadStores.join(" + ")} adds a multi-store styled feel.`;
   }
 
-  return `${palette.slice(0, 3).map(formatLabel).join(", ")} tones keep the outfit cohesive while ${leadStores.join(" + ")} gives it a creator-styled mix.`;
+  return `${palette.slice(0, 3).map(formatLabel).join(", ")} tones keep the outfit cohesive while ${leadStores.join(" + ")} gives it a polished multi-store finish.`;
 }
 
 function buildMatchReasons(
@@ -568,6 +610,7 @@ function buildMatchReasons(
   budgetLabel: BudgetMatchLabel,
 ) {
   const reasons = new Set<string>();
+  const aestheticLabel = formatAestheticLabel(answers.aesthetic, answers.stylePreference);
   const matchedColors = Array.from(
     new Set(productEntries.flatMap((entry) => entry.matchedPreferredColors)),
   );
@@ -583,8 +626,8 @@ function buildMatchReasons(
     const exactCount = productEntries.filter((entry) => entry.exactAesthetic).length;
     reasons.add(
       exactCount >= 2
-        ? `Matches your ${formatLabel(answers.aesthetic)} aesthetic`
-        : `Leans close to your ${formatLabel(answers.aesthetic)} aesthetic`,
+        ? `Matches your ${aestheticLabel} aesthetic`
+        : `Leans close to your ${aestheticLabel} aesthetic`,
     );
   }
 
@@ -613,9 +656,9 @@ function buildMatchReasons(
     reasons.add(`Stays close to your ${formatLabel(answers.fitPreference)} fit preference`);
   }
 
-  if (budgetLabel === "Under budget") {
-    reasons.add(`Keeps the look under ${formatLabel(answers.budgetRange || "your target budget")}`);
-  } else if (budgetLabel === "Close to budget") {
+  if (budgetLabel === "Within budget") {
+    reasons.add(`Keeps the look within ${formatLabel(answers.budgetRange || "your target budget")}`);
+  } else if (budgetLabel === "Near budget") {
     reasons.add("Keeps the full outfit close to your budget range");
   } else {
     reasons.add(`Pushes past ${formatLabel(answers.budgetRange || "budget")} only because the overall match is stronger`);
@@ -628,29 +671,124 @@ function buildMatchReasons(
   return Array.from(reasons);
 }
 
-function matchQualityLabel(
-  matchMode: OutfitRecommendation["matchMode"],
-  confidenceScore: number,
-  creatorAlignmentScore: number,
-) {
-  if (matchMode === "closest") {
-    return "Closest match" as MatchQualityLabel;
-  }
-
-  if (creatorAlignmentScore >= 6) {
-    return "Creator-ready" as MatchQualityLabel;
-  }
-
-  if (confidenceScore >= 90) {
+function matchQualityLabel(confidenceScore: number) {
+  if (confidenceScore >= 75) {
     return "Best match" as MatchQualityLabel;
   }
 
-  return "Strong match" as MatchQualityLabel;
+  if (confidenceScore >= 55) {
+    return "Strong match" as MatchQualityLabel;
+  }
+
+  return "Closest match" as MatchQualityLabel;
 }
 
-function confidenceFromScore(score: number, matchMode: OutfitRecommendation["matchMode"]) {
-  const base = matchMode === "exact" ? 76 : 64;
-  return Math.max(58, Math.min(98, base + Math.round(score / 4)));
+function buildConfidenceScore(
+  productEntries: ScoredProduct[],
+  budgetCap: number | null,
+  totalPrice: number,
+  creatorAlignmentScore: number,
+  occasion: Occasion,
+) {
+  const items = productEntries.map((entry) => entry.product);
+  const exactAestheticCount = productEntries.filter((entry) => entry.exactAesthetic).length;
+  const fallbackAestheticCount = productEntries.filter((entry) => entry.fallbackAesthetic).length;
+  const exactOccasionCount = productEntries.filter((entry) => entry.exactOccasion).length;
+  const fallbackOccasionCount = productEntries.filter((entry) => entry.fallbackOccasion).length;
+  const sizeExactCount = productEntries.filter((entry) => entry.sizeExact).length;
+  const fitExactCount = productEntries.filter((entry) => entry.fitExact).length;
+  const fitAlignedCount = productEntries.filter((entry) => entry.fitAligned).length;
+  const matchedColorCount = Array.from(
+    new Set(productEntries.flatMap((entry) => entry.matchedPreferredColors)),
+  ).length;
+  const matchedPreferredFamilyCount = productEntries.filter(
+    (entry) => entry.matchedPreferredFamily,
+  ).length;
+  const matchedStoreCount = Array.from(
+    new Set(productEntries.flatMap((entry) => entry.matchedStores)),
+  ).length;
+  const allSizeMatched = sizeExactCount === productEntries.length;
+  const paletteTight = new Set(items.map((item) => item.colorFamily)).size <= 3;
+  const withinBudget = budgetCap ? totalPrice <= budgetCap : false;
+  const nearBudget = budgetCap ? totalPrice <= budgetCap * 1.08 : false;
+
+  let confidence = 28;
+
+  if (exactAestheticCount >= 2) {
+    confidence += 20;
+  } else if (exactAestheticCount === 1) {
+    confidence += 14;
+  } else if (fallbackAestheticCount >= 2) {
+    confidence += 10;
+  } else if (fallbackAestheticCount === 1) {
+    confidence += 6;
+  } else {
+    confidence -= 4;
+  }
+
+  if (exactOccasionCount >= 2) {
+    confidence += 20;
+  } else if (exactOccasionCount === 1) {
+    confidence += 14;
+  } else if (fallbackOccasionCount >= 2) {
+    confidence += 10;
+  } else if (fallbackOccasionCount === 1) {
+    confidence += 6;
+  } else {
+    confidence -= 4;
+  }
+
+  if (!budgetCap) {
+    confidence += 10;
+  } else if (withinBudget) {
+    confidence += 18;
+  } else if (nearBudget) {
+    confidence += 10;
+  } else if (totalPrice <= budgetCap * 1.16) {
+    confidence += 3;
+  } else {
+    confidence -= 8;
+  }
+
+  if (allSizeMatched) {
+    confidence += 10;
+  } else if (sizeExactCount >= Math.max(2, productEntries.length - 1)) {
+    confidence += 5;
+  } else {
+    confidence -= 6;
+  }
+
+  if (fitExactCount >= 2) {
+    confidence += 8;
+  } else if (fitAlignedCount >= 2) {
+    confidence += 5;
+  } else if (fitAlignedCount >= 1) {
+    confidence += 2;
+  }
+
+  if (matchedColorCount > 0) {
+    confidence += 6;
+  } else if (matchedPreferredFamilyCount > 0) {
+    confidence += 3;
+  }
+
+  if (matchedStoreCount > 0) {
+    confidence += 4;
+  }
+
+  if (paletteTight) {
+    confidence += 4;
+  }
+
+  if (isCreatorOccasion(occasion) && creatorAlignmentScore >= 4) {
+    confidence += 4;
+  }
+
+  if (budgetCap && totalPrice <= budgetCap && productEntries.length <= 4) {
+    confidence += 2;
+  }
+
+  return Math.max(35, Math.min(96, confidence));
 }
 
 function buildOutfitRecommendation(
@@ -666,30 +804,15 @@ function buildOutfitRecommendation(
     (sum, entry) => sum + entry.creatorAlignmentScore,
     0,
   );
-  const exactCount = productEntries.filter(
-    (entry) => entry.exactAesthetic && entry.exactOccasion && entry.sizeExact,
-  ).length;
-  const matchMode: OutfitRecommendation["matchMode"] = exactCount >= 3 ? "exact" : "closest";
-  const allSizeMatched = productEntries.every((entry) => entry.sizeExact);
-  const exactAestheticCount = productEntries.filter((entry) => entry.exactAesthetic).length;
-  const exactOccasionCount = productEntries.filter((entry) => entry.exactOccasion).length;
-  const priceBufferScore =
-    budgetCap && totalPrice <= budgetCap
-      ? 3
-      : budgetCap && totalPrice <= budgetCap * 1.06
-        ? 1
-        : 0;
-  const synergyScore =
-    (new Set(items.map((item) => item.colorFamily)).size <= 3 ? 4 : 0) +
-    (new Set(items.map((item) => item.store)).size >= 2 ? 2 : 0) +
-    (allSizeMatched ? 4 : 0) +
-    (exactAestheticCount >= 2 ? 4 : 0) +
-    (exactOccasionCount >= 2 ? 4 : 0) +
-    priceBufferScore +
-    creatorAlignmentScore;
-  const rawScore =
-    productEntries.reduce((sum, entry) => sum + entry.score, 0) + synergyScore;
-  const confidenceScore = confidenceFromScore(rawScore, matchMode);
+  const confidenceScore = buildConfidenceScore(
+    productEntries,
+    budgetCap,
+    totalPrice,
+    creatorAlignmentScore,
+    (answers.occasion || "daily wear") as Occasion,
+  );
+  const matchMode: OutfitRecommendation["matchMode"] =
+    confidenceScore >= 55 ? "exact" : "closest";
   const budgetMatch = buildBudgetMatch(totalPrice, budgetCap);
   const matchReasons = buildMatchReasons(productEntries, answers, totalPrice, budgetMatch.label);
   const matchedColors = Array.from(
@@ -701,6 +824,7 @@ function buildOutfitRecommendation(
     name: buildName(
       (answers.aesthetic || "smart casual") as Aesthetic,
       (answers.occasion || "daily wear") as Occasion,
+      answers.stylePreference,
       index,
     ),
     aesthetic: (answers.aesthetic || "smart casual") as Aesthetic,
@@ -710,7 +834,7 @@ function buildOutfitRecommendation(
       top: productEntries.find((entry) => entry.product.category === "top")!.product,
       bottom: productEntries.find((entry) => entry.product.category === "bottom")!.product,
       shoes: productEntries.find((entry) => entry.product.category === "shoes")!.product,
-      accessory: productEntries.find((entry) => entry.product.category === "accessory")!.product,
+      accessory: productEntries.find((entry) => entry.product.category === "accessory")?.product,
       outerwear: productEntries.find((entry) => entry.product.category === "outerwear")?.product,
     },
     colorPalette,
@@ -719,7 +843,7 @@ function buildOutfitRecommendation(
     whyItWorks: buildWhyItWorks(items, answers, matchedColors),
     creatorUseCase: buildCreatorUseCase((answers.occasion || "daily wear") as Occasion),
     confidenceScore,
-    matchQualityLabel: matchQualityLabel(matchMode, confidenceScore, creatorAlignmentScore),
+    matchQualityLabel: matchQualityLabel(confidenceScore),
     budgetMatchLabel: budgetMatch.label,
     budgetNote: budgetMatch.note,
     matchReasons,
@@ -738,20 +862,31 @@ export function buildOutfitRecommendations(answers: QuizAnswers, limit = 8) {
   const outerwearPool = pickPool("outerwear", answers);
   const budgetCap = budgetCapFromRange(answers.budgetRange);
   const recommendations: OutfitRecommendation[] = [];
+  const accessoryChoices = [undefined, ...accessoryPool];
   const outerwearChoices = [undefined, ...outerwearPool];
 
   for (const top of topPool) {
     for (const bottom of bottomPool) {
       for (const shoes of shoesPool) {
-        for (const accessory of accessoryPool) {
+        for (const accessory of accessoryChoices) {
           for (const outerwear of outerwearChoices) {
-            const productEntries = [top, bottom, shoes, accessory, outerwear].filter(
-              Boolean,
-            ) as ScoredProduct[];
+            const productEntries = [top, bottom, shoes, accessory, outerwear].filter(Boolean) as ScoredProduct[];
             const items = productEntries.map((entry) => entry.product);
             const totalPrice = items.reduce((sum, item) => sum + item.price, 0);
+            const coreTotal = [top, bottom, shoes].reduce(
+              (sum, entry) => sum + entry.product.price,
+              0,
+            );
 
-            if (budgetCap && totalPrice > budgetCap * 1.28) {
+            if (budgetCap && coreTotal > budgetCap * 1.08) {
+              continue;
+            }
+
+            if (budgetCap && budgetCap <= 200 && totalPrice > budgetCap * 1.1) {
+              continue;
+            }
+
+            if (budgetCap && budgetCap > 200 && totalPrice > budgetCap * 1.16) {
               continue;
             }
 
@@ -772,8 +907,21 @@ export function buildOutfitRecommendations(answers: QuizAnswers, limit = 8) {
     new Map(recommendations.map((recommendation) => [recommendation.id, recommendation])).values(),
   );
 
+  const budgetPriority = (label: BudgetMatchLabel) => {
+    if (label === "Within budget") {
+      return 0;
+    }
+
+    if (label === "Near budget") {
+      return 1;
+    }
+
+    return 2;
+  };
+
   const sorted = uniqueRecommendations.sort(
     (left, right) =>
+      budgetPriority(left.budgetMatchLabel) - budgetPriority(right.budgetMatchLabel) ||
       right.confidenceScore - left.confidenceScore ||
       right.creatorAlignmentScore - left.creatorAlignmentScore ||
       left.totalPrice - right.totalPrice,
@@ -785,12 +933,13 @@ export function buildOutfitRecommendations(answers: QuizAnswers, limit = 8) {
       name: buildName(
         (answers.aesthetic || "smart casual") as Aesthetic,
         (answers.occasion || "daily wear") as Occasion,
+        answers.stylePreference,
         index,
       ),
     }));
   }
 
-  const fallbackItems = requiredCategories
+  const fallbackItems = [...coreCategories, "accessory" as const]
     .map((category) =>
       products
         .filter((product) => product.category === category)
@@ -798,7 +947,7 @@ export function buildOutfitRecommendations(answers: QuizAnswers, limit = 8) {
     )
     .filter(Boolean) as Product[];
 
-  if (fallbackItems.length < 4) {
+  if (fallbackItems.length < 3) {
     return [];
   }
 
@@ -812,7 +961,7 @@ export function buildOutfitRecommendations(answers: QuizAnswers, limit = 8) {
         top: fallbackItems.find((item) => item.category === "top")!,
         bottom: fallbackItems.find((item) => item.category === "bottom")!,
         shoes: fallbackItems.find((item) => item.category === "shoes")!,
-        accessory: fallbackItems.find((item) => item.category === "accessory")!,
+        accessory: fallbackItems.find((item) => item.category === "accessory"),
         outerwear: undefined,
       },
       colorPalette: uniqueColors(fallbackItems),
@@ -820,14 +969,14 @@ export function buildOutfitRecommendations(answers: QuizAnswers, limit = 8) {
       fitNote: buildFitNote(fallbackItems, answers),
       whyItWorks: "This is the closest ready-to-buy outfit mix available in the current mock catalog.",
       creatorUseCase: buildCreatorUseCase((answers.occasion || "daily wear") as Occasion),
-      confidenceScore: 61,
+      confidenceScore: 49,
       matchQualityLabel: "Closest match",
-      budgetMatchLabel: "Close to budget",
+      budgetMatchLabel: "Near budget",
       budgetNote: "This fallback prioritizes showing a complete outfit over a blank page.",
       matchReasons: [
         "No perfect match yet, but this is the closest full outfit in the current mock catalog",
         answers.aesthetic
-          ? `Still leans toward your ${formatLabel(answers.aesthetic)} aesthetic`
+          ? `Still leans toward your ${formatAestheticLabel(answers.aesthetic, answers.stylePreference)} aesthetic`
           : "Still keeps the outfit visually cohesive",
       ],
       creatorAlignmentScore: 2,

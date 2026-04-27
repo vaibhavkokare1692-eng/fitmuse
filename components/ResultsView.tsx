@@ -22,7 +22,14 @@ import {
   writeSavedLooks,
   writeStoredQuizAnswers,
 } from "@/lib/local-storage";
-import { formatCurrency, formatOptionLabel, splitCommaSeparated } from "@/lib/utils";
+import {
+  formatAestheticLabel,
+  formatCurrency,
+  formatOptionLabel,
+  getOccasionResultsDescriptor,
+  getUseCaseLabel,
+  splitCommaSeparated,
+} from "@/lib/utils";
 import { buildOutfitRecommendations, hasQuizAnswers } from "@/utils/outfitMatcher";
 import type {
   Aesthetic,
@@ -75,7 +82,7 @@ const sortOptions: Array<{ value: ResultsSort; label: string }> = [
   { value: "best-match", label: "Best match" },
   { value: "lowest-price", label: "Lowest price" },
   { value: "highest-confidence", label: "Highest confidence" },
-  { value: "creator-ready", label: "Creator-ready" },
+  { value: "creator-ready", label: "Occasion focus" },
 ];
 
 const savedColorMap: Record<string, string> = {
@@ -135,9 +142,17 @@ function mergeLeadingValue(primary: string, source: string) {
   return Array.from(new Set(values)).join(", ");
 }
 
-function getActiveFilterChips(filters: ResultsFilters) {
+function getActiveFilterChips(
+  filters: ResultsFilters,
+  stylePreference: QuizAnswers["stylePreference"] = "",
+) {
   return [
-    filters.aesthetic ? { label: "Aesthetic", value: formatOptionLabel(filters.aesthetic) } : null,
+    filters.aesthetic
+      ? {
+          label: "Aesthetic",
+          value: formatAestheticLabel(filters.aesthetic, stylePreference),
+        }
+      : null,
     filters.occasion ? { label: "Occasion", value: formatOptionLabel(filters.occasion) } : null,
     filters.maxBudget ? { label: "Budget", value: formatOptionLabel(filters.maxBudget) } : null,
     filters.fit ? { label: "Fit", value: formatOptionLabel(filters.fit) } : null,
@@ -161,8 +176,15 @@ function sortRecommendations(recommendations: OutfitRecommendation[], sort: Resu
     }
 
     if (sort === "creator-ready") {
+      const creatorMomentSelected =
+        left.occasion === "reels" ||
+        left.occasion === "photoshoot" ||
+        left.occasion === "brand content";
+
       return (
-        right.creatorAlignmentScore - left.creatorAlignmentScore ||
+        (creatorMomentSelected
+          ? right.creatorAlignmentScore - left.creatorAlignmentScore
+          : 0) ||
         right.confidenceScore - left.confidenceScore ||
         left.totalPrice - right.totalPrice
       );
@@ -342,10 +364,16 @@ export function ResultsView({ searchParamsObject = {} }: ResultsViewProps) {
     savedRecommendations,
   ]);
 
-  const activeFilterChips = getActiveFilterChips(filters);
+  const activeFilterChips = getActiveFilterChips(filters, quizAnswers?.stylePreference ?? "");
+  const weakRecommendationCount = sortedRecommendations.filter(
+    (recommendation) => recommendation.confidenceScore < 55,
+  ).length;
   const isClosestOnly =
     sortedRecommendations.length > 0 &&
-    sortedRecommendations.every((recommendation) => recommendation.matchMode === "closest");
+    weakRecommendationCount >= Math.ceil(sortedRecommendations.length * 0.6);
+  const resultsDescriptor = getOccasionResultsDescriptor(
+    filters.occasion || quizAnswers?.occasion || "",
+  );
   const preferredColors = splitCommaSeparated(quizAnswers?.preferredColors);
   const preferredStores = splitCommaSeparated(quizAnswers?.storesLike);
   const selectedSavedLook = useMemo(
@@ -605,27 +633,39 @@ export function ResultsView({ searchParamsObject = {} }: ResultsViewProps) {
                 <p className="eyebrow !mb-0 text-accent-3">Your Style Brief</p>
                 <h2 className="mt-4 text-4xl leading-tight text-white sm:text-5xl">
                   Styled for:{" "}
-                  {[quizAnswers.aesthetic, quizAnswers.occasion, quizAnswers.budgetRange]
+                  {[
+                    quizAnswers.aesthetic
+                      ? formatAestheticLabel(quizAnswers.aesthetic, quizAnswers.stylePreference)
+                      : "",
+                    quizAnswers.occasion ? formatOptionLabel(quizAnswers.occasion) : "",
+                    quizAnswers.budgetRange ? formatOptionLabel(quizAnswers.budgetRange) : "",
+                  ]
                     .filter(Boolean)
-                    .map(formatOptionLabel)
                     .join(" / ")}
                 </h2>
                 <p className="mt-4 max-w-2xl text-white/72">
                   {quizAnswers.fitPreference
                     ? `FitMuse is ranking looks around your ${formatOptionLabel(quizAnswers.fitPreference)} fit preference.`
-                    : "FitMuse is prioritizing creator-ready looks around your style brief."}
+                    : `FitMuse is prioritizing ${resultsDescriptor} looks around your style brief.`}
                 </p>
 
                 <div className="mt-5 grid gap-3 sm:grid-cols-2">
                   {[
-                    { label: "Aesthetic", value: quizAnswers.aesthetic || "Open" },
+                    {
+                      label: "Aesthetic",
+                      value: quizAnswers.aesthetic
+                        ? formatAestheticLabel(quizAnswers.aesthetic, quizAnswers.stylePreference)
+                        : "Open",
+                    },
                     { label: "Occasion", value: quizAnswers.occasion || "Open" },
                     { label: "Budget", value: quizAnswers.budgetRange || "Flexible" },
                     { label: "Fit preference", value: quizAnswers.fitPreference || "Open" },
                   ].map((item) => (
                     <div key={item.label} className="rounded-[1.35rem] border border-white/12 bg-white/10 p-4">
                       <p className="mini-label !text-white/62">{item.label}</p>
-                      <p className="mt-2 text-sm text-white/92">{formatOptionLabel(item.value)}</p>
+                      <p className="mt-2 text-sm text-white/92">
+                        {item.label === "Aesthetic" ? item.value : formatOptionLabel(item.value)}
+                      </p>
                     </div>
                   ))}
                 </div>
@@ -711,7 +751,7 @@ export function ResultsView({ searchParamsObject = {} }: ResultsViewProps) {
                     <option value="">Any aesthetic</option>
                     {allAestheticOptions.map((option) => (
                       <option key={option} value={option}>
-                        {formatOptionLabel(option)}
+                        {formatAestheticLabel(option, quizAnswers.stylePreference)}
                       </option>
                     ))}
                   </select>
@@ -883,7 +923,7 @@ export function ResultsView({ searchParamsObject = {} }: ResultsViewProps) {
             <div>
               <p className="eyebrow !mb-0">Results</p>
               <h2 className="mt-3 text-4xl text-foreground">
-                {sortedRecommendations.length} creator-ready{" "}
+                {sortedRecommendations.length} {resultsDescriptor}{" "}
                 {sortedRecommendations.length === 1 ? "look" : "looks"} ranked for your brief.
               </h2>
               <p className="mt-3 max-w-2xl">
@@ -920,6 +960,7 @@ export function ResultsView({ searchParamsObject = {} }: ResultsViewProps) {
                     recommendation={recommendation}
                     saved={savedLookIds.includes(recommendation.id)}
                     onToggleSave={toggleSave}
+                    stylePreference={quizAnswers.stylePreference}
                   />
                 ))}
               </div>
@@ -956,7 +997,9 @@ export function ResultsView({ searchParamsObject = {} }: ResultsViewProps) {
                 className="rounded-[1.6rem] border border-line/70 bg-white/82 p-5 shadow-[0_18px_40px_rgba(27,21,19,0.06)]"
               >
                 <div className="flex flex-wrap gap-2">
-                  <span className="chip">{formatOptionLabel(savedLook.aesthetic)}</span>
+                  <span className="chip">
+                    {formatAestheticLabel(savedLook.aesthetic, savedLook.stylePreference)}
+                  </span>
                   <span className="chip">{formatOptionLabel(savedLook.occasion)}</span>
                   {savedLook.stylePreference ? (
                     <span className="chip">{formatOptionLabel(savedLook.stylePreference)}</span>
@@ -1045,7 +1088,9 @@ export function ResultsView({ searchParamsObject = {} }: ResultsViewProps) {
             </div>
 
             <div className="mt-5 flex flex-wrap gap-2">
-              <span className="chip">{formatOptionLabel(selectedSavedLook.aesthetic)}</span>
+              <span className="chip">
+                {formatAestheticLabel(selectedSavedLook.aesthetic, selectedSavedLook.stylePreference)}
+              </span>
               <span className="chip">{formatOptionLabel(selectedSavedLook.occasion)}</span>
               {selectedSavedLook.stylePreference ? (
                 <span className="chip">{formatOptionLabel(selectedSavedLook.stylePreference)}</span>
@@ -1066,7 +1111,7 @@ export function ResultsView({ searchParamsObject = {} }: ResultsViewProps) {
                 <p className="mini-label">Saved from brief</p>
                 <p className="mt-2 text-sm text-foreground">
                   {selectedSavedLook.briefSummary?.aesthetic
-                    ? `${formatOptionLabel(selectedSavedLook.briefSummary.aesthetic)} / ${formatOptionLabel(selectedSavedLook.briefSummary.occasion || "")}`
+                    ? `${formatAestheticLabel(selectedSavedLook.briefSummary.aesthetic, selectedSavedLook.stylePreference)} / ${formatOptionLabel(selectedSavedLook.briefSummary.occasion || "")}`
                     : "Saved from a previous FitMuse brief"}
                 </p>
               </div>
@@ -1096,7 +1141,9 @@ export function ResultsView({ searchParamsObject = {} }: ResultsViewProps) {
                   { label: "Top", value: selectedSavedLook.items.top.name },
                   { label: "Bottom", value: selectedSavedLook.items.bottom.name },
                   { label: "Shoes", value: selectedSavedLook.items.shoes.name },
-                  { label: "Accessory", value: selectedSavedLook.items.accessory.name },
+                  selectedSavedLook.items.accessory
+                    ? { label: "Accessory", value: selectedSavedLook.items.accessory.name }
+                    : null,
                   selectedSavedLook.items.outerwear
                     ? { label: "Outerwear", value: selectedSavedLook.items.outerwear.name }
                     : null,
@@ -1124,7 +1171,7 @@ export function ResultsView({ searchParamsObject = {} }: ResultsViewProps) {
             </div>
 
             <div className="mt-6 rounded-[1.5rem] border border-line/70 bg-white/78 p-5">
-              <p className="mini-label">Creator use case</p>
+              <p className="mini-label">{getUseCaseLabel(selectedSavedLook.occasion)}</p>
               <p className="mt-3 text-sm leading-6 text-foreground">{selectedSavedLook.creatorUseCase}</p>
             </div>
 
@@ -1150,7 +1197,10 @@ export function ResultsView({ searchParamsObject = {} }: ResultsViewProps) {
                   ) : null}
                   {selectedSavedLook.briefSummary.aesthetic ? (
                     <span className="chip">
-                      {formatOptionLabel(selectedSavedLook.briefSummary.aesthetic)}
+                      {formatAestheticLabel(
+                        selectedSavedLook.briefSummary.aesthetic,
+                        selectedSavedLook.stylePreference,
+                      )}
                     </span>
                   ) : null}
                   {selectedSavedLook.briefSummary.occasion ? (

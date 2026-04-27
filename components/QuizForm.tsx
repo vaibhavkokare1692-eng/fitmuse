@@ -34,7 +34,7 @@ import {
   readStoredQuizAnswers,
   writeStoredQuizAnswers,
 } from "@/lib/local-storage";
-import { formatCurrency, formatOptionLabel } from "@/lib/utils";
+import { formatAestheticLabel, formatCurrency, formatOptionLabel } from "@/lib/utils";
 import { buildOutfitRecommendations, emptyQuizAnswers, hasQuizAnswers } from "@/utils/outfitMatcher";
 import type { QuizAnswers } from "@/types";
 
@@ -320,7 +320,7 @@ export function QuizForm() {
             <h3 className="mt-3 text-3xl text-white">{previewLooks[0].name}</h3>
             <div className="mt-4 flex flex-wrap gap-2">
               <span className="rounded-full bg-white/12 px-3 py-2 text-sm text-white/92">
-                {formatOptionLabel(previewLooks[0].aesthetic)}
+                {formatAestheticLabel(previewLooks[0].aesthetic, formValues.stylePreference)}
               </span>
               <span className="rounded-full bg-white/12 px-3 py-2 text-sm text-white/92">
                 {formatCurrency(previewLooks[0].totalPrice)}
@@ -537,7 +537,7 @@ export function QuizForm() {
                               : "border-line/70 bg-white/80 text-foreground hover:border-accent hover:text-accent"
                           }`}
                         >
-                          {formatOptionLabel(option)}
+                          {formatAestheticLabel(option, formValues.stylePreference)}
                         </button>
                       );
                     })}
@@ -736,7 +736,7 @@ export function QuizForm() {
                             previewLooks[0].items.top.name,
                             previewLooks[0].items.bottom.name,
                             previewLooks[0].items.shoes.name,
-                            previewLooks[0].items.accessory.name,
+                            previewLooks[0].items.accessory?.name,
                             previewLooks[0].items.outerwear?.name,
                           ]
                             .filter(Boolean)

@@ -94,14 +94,13 @@ export type ProductVisualType =
   | "layered";
 
 export type BudgetMatchLabel =
-  | "Under budget"
-  | "Close to budget"
-  | "Over budget but strong match";
+  | "Within budget"
+  | "Near budget"
+  | "Over budget but strong style match";
 
 export type MatchQualityLabel =
   | "Best match"
   | "Strong match"
-  | "Creator-ready"
   | "Closest match";
 
 export type Product = {
@@ -155,7 +154,7 @@ export type OutfitRecommendationItems = {
   top: Product;
   bottom: Product;
   shoes: Product;
-  accessory: Product;
+  accessory?: Product;
   outerwear?: Product;
 };
 
