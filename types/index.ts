@@ -167,6 +167,7 @@ export type OutfitRecommendation = {
   totalPrice: number;
   items: OutfitRecommendationItems;
   colorPalette: string[];
+  colorFamilies: ColorFamily[];
   fitNote: string;
   whyItWorks: string;
   creatorUseCase: string;

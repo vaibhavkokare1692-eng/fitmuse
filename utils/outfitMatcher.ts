@@ -467,6 +467,10 @@ function uniqueColors(items: Product[]) {
   return Array.from(new Set(items.flatMap((item) => item.colors))).slice(0, 5);
 }
 
+function uniqueColorFamilies(items: Product[]) {
+  return Array.from(new Set(items.map((item) => item.colorFamily)));
+}
+
 function buildName(aesthetic: Aesthetic, occasion: Occasion, index: number) {
   const key = `${aesthetic}|${occasion}`;
   const names: Record<string, string> = {
@@ -710,6 +714,7 @@ function buildOutfitRecommendation(
       outerwear: productEntries.find((entry) => entry.product.category === "outerwear")?.product,
     },
     colorPalette,
+    colorFamilies: uniqueColorFamilies(items),
     fitNote: buildFitNote(items, answers),
     whyItWorks: buildWhyItWorks(items, answers, matchedColors),
     creatorUseCase: buildCreatorUseCase((answers.occasion || "daily wear") as Occasion),
@@ -811,6 +816,7 @@ export function buildOutfitRecommendations(answers: QuizAnswers, limit = 8) {
         outerwear: undefined,
       },
       colorPalette: uniqueColors(fallbackItems),
+      colorFamilies: uniqueColorFamilies(fallbackItems),
       fitNote: buildFitNote(fallbackItems, answers),
       whyItWorks: "This is the closest ready-to-buy outfit mix available in the current mock catalog.",
       creatorUseCase: buildCreatorUseCase((answers.occasion || "daily wear") as Occasion),

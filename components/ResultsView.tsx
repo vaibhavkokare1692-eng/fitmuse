@@ -28,6 +28,7 @@ import { buildOutfitRecommendations, hasQuizAnswers } from "@/utils/outfitMatche
 import type {
   Aesthetic,
   BudgetRange,
+  ColorFamily,
   FitPreference,
   Occasion,
   OutfitRecommendation,
@@ -46,7 +47,7 @@ type ResultsFilters = {
   maxBudget: BudgetRange | "";
   fit: FitPreference | "";
   store: string;
-  color: string;
+  colorFamily: ColorFamily | "";
 };
 
 const allAestheticOptions = Array.from(
@@ -65,8 +66,8 @@ const allOccasionOptions = Array.from(
 
 const allStoreOptions = Array.from(new Set(products.map((product) => product.store))).sort();
 
-const allColorOptions = Array.from(
-  new Set(products.flatMap((product) => product.colors.map((color) => color.toLowerCase()))),
+const allColorFamilyOptions = Array.from(
+  new Set(products.map((product) => product.colorFamily)),
 ).sort((left, right) => formatOptionLabel(left).localeCompare(formatOptionLabel(right)));
 
 const sortOptions: Array<{ value: ResultsSort; label: string }> = [
@@ -83,7 +84,7 @@ function buildBaseFilters(answers: QuizAnswers | null): ResultsFilters {
     maxBudget: answers?.budgetRange ?? "",
     fit: answers?.fitPreference ?? "",
     store: "",
-    color: "",
+    colorFamily: "",
   };
 }
 
@@ -94,7 +95,7 @@ function sameFilters(left: ResultsFilters, right: ResultsFilters) {
     left.maxBudget === right.maxBudget &&
     left.fit === right.fit &&
     left.store === right.store &&
-    left.color === right.color
+    left.colorFamily === right.colorFamily
   );
 }
 
@@ -113,7 +114,9 @@ function getActiveFilterChips(filters: ResultsFilters) {
     filters.maxBudget ? { label: "Budget", value: formatOptionLabel(filters.maxBudget) } : null,
     filters.fit ? { label: "Fit", value: formatOptionLabel(filters.fit) } : null,
     filters.store ? { label: "Store", value: filters.store } : null,
-    filters.color ? { label: "Color", value: formatOptionLabel(filters.color) } : null,
+    filters.colorFamily
+      ? { label: "Color family", value: formatOptionLabel(filters.colorFamily) }
+      : null,
   ].filter(Boolean) as Array<{ label: string; value: string }>;
 }
 
@@ -220,9 +223,6 @@ export function ResultsView({ searchParamsObject = {} }: ResultsViewProps) {
       occasion: filters.occasion || quizAnswers.occasion,
       budgetRange: filters.maxBudget || quizAnswers.budgetRange,
       fitPreference: filters.fit || quizAnswers.fitPreference,
-      preferredColors: filters.color
-        ? mergeLeadingValue(filters.color, quizAnswers.preferredColors)
-        : quizAnswers.preferredColors,
       storesLike: filters.store
         ? mergeLeadingValue(filters.store, quizAnswers.storesLike)
         : quizAnswers.storesLike,
@@ -250,17 +250,15 @@ export function ResultsView({ searchParamsObject = {} }: ResultsViewProps) {
       }
 
       if (
-        filters.color &&
-        !recommendation.colorPalette.some(
-          (color) => color.toLowerCase() === filters.color.toLowerCase(),
-        )
-        ) {
+        filters.colorFamily &&
+        !recommendation.colorFamilies.some((family) => family === filters.colorFamily)
+      ) {
         return false;
       }
 
       return true;
     });
-  }, [filters.color, filters.store, recommendations]);
+  }, [filters.colorFamily, filters.store, recommendations]);
 
   const sortedRecommendations = useMemo(
     () => sortRecommendations(filteredRecommendations, sort),
@@ -283,6 +281,8 @@ export function ResultsView({ searchParamsObject = {} }: ResultsViewProps) {
   const isClosestOnly =
     sortedRecommendations.length > 0 &&
     sortedRecommendations.every((recommendation) => recommendation.matchMode === "closest");
+  const preferredColors = splitCommaSeparated(quizAnswers?.preferredColors);
+  const preferredStores = splitCommaSeparated(quizAnswers?.storesLike);
 
   function handleFilterChange<K extends keyof ResultsFilters>(key: K, value: ResultsFilters[K]) {
     setFilters((current) => {
@@ -407,6 +407,20 @@ export function ResultsView({ searchParamsObject = {} }: ResultsViewProps) {
                 ? `FitMuse is ranking looks around your ${formatOptionLabel(quizAnswers.fitPreference)} fit preference.`
                 : "FitMuse is prioritizing creator-ready looks around your style brief."}
             </p>
+
+            <div className="mt-5 grid gap-3 sm:grid-cols-2">
+              {[
+                { label: "Aesthetic", value: quizAnswers.aesthetic || "Open" },
+                { label: "Occasion", value: quizAnswers.occasion || "Open" },
+                { label: "Budget", value: quizAnswers.budgetRange || "Flexible" },
+                { label: "Fit preference", value: quizAnswers.fitPreference || "Open" },
+              ].map((item) => (
+                <div key={item.label} className="rounded-[1.35rem] border border-white/12 bg-white/10 p-4">
+                  <p className="mini-label !text-white/62">{item.label}</p>
+                  <p className="mt-2 text-sm text-white/92">{formatOptionLabel(item.value)}</p>
+                </div>
+              ))}
+            </div>
           </div>
 
           <div className="grid gap-3 sm:grid-cols-2">
@@ -426,8 +440,8 @@ export function ResultsView({ searchParamsObject = {} }: ResultsViewProps) {
           <div className="rounded-[1.5rem] border border-white/12 bg-white/8 p-5">
             <p className="mini-label !text-white/62">Color + store direction</p>
             <div className="mt-4 flex flex-wrap gap-2">
-              {(splitCommaSeparated(quizAnswers.preferredColors).length > 0
-                ? splitCommaSeparated(quizAnswers.preferredColors).slice(0, 4)
+              {(preferredColors.length > 0
+                ? preferredColors.slice(0, 4)
                 : ["Open palette"]
               ).map((color) => (
                 <span key={color} className="rounded-full bg-white/12 px-3 py-2 text-sm text-white/92">
@@ -440,6 +454,13 @@ export function ResultsView({ searchParamsObject = {} }: ResultsViewProps) {
                 ? `Preferred stores: ${quizAnswers.storesLike}.`
                 : "No store lock-in yet, so FitMuse is mixing the strongest mock products across the catalog."}
             </p>
+            <div className="mt-4 flex flex-wrap gap-2">
+              {(preferredStores.length > 0 ? preferredStores.slice(0, 4) : ["Any store"]).map((store) => (
+                <span key={store} className="rounded-full bg-black/12 px-3 py-2 text-sm text-white/88">
+                  {store === "Any store" ? store : `Store: ${store}`}
+                </span>
+              ))}
+            </div>
           </div>
         </motion.div>
 
@@ -454,7 +475,7 @@ export function ResultsView({ searchParamsObject = {} }: ResultsViewProps) {
               <p className="eyebrow !mb-0">Refine your pack</p>
               <h2 className="mt-3 text-4xl text-foreground">Tune the recommendation mix.</h2>
               <p className="mt-3 max-w-2xl">
-                Adjust the aesthetic, occasion, spend cap, store, or color direction without rebuilding your whole quiz.
+                Adjust the aesthetic, occasion, spend cap, store, or color-family direction without rebuilding your whole quiz.
               </p>
             </div>
             <button type="button" onClick={handleStartNewQuiz} className="cta-secondary">
@@ -567,17 +588,19 @@ export function ResultsView({ searchParamsObject = {} }: ResultsViewProps) {
             </div>
 
             <div>
-              <label htmlFor="results-color" className="mini-label">
-                Color
+              <label htmlFor="results-color-family" className="mini-label">
+                Color family
               </label>
               <select
-                id="results-color"
-                value={filters.color}
-                onChange={(event) => handleFilterChange("color", event.target.value)}
+                id="results-color-family"
+                value={filters.colorFamily}
+                onChange={(event) =>
+                  handleFilterChange("colorFamily", event.target.value as ResultsFilters["colorFamily"])
+                }
                 className="filter-select mt-2"
               >
-                <option value="">Any color</option>
-                {allColorOptions.map((option) => (
+                <option value="">Any color family</option>
+                {allColorFamilyOptions.map((option) => (
                   <option key={option} value={option}>
                     {formatOptionLabel(option)}
                   </option>
@@ -677,7 +700,7 @@ export function ResultsView({ searchParamsObject = {} }: ResultsViewProps) {
             <div>
               <p className="mini-label">Closest matches</p>
               <h2 className="mt-3 text-3xl text-foreground">
-                No perfect match yet, but these looks are closest to your style brief.
+                No perfect match yet — these are the closest looks to your style brief.
               </h2>
               <p className="mt-3 max-w-3xl">
                 FitMuse is still prioritizing the strongest aesthetic, budget, and color overlap instead of leaving you with a blank page.
@@ -709,7 +732,7 @@ export function ResultsView({ searchParamsObject = {} }: ResultsViewProps) {
           <p className="mini-label">No looks in current filter mix</p>
           <h2 className="mt-3 text-4xl text-foreground">Try widening one filter to bring more looks back.</h2>
           <p className="mt-4 max-w-2xl">
-            The recommendation engine still has mock inventory, but the current combination of store, color, fit, and budget is too narrow.
+            The recommendation engine still has mock inventory, but the current combination of store, color family, fit, and budget is too narrow.
           </p>
           <div className="mt-6">
             <button type="button" onClick={resetFiltersToBrief} className="cta-primary">
