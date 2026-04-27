@@ -171,7 +171,12 @@ export function ResultsView({ searchParamsObject = {} }: ResultsViewProps) {
   const [savedLooks, setSavedLooks] = useState<OutfitRecommendation[]>([]);
   const [filters, setFilters] = useState<ResultsFilters>(buildBaseFilters(searchAnswers));
   const [sort, setSort] = useState<ResultsSort>("best-match");
+  const [highlightedLookId, setHighlightedLookId] = useState<string | null>(null);
+  const [savedLooksMessage, setSavedLooksMessage] = useState("");
+  const [pendingOpenSavedLookId, setPendingOpenSavedLookId] = useState<string | null>(null);
   const filtersSeedRef = useRef("");
+  const highlightTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const savedMessageTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
     if (searchAnswers && hasQuizAnswers(searchAnswers)) {
@@ -284,6 +289,45 @@ export function ResultsView({ searchParamsObject = {} }: ResultsViewProps) {
   const preferredColors = splitCommaSeparated(quizAnswers?.preferredColors);
   const preferredStores = splitCommaSeparated(quizAnswers?.storesLike);
 
+  function setTemporarySavedLooksMessage(message: string) {
+    setSavedLooksMessage(message);
+
+    if (savedMessageTimeoutRef.current) {
+      clearTimeout(savedMessageTimeoutRef.current);
+    }
+
+    savedMessageTimeoutRef.current = setTimeout(() => {
+      setSavedLooksMessage("");
+      savedMessageTimeoutRef.current = null;
+    }, 2800);
+  }
+
+  function highlightLookCard(recommendationId: string) {
+    if (typeof document === "undefined") {
+      return false;
+    }
+
+    const targetCard = document.getElementById(`look-${recommendationId}`);
+
+    if (!targetCard) {
+      return false;
+    }
+
+    targetCard.scrollIntoView({ behavior: "smooth", block: "center" });
+    setHighlightedLookId(recommendationId);
+
+    if (highlightTimeoutRef.current) {
+      clearTimeout(highlightTimeoutRef.current);
+    }
+
+    highlightTimeoutRef.current = setTimeout(() => {
+      setHighlightedLookId((current) => (current === recommendationId ? null : current));
+      highlightTimeoutRef.current = null;
+    }, 2600);
+
+    return true;
+  }
+
   function handleFilterChange<K extends keyof ResultsFilters>(key: K, value: ResultsFilters[K]) {
     setFilters((current) => {
       const next = { ...current, [key]: value };
@@ -327,6 +371,24 @@ export function ResultsView({ searchParamsObject = {} }: ResultsViewProps) {
     router.push("/quiz");
   }
 
+  function handleOpenSavedLook(recommendationId: string) {
+    setSavedLooksMessage("");
+
+    if (highlightLookCard(recommendationId)) {
+      return;
+    }
+
+    if (recommendations.some((recommendation) => recommendation.id === recommendationId)) {
+      const baseFilters = buildBaseFilters(quizAnswers);
+      setPendingOpenSavedLookId(recommendationId);
+      setFilters((current) => (sameFilters(current, baseFilters) ? current : baseFilters));
+      setTemporarySavedLooksMessage("Cleared filters to reopen your saved look.");
+      return;
+    }
+
+    setTemporarySavedLooksMessage("This saved look is not part of your current results set.");
+  }
+
   useEffect(() => {
     if (savedLookIds.length === 0 || recommendationLookup.size === 0) {
       return;
@@ -362,6 +424,32 @@ export function ResultsView({ searchParamsObject = {} }: ResultsViewProps) {
       return uniqueNext;
     });
   }, [recommendationLookup, savedLookIds]);
+
+  useEffect(() => {
+    if (!pendingOpenSavedLookId) {
+      return;
+    }
+
+    if (!sortedRecommendations.some((recommendation) => recommendation.id === pendingOpenSavedLookId)) {
+      return;
+    }
+
+    if (highlightLookCard(pendingOpenSavedLookId)) {
+      setPendingOpenSavedLookId(null);
+    }
+  }, [pendingOpenSavedLookId, sortedRecommendations]);
+
+  useEffect(() => {
+    return () => {
+      if (highlightTimeoutRef.current) {
+        clearTimeout(highlightTimeoutRef.current);
+      }
+
+      if (savedMessageTimeoutRef.current) {
+        clearTimeout(savedMessageTimeoutRef.current);
+      }
+    };
+  }, []);
 
   if (!quizAnswers) {
     return (
@@ -669,10 +757,19 @@ export function ResultsView({ searchParamsObject = {} }: ResultsViewProps) {
                 className="rounded-[1.5rem] border border-line/70 bg-white/82 p-4"
               >
                 <div className="flex items-start justify-between gap-3">
-                  <div>
+                  <button
+                    type="button"
+                    onClick={() => handleOpenSavedLook(recommendation.id)}
+                    aria-label={`Open saved look: ${recommendation.name}`}
+                    data-testid={`open-saved-look-${recommendation.id}`}
+                    className="min-w-0 flex-1 rounded-[1.1rem] text-left transition hover:bg-background/70 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-2/70"
+                  >
                     <p className="mini-label">{recommendation.matchQualityLabel}</p>
                     <h3 className="mt-2 text-2xl text-foreground">{recommendation.name}</h3>
-                  </div>
+                    <p className="mt-2 text-sm text-muted">
+                      Open this saved look in your recommendation grid.
+                    </p>
+                  </button>
                   <button
                     type="button"
                     onClick={() => toggleSave(recommendation.id)}
@@ -687,6 +784,12 @@ export function ResultsView({ searchParamsObject = {} }: ResultsViewProps) {
                 </div>
               </div>
             ))}
+          </div>
+
+          <div aria-live="polite" className="mt-4 min-h-6">
+            {savedLooksMessage ? (
+              <p className="text-sm font-medium text-accent-2">{savedLooksMessage}</p>
+            ) : null}
           </div>
         </div>
       ) : null}
@@ -746,6 +849,8 @@ export function ResultsView({ searchParamsObject = {} }: ResultsViewProps) {
             {sortedRecommendations.map((recommendation) => (
               <RecommendationCard
                 key={recommendation.id}
+                cardId={`look-${recommendation.id}`}
+                highlighted={highlightedLookId === recommendation.id}
                 recommendation={recommendation}
                 saved={savedLookIds.includes(recommendation.id)}
                 onToggleSave={toggleSave}

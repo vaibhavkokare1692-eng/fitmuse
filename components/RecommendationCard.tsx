@@ -11,6 +11,8 @@ type RecommendationCardProps = {
   recommendation: OutfitRecommendation;
   saved: boolean;
   onToggleSave: (id: string) => void;
+  cardId?: string;
+  highlighted?: boolean;
 };
 
 const colorMap: Record<string, string> = {
@@ -80,6 +82,8 @@ export function RecommendationCard({
   recommendation,
   saved,
   onToggleSave,
+  cardId,
+  highlighted = false,
 }: RecommendationCardProps) {
   const topReasons = recommendation.matchReasons.slice(0, 2);
   const itemRows = [
@@ -106,11 +110,17 @@ export function RecommendationCard({
 
   return (
     <motion.article
+      id={cardId}
       initial={{ opacity: 0, y: 18 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, amount: 0.18 }}
       transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-      className="hero-card hover-lift flex h-full flex-col overflow-hidden p-4"
+      data-testid={`look-card-${recommendation.id}`}
+      className={`hero-card hover-lift scroll-mt-24 flex h-full flex-col overflow-hidden p-4 transition-[box-shadow,border-color,background-color] duration-500 ${
+        highlighted
+          ? "ring-2 ring-accent-2/70 shadow-[0_24px_55px_rgba(35,79,94,0.20)] bg-accent-4/45"
+          : ""
+      }`}
     >
       <div className="flex items-start justify-between gap-3 px-2 pb-4">
         <div className="flex flex-wrap gap-2">
