@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import { useState } from "react";
 import { Bookmark } from "lucide-react";
 import { formatCurrency } from "@/lib/utils";
+import { OutfitVisual } from "@/components/OutfitVisual";
 import { ShoppingLinksButton } from "@/components/ShoppingLinksButton";
 import type { Outfit } from "@/types";
 
@@ -32,27 +33,6 @@ const colorMap: Record<string, string> = {
   beige: "#d9c8ae",
 };
 
-function getVisualTheme(outfitId: string) {
-  switch (outfitId) {
-    case "old-money-dinner-look":
-      return "from-[#203138] via-[#576d63] to-[#e8d2b5]";
-    case "streetwear-reel-outfit":
-      return "from-[#23252c] via-[#4f5967] to-[#bbb5a7]";
-    case "minimalist-coffee-date-look":
-      return "from-[#3a302d] via-[#847269] to-[#efe2d7]";
-    case "clean-girl-everyday-look":
-      return "from-[#355f58] via-[#87a59a] to-[#f4efe7]";
-    case "college-casual-fit":
-      return "from-[#31455d] via-[#7182a1] to-[#f2ece2]";
-    case "office-smart-casual":
-      return "from-[#2c3948] via-[#6d7887] to-[#ede6dc]";
-    case "party-night-outfit":
-      return "from-[#171218] via-[#57344f] to-[#d1b1bb]";
-    default:
-      return "from-[#3a403f] via-[#81826f] to-[#eee0ce]";
-  }
-}
-
 function shortenFitNote(value: string, maxLength = 108) {
   if (value.length <= maxLength) {
     return value;
@@ -63,10 +43,19 @@ function shortenFitNote(value: string, maxLength = 108) {
 
 export function OutfitCard({ outfit, rank, compact = false }: OutfitCardProps) {
   const [saved, setSaved] = useState(false);
-  const visualTheme = getVisualTheme(outfit.id);
   const quickItems = [outfit.items.top, outfit.items.bottom, outfit.items.shoes].slice(0, 3);
   const palette = outfit.colors.slice(0, 3);
   const fitPreview = shortenFitNote(outfit.fitNotes, compact ? 82 : 96);
+  const visualItems = [
+    { category: "top" as const, name: outfit.items.top },
+    { category: "bottom" as const, name: outfit.items.bottom },
+    { category: "shoes" as const, name: outfit.items.shoes },
+    { category: "accessory" as const, name: outfit.items.accessories },
+    outfit.items.outerwear ? { category: "outerwear" as const, name: outfit.items.outerwear } : null,
+  ].filter(Boolean) as Array<{
+    category: "top" | "bottom" | "shoes" | "accessory" | "outerwear";
+    name: string;
+  }>;
 
   return (
     <motion.article
@@ -76,53 +65,42 @@ export function OutfitCard({ outfit, rank, compact = false }: OutfitCardProps) {
       transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
       className="hero-card hover-lift flex h-full flex-col overflow-hidden p-4"
     >
-      <div
-        className={`relative h-64 overflow-hidden rounded-[1.9rem] bg-gradient-to-br ${visualTheme} p-5 text-white`}
-      >
-        <div className="absolute -right-6 top-6 h-24 w-24 rounded-full bg-white/18 blur-2xl" />
-        <div className="absolute bottom-0 right-0 h-32 w-32 rounded-full bg-black/12 blur-2xl" />
-        <div className="absolute left-10 top-18 h-28 w-28 rounded-full border border-white/12 bg-white/8 blur-[1px]" />
-        <div className="absolute left-24 top-10 h-18 w-18 rounded-full border border-white/12 bg-black/8" />
-
-        <div className="relative flex h-full flex-col justify-between">
-          <div className="flex items-start justify-between gap-3">
-            <div className="flex flex-wrap gap-2">
-              {typeof rank === "number" && rank === 0 ? (
-                <span className="rounded-full bg-white/16 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.22em] text-white">
-                  Featured look
-                </span>
-              ) : null}
-              <span className="rounded-full bg-white/16 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.22em] text-white/90">
-                {outfit.aesthetic}
-              </span>
-            </div>
-
-            <button
-              type="button"
-              className={`rounded-full border px-3 py-2 text-sm font-semibold backdrop-blur-sm ${
-                saved
-                  ? "border-white/20 bg-white/16 text-white"
-                  : "border-white/20 bg-black/10 text-white"
-              }`}
-              onClick={() => setSaved((current) => !current)}
-            >
-              <span className="flex items-center gap-2">
-                <Bookmark size={14} />
-                {saved ? "Saved" : "Save"}
-              </span>
-            </button>
-          </div>
-
-          <div className="flex items-end justify-between gap-4">
-            <span className="rounded-full bg-white/14 px-3 py-2 text-xs font-medium text-white/92">
-              {outfit.occasion}
+      <div className="flex items-start justify-between gap-3 px-2 pb-4">
+        <div className="flex flex-wrap gap-2">
+          {typeof rank === "number" && rank === 0 ? (
+            <span className="rounded-full border border-line/70 bg-accent-4 px-3 py-2 text-[11px] font-semibold uppercase tracking-[0.22em] text-accent-2">
+              Featured look
             </span>
-            <span className="rounded-full bg-black/12 px-3 py-2 text-xs font-medium text-white/86">
-              Ready-to-buy
-            </span>
-          </div>
+          ) : null}
+          <span className="rounded-full border border-line/70 bg-white px-3 py-2 text-[11px] font-semibold uppercase tracking-[0.22em] text-foreground">
+            {outfit.aesthetic}
+          </span>
         </div>
+
+        <button
+          type="button"
+          className={`rounded-full border px-3 py-2 text-sm font-semibold ${
+            saved
+              ? "border-accent-2 bg-accent-2 text-white"
+              : "border-line/80 bg-white text-foreground"
+          }`}
+          onClick={() => setSaved((current) => !current)}
+        >
+          <span className="flex items-center gap-2">
+            <Bookmark size={14} />
+            {saved ? "Saved" : "Save"}
+          </span>
+        </button>
       </div>
+
+      <OutfitVisual
+        title={outfit.name}
+        subtitle={outfit.occasion}
+        palette={outfit.colors}
+        items={visualItems}
+        stores={outfit.stores}
+        compact={compact}
+      />
 
       <div className="flex flex-1 flex-col p-2 pt-5">
         <div className="flex items-start justify-between gap-4">
@@ -164,14 +142,7 @@ export function OutfitCard({ outfit, rank, compact = false }: OutfitCardProps) {
         </div>
 
         <div className="mt-6 flex flex-wrap gap-3">
-          <button
-            type="button"
-            className="cta-secondary"
-            onClick={() => setSaved((current) => !current)}
-          >
-            {saved ? "Saved" : "Save"}
-          </button>
-          <ShoppingLinksButton />
+          <ShoppingLinksButton className="cta-secondary" />
         </div>
       </div>
     </motion.article>

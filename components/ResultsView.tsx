@@ -741,16 +741,24 @@ export function ResultsView({ searchParamsObject = {} }: ResultsViewProps) {
           </div>
         </div>
       ) : (
-        <div className="grid gap-6 xl:grid-cols-2">
-          {sortedRecommendations.map((recommendation) => (
-            <RecommendationCard
-              key={recommendation.id}
-              recommendation={recommendation}
-              saved={savedLookIds.includes(recommendation.id)}
-              onToggleSave={toggleSave}
-            />
-          ))}
-        </div>
+        <>
+          <div className="grid gap-6 xl:grid-cols-2">
+            {sortedRecommendations.map((recommendation) => (
+              <RecommendationCard
+                key={recommendation.id}
+                recommendation={recommendation}
+                saved={savedLookIds.includes(recommendation.id)}
+                onToggleSave={toggleSave}
+              />
+            ))}
+          </div>
+
+          <div className="rounded-[1.4rem] border border-line/70 bg-white/74 px-5 py-4">
+            <p className="text-sm leading-6 text-muted">
+              FitMuse currently uses mock outfit data for demo purposes. Real product links and affiliate shopping feeds can be connected in a future version.
+            </p>
+          </div>
+        </>
       )}
     </section>
   );

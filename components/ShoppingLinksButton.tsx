@@ -32,9 +32,9 @@ export function ShoppingLinksButton({
       {showMessage ? (
         <div
           data-testid={`${testId}-message`}
-          className="max-w-xs rounded-[1.2rem] border border-line/70 bg-white/94 px-4 py-3 text-xs leading-5 text-foreground shadow-[0_16px_32px_rgba(27,21,19,0.08)]"
+          className="max-w-xs rounded-[1.2rem] border border-line/70 bg-white/96 px-4 py-3 text-xs leading-5 text-foreground shadow-[0_16px_32px_rgba(27,21,19,0.08)]"
         >
-          Shopping links coming soon. This MVP uses mock products for now.
+          Shopping links are coming soon. This MVP uses mock products while we prepare real affiliate links.
         </div>
       ) : null}
     </div>

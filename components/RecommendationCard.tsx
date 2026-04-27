@@ -3,6 +3,7 @@
 import { motion } from "framer-motion";
 import { Bookmark, ChevronDown } from "lucide-react";
 import { formatCurrency, formatOptionLabel } from "@/lib/utils";
+import { OutfitVisual } from "@/components/OutfitVisual";
 import { ShoppingLinksButton } from "@/components/ShoppingLinksButton";
 import type { OutfitRecommendation } from "@/types";
 
@@ -47,32 +48,20 @@ function shorten(value: string, maxLength: number) {
   return `${value.slice(0, maxLength).trimEnd()}...`;
 }
 
-function getVisualColors(palette: string[]) {
-  const resolved = palette
-    .map((color) => colorMap[color.toLowerCase()] ?? "#ddd2bf")
-    .slice(0, 4);
-
-  while (resolved.length < 4) {
-    resolved.push("#f0e9df");
-  }
-
-  return resolved;
-}
-
 function getMatchBadgeClasses(label: OutfitRecommendation["matchQualityLabel"]) {
   if (label === "Best match") {
-    return "bg-white/18 text-white";
+    return "bg-[#17363d] text-white";
   }
 
   if (label === "Creator-ready") {
-    return "bg-[#17363d]/68 text-white";
+    return "bg-foreground text-white";
   }
 
   if (label === "Closest match") {
-    return "bg-black/16 text-white";
+    return "bg-accent-3 text-foreground";
   }
 
-  return "bg-white/12 text-white";
+  return "bg-white text-foreground";
 }
 
 function getBudgetBadgeClasses(label: OutfitRecommendation["budgetMatchLabel"]) {
@@ -92,7 +81,6 @@ export function RecommendationCard({
   saved,
   onToggleSave,
 }: RecommendationCardProps) {
-  const visualColors = getVisualColors(recommendation.colorPalette);
   const topReasons = recommendation.matchReasons.slice(0, 2);
   const itemRows = [
     { label: "Top", value: recommendation.items.top.name },
@@ -103,6 +91,18 @@ export function RecommendationCard({
       ? { label: "Outerwear", value: recommendation.items.outerwear.name }
       : null,
   ].filter(Boolean) as Array<{ label: string; value: string }>;
+  const visualItems = [
+    { category: "top", name: recommendation.items.top.name },
+    { category: "bottom", name: recommendation.items.bottom.name },
+    { category: "shoes", name: recommendation.items.shoes.name },
+    { category: "accessory", name: recommendation.items.accessory.name },
+    recommendation.items.outerwear
+      ? { category: "outerwear", name: recommendation.items.outerwear.name }
+      : null,
+  ].filter(Boolean) as Array<{
+    category: "top" | "bottom" | "shoes" | "accessory" | "outerwear";
+    name: string;
+  }>;
 
   return (
     <motion.article
@@ -112,115 +112,59 @@ export function RecommendationCard({
       transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
       className="hero-card hover-lift flex h-full flex-col overflow-hidden p-4"
     >
-      <div className="relative overflow-hidden rounded-[2rem] p-5 text-white">
-        <div
-          className="absolute inset-0"
-          style={{
-            background: `linear-gradient(135deg, ${visualColors[0]} 0%, ${visualColors[1]} 34%, ${visualColors[2]} 68%, ${visualColors[3]} 100%)`,
-          }}
-        />
-        <div className="absolute -right-12 top-0 h-32 w-32 rounded-full bg-white/28 blur-3xl" />
-        <div className="absolute bottom-0 left-8 h-20 w-20 rounded-full bg-black/10 blur-2xl" />
-        <div className="relative flex min-h-80 flex-col justify-between">
-          <div className="flex items-start justify-between gap-3">
-            <div className="flex flex-wrap gap-2">
-              <span className="rounded-full bg-black/12 px-3 py-2 text-[11px] font-semibold uppercase tracking-[0.22em] text-white">
-                {formatOptionLabel(recommendation.aesthetic)}
-              </span>
-              <span className="rounded-full bg-white/16 px-3 py-2 text-[11px] font-semibold uppercase tracking-[0.22em] text-white">
-                {formatOptionLabel(recommendation.occasion)}
-              </span>
-              <span
-                className={`rounded-full px-3 py-2 text-[11px] font-semibold uppercase tracking-[0.22em] ${getMatchBadgeClasses(recommendation.matchQualityLabel)}`}
-              >
-                {recommendation.matchQualityLabel}
-              </span>
-            </div>
+      <div className="flex items-start justify-between gap-3 px-2 pb-4">
+        <div className="flex flex-wrap gap-2">
+          <span className="rounded-full border border-line/70 bg-white px-3 py-2 text-[11px] font-semibold uppercase tracking-[0.22em] text-foreground">
+            {formatOptionLabel(recommendation.aesthetic)}
+          </span>
+          <span className="rounded-full border border-line/70 bg-background/86 px-3 py-2 text-[11px] font-semibold uppercase tracking-[0.22em] text-foreground">
+            {formatOptionLabel(recommendation.occasion)}
+          </span>
+          <span
+            className={`rounded-full px-3 py-2 text-[11px] font-semibold uppercase tracking-[0.22em] ${getMatchBadgeClasses(recommendation.matchQualityLabel)}`}
+          >
+            {recommendation.matchQualityLabel}
+          </span>
+        </div>
 
-            <button
-              type="button"
-              onClick={() => onToggleSave(recommendation.id)}
-              aria-pressed={saved}
-              data-testid={`save-look-${recommendation.id}`}
-              className={`rounded-full border px-3 py-2 text-sm font-semibold backdrop-blur-sm ${
-                saved
-                  ? "border-white/18 bg-white/16 text-white"
-                  : "border-white/18 bg-black/10 text-white"
-              }`}
-            >
-              <span className="flex items-center gap-2">
-                <Bookmark size={14} />
-                {saved ? "Saved" : "Save look"}
-              </span>
-            </button>
-          </div>
+        <button
+          type="button"
+          onClick={() => onToggleSave(recommendation.id)}
+          aria-pressed={saved}
+          data-testid={`save-look-${recommendation.id}`}
+          className={`rounded-full border px-3 py-2 text-sm font-semibold ${
+            saved
+              ? "border-accent-2 bg-accent-2 text-white"
+              : "border-line/80 bg-white text-foreground"
+          }`}
+        >
+          <span className="flex items-center gap-2">
+            <Bookmark size={14} />
+            {saved ? "Saved" : "Save look"}
+          </span>
+        </button>
+      </div>
 
-          <div className="grid gap-4 md:grid-cols-[1.08fr_0.92fr]">
-            <div>
-              <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-white/68">
-                FitMuse outfit
-              </p>
-              <h3 className="mt-3 text-4xl leading-tight text-white">{recommendation.name}</h3>
-              <p className="mt-4 max-w-lg text-sm leading-6 text-white/84">
-                {shorten(recommendation.fitNote, 108)}
-              </p>
-              <div className="mt-4 flex flex-wrap gap-2">
-                {recommendation.items.outerwear ? (
-                  <span className="rounded-full bg-black/12 px-3 py-2 text-xs font-medium text-white">
-                    5-piece look
-                  </span>
-                ) : (
-                  <span className="rounded-full bg-black/12 px-3 py-2 text-xs font-medium text-white">
-                    4-piece look
-                  </span>
-                )}
-                <span className="rounded-full bg-white/16 px-3 py-2 text-xs font-medium text-white">
-                  {recommendation.stores.slice(0, 2).join(" + ")}
-                </span>
-              </div>
-            </div>
+      <OutfitVisual
+        title={recommendation.name}
+        subtitle={`${recommendation.confidenceScore}% confidence`}
+        palette={recommendation.colorPalette}
+        items={visualItems}
+        stores={recommendation.stores}
+      />
 
-            <div className="grid gap-3">
-              <div className="rounded-[1.35rem] bg-white/18 px-4 py-4 backdrop-blur-md">
-                <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-white/70">
-                  Total price
-                </p>
-                <p className="mt-2 text-xl text-white">
-                  {formatCurrency(recommendation.totalPrice)}
-                </p>
-              </div>
-              <div className="rounded-[1.35rem] bg-black/12 px-4 py-4 backdrop-blur-md">
-                <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-white/70">
-                  Confidence
-                </p>
-                <p className="mt-2 text-xl text-white">{recommendation.confidenceScore}%</p>
-              </div>
-              <div className="rounded-[1.35rem] bg-white/12 px-4 py-4 backdrop-blur-md">
-                <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-white/70">
-                  Budget
-                </p>
-                <p className="mt-2 text-base text-white">{recommendation.budgetMatchLabel}</p>
-              </div>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
-            {[
-              recommendation.items.top.category,
-              recommendation.items.bottom.category,
-              recommendation.items.shoes.category,
-              recommendation.items.accessory.category,
-            ].map((category, index) => (
-              <div
-                key={`${recommendation.id}-${category}-${index}`}
-                className="rounded-[1.3rem] border border-white/16 bg-white/10 px-3 py-3 text-center backdrop-blur-sm"
-              >
-                <p className="text-[10px] font-semibold uppercase tracking-[0.24em] text-white/66">
-                  {formatOptionLabel(category)}
-                </p>
-              </div>
-            ))}
-          </div>
+      <div className="mt-4 grid gap-3 px-2 sm:grid-cols-3">
+        <div className="rounded-[1.35rem] border border-line/70 bg-white/86 px-4 py-4">
+          <p className="mini-label">Total price</p>
+          <p className="mt-2 text-xl text-foreground">{formatCurrency(recommendation.totalPrice)}</p>
+        </div>
+        <div className="rounded-[1.35rem] border border-line/70 bg-background/84 px-4 py-4">
+          <p className="mini-label">Confidence</p>
+          <p className="mt-2 text-xl text-foreground">{recommendation.confidenceScore}%</p>
+        </div>
+        <div className="rounded-[1.35rem] border border-line/70 bg-background/84 px-4 py-4">
+          <p className="mini-label">Budget match</p>
+          <p className="mt-2 text-base text-foreground">{recommendation.budgetMatchLabel}</p>
         </div>
       </div>
 
@@ -313,7 +257,7 @@ export function RecommendationCard({
         </details>
 
         <div className="mt-6 flex flex-wrap gap-3">
-          <ShoppingLinksButton testId={`shop-look-${recommendation.id}`} />
+          <ShoppingLinksButton className="cta-secondary" testId={`shop-look-${recommendation.id}`} />
         </div>
 
         <div aria-live="polite" data-testid={`save-status-${recommendation.id}`} className="mt-3 min-h-6">
