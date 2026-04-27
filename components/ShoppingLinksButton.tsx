@@ -5,10 +5,12 @@ import { ExternalLink } from "lucide-react";
 
 type ShoppingLinksButtonProps = {
   className?: string;
+  testId?: string;
 };
 
 export function ShoppingLinksButton({
   className = "cta-primary",
+  testId = "shop-look-button",
 }: ShoppingLinksButtonProps) {
   const [showMessage, setShowMessage] = useState(false);
 
@@ -19,6 +21,7 @@ export function ShoppingLinksButton({
         className={className}
         onClick={() => setShowMessage((current) => !current)}
         aria-expanded={showMessage}
+        data-testid={testId}
       >
         <span className="flex items-center gap-2">
           Shop look
@@ -27,7 +30,10 @@ export function ShoppingLinksButton({
       </button>
 
       {showMessage ? (
-        <div className="max-w-xs rounded-[1.2rem] border border-line/70 bg-white/94 px-4 py-3 text-xs leading-5 text-foreground shadow-[0_16px_32px_rgba(27,21,19,0.08)]">
+        <div
+          data-testid={`${testId}-message`}
+          className="max-w-xs rounded-[1.2rem] border border-line/70 bg-white/94 px-4 py-3 text-xs leading-5 text-foreground shadow-[0_16px_32px_rgba(27,21,19,0.08)]"
+        >
           Shopping links coming soon. This MVP uses mock products for now.
         </div>
       ) : null}

@@ -2,8 +2,10 @@ import { products } from "@/data/products";
 import { splitCommaSeparated } from "@/lib/utils";
 import type {
   Aesthetic,
+  BudgetMatchLabel,
   BudgetRange,
   FitPreference,
+  MatchQualityLabel,
   Occasion,
   OutfitRecommendation,
   Product,
@@ -15,10 +17,26 @@ import type {
 type ScoredProduct = {
   product: Product;
   score: number;
-  exact: boolean;
+  exactAesthetic: boolean;
+  exactOccasion: boolean;
+  sizeExact: boolean;
+  matchedPreferredColors: string[];
+  matchedStores: string[];
+  matchReasons: string[];
+  creatorAlignmentScore: number;
 };
 
 const requiredCategories: ProductCategory[] = ["top", "bottom", "shoes", "accessory"];
+const poolSizes: Record<ProductCategory, number> = {
+  top: 7,
+  bottom: 7,
+  shoes: 5,
+  accessory: 5,
+  outerwear: 4,
+};
+
+const creatorMoments: Occasion[] = ["reels", "photoshoot", "brand content"];
+const creatorMomentSet = new Set<Occasion>(creatorMoments);
 
 const fallbackAesthetics: Record<Aesthetic, Aesthetic[]> = {
   "old money": ["luxury neutral", "smart casual", "date night"],
@@ -40,7 +58,7 @@ const fallbackOccasions: Record<Occasion, Occasion[]> = {
   photoshoot: ["brand content", "reels", "party"],
   date: ["party", "brand content", "daily wear"],
   party: ["photoshoot", "date", "brand content"],
-  college: ["daily wear", "reels", "travel"],
+  college: ["daily wear", "travel", "reels"],
   office: ["brand content", "daily wear", "travel"],
   travel: ["daily wear", "college", "reels"],
   "wedding guest": ["date", "party", "brand content"],
@@ -76,43 +94,43 @@ export function budgetCapFromRange(range?: string | null) {
     return null;
   }
 
-  if (normalized.includes("under $100")) {
+  if (normalized === "under $100") {
     return 100;
   }
 
-  if (normalized.includes("$100-$200") || normalized.includes("$100 - $200")) {
+  if (normalized === "$100-$200") {
     return 200;
   }
 
-  if (normalized.includes("$200-$350") || normalized.includes("$200 - $350")) {
+  if (normalized === "$200-$350") {
     return 350;
   }
 
-  if (normalized.includes("$350+")) {
+  if (normalized === "$350+") {
     return 550;
   }
 
-  if (normalized.includes("under $75")) {
-    return 75;
-  }
-
-  if (normalized.includes("$75 - $150")) {
-    return 150;
-  }
-
-  if (normalized.includes("$150 - $250")) {
-    return 250;
-  }
-
-  if (normalized.includes("$250 - $400")) {
-    return 400;
-  }
-
-  if (normalized.includes("$400+")) {
-    return 600;
-  }
-
   return null;
+}
+
+function budgetTargetForCategory(category: ProductCategory, budgetCap: number | null) {
+  if (!budgetCap) {
+    return null;
+  }
+
+  if (category === "outerwear") {
+    return budgetCap * 0.3;
+  }
+
+  if (category === "accessory") {
+    return budgetCap * 0.16;
+  }
+
+  if (category === "shoes") {
+    return budgetCap * 0.24;
+  }
+
+  return budgetCap * 0.22;
 }
 
 function getRequiredSize(product: Product, answers: QuizAnswers) {
@@ -131,245 +149,480 @@ function getRequiredSize(product: Product, answers: QuizAnswers) {
   return "";
 }
 
-function sizeScore(product: Product, answers: QuizAnswers) {
-  const requiredSize = getRequiredSize(product, answers);
-
-  if (!requiredSize || product.category === "accessory") {
-    return { score: 0, exact: true };
+function getSizeSignal(product: Product, answers: QuizAnswers) {
+  if (product.category === "accessory") {
+    return { score: 0, exact: true, reason: "" };
   }
 
-  const available = product.availableSizes.map((size) => normalize(size));
-  const matches = available.includes(requiredSize);
+  const requestedSize = getRequiredSize(product, answers);
+
+  if (!requestedSize) {
+    return { score: 0, exact: true, reason: "" };
+  }
+
+  const hasSize = product.availableSizes.map((size) => normalize(size)).includes(requestedSize);
 
   return {
-    score: matches ? 3 : -6,
-    exact: matches,
+    score: hasSize ? 5 : -10,
+    exact: hasSize,
+    reason: hasSize ? "Available in your saved size range" : "",
   };
 }
 
-function getTagScore<T extends string>(selected: T | "", tags: T[], fallbacks: Record<T, T[]>) {
+function getTagSignal<T extends string>(
+  selected: T | "",
+  tags: T[],
+  fallbacks: Record<T, T[]>,
+  exactReason: string,
+  fallbackReason: string,
+) {
   if (!selected) {
-    return { score: 0, exact: true };
+    return {
+      score: 0,
+      exact: true,
+      matchedExact: false,
+      matchedFallback: false,
+      reason: "",
+    };
   }
 
   if (tags.includes(selected)) {
-    return { score: 7, exact: true };
+    return {
+      score: 13,
+      exact: true,
+      matchedExact: true,
+      matchedFallback: false,
+      reason: exactReason,
+    };
   }
 
   const related = fallbacks[selected] ?? [];
-  const hasRelatedMatch = tags.some((tag) => related.includes(tag));
 
-  if (hasRelatedMatch) {
-    return { score: 3, exact: false };
+  if (tags.some((tag) => related.includes(tag))) {
+    return {
+      score: 7,
+      exact: false,
+      matchedExact: false,
+      matchedFallback: true,
+      reason: fallbackReason,
+    };
   }
 
-  return { score: -3, exact: false };
+  return {
+    score: -4,
+    exact: false,
+    matchedExact: false,
+    matchedFallback: false,
+    reason: "",
+  };
 }
 
-function stylePreferenceScore(product: Product, stylePreference: StylePreference | "") {
-  if (!stylePreference) {
-    return 0;
+function stylePreferenceScore(product: Product, preference: StylePreference | "") {
+  if (!preference) {
+    return { score: 0, reason: "" };
   }
 
-  if (
-    product.stylePreferences.includes(stylePreference) ||
-    product.stylePreferences.includes("mixed / open to all")
-  ) {
-    return 2;
-  }
+  const matches =
+    product.stylePreferences.includes(preference) ||
+    product.stylePreferences.includes("mixed / open to all");
 
-  return -1;
-}
-
-function colorScore(product: Product, preferredColors: string[], avoidColors: string[]) {
-  let score = 0;
-
-  const matchingPreferred = product.colors.filter((color) => preferredColors.includes(normalize(color)));
-  const matchingAvoid = product.colors.filter((color) => avoidColors.includes(normalize(color)));
-
-  score += matchingPreferred.length * 2;
-  score -= matchingAvoid.length * 3;
-
-  return score;
+  return {
+    score: matches ? 3 : -2,
+    reason: matches ? "Supports your style preference" : "",
+  };
 }
 
 function fitScore(product: Product, fitPreference: FitPreference | "") {
   if (!fitPreference) {
-    return 0;
+    return { score: 0, reason: "" };
   }
-
-  return product.fitType === fitPreference ? 4 : -1;
-}
-
-function storeScore(product: Product, preferredStores: string[]) {
-  if (preferredStores.length === 0) {
-    return 0;
-  }
-
-  return preferredStores.includes(normalize(product.store)) ? 2 : 0;
-}
-
-function budgetScore(product: Product, budgetCap: number | null) {
-  if (!budgetCap) {
-    return 0;
-  }
-
-  const categoryBudget = budgetCap / 4.6;
-
-  if (product.price <= categoryBudget) {
-    return 2;
-  }
-
-  if (product.price <= categoryBudget * 1.25) {
-    return 0;
-  }
-
-  return -2;
-}
-
-function scoreProduct(product: Product, answers: QuizAnswers) {
-  const preferredColors = splitCommaSeparated(answers.preferredColors);
-  const avoidColors = splitCommaSeparated(answers.avoidColors);
-  const preferredStores = splitCommaSeparated(answers.storesLike);
-  const budgetCap = budgetCapFromRange(answers.budgetRange);
-
-  const aestheticScore = getTagScore(answers.aesthetic, product.aestheticTags, fallbackAesthetics);
-  const occasionScore = getTagScore(answers.occasion, product.occasionTags, fallbackOccasions);
-  const sizeMatch = sizeScore(product, answers);
-
-  const score =
-    aestheticScore.score +
-    occasionScore.score +
-    fitScore(product, answers.fitPreference) +
-    stylePreferenceScore(product, answers.stylePreference) +
-    colorScore(product, preferredColors, avoidColors) +
-    storeScore(product, preferredStores) +
-    budgetScore(product, budgetCap) +
-    sizeMatch.score;
 
   return {
-    product,
-    score,
-    exact: aestheticScore.exact && occasionScore.exact && sizeMatch.exact,
+    score: product.fitType === fitPreference ? 5 : -1,
+    reason: product.fitType === fitPreference ? `Leans ${formatLabel(fitPreference)} like you asked` : "",
   };
 }
 
+function colorScore(product: Product, preferredColors: string[], avoidedColors: string[]) {
+  const matchedPreferredColors = product.colors.filter((color) =>
+    preferredColors.includes(normalize(color)),
+  );
+  const matchedAvoidColors = product.colors.filter((color) =>
+    avoidedColors.includes(normalize(color)),
+  );
+
+  let score = matchedPreferredColors.length * 3 - matchedAvoidColors.length * 6;
+
+  if (preferredColors.length > 0 && matchedPreferredColors.length === 0 && product.colorFamily === "neutral") {
+    score += 1;
+  }
+
+  return {
+    score,
+    matchedPreferredColors,
+    matchedAvoidColors,
+    reason:
+      matchedPreferredColors.length > 0
+        ? `Uses your preferred ${formatLabel(matchedPreferredColors[0])} palette`
+        : "",
+  };
+}
+
+function storeScore(product: Product, preferredStores: string[]) {
+  const matchedStores = preferredStores.filter((store) => normalize(product.store) === store);
+
+  return {
+    score: matchedStores.length > 0 ? 4 : 0,
+    matchedStores,
+    reason: matchedStores.length > 0 ? `Pulls from a store you already like: ${product.store}` : "",
+  };
+}
+
+function budgetScore(product: Product, budgetCap: number | null) {
+  const target = budgetTargetForCategory(product.category, budgetCap);
+
+  if (!target) {
+    return { score: 0, reason: "" };
+  }
+
+  if (product.price <= target) {
+    return { score: 4, reason: "Keeps the outfit budget realistic" };
+  }
+
+  if (product.price <= target * 1.18) {
+    return { score: 1, reason: "Still sits close to the spend target" };
+  }
+
+  return { score: -5, reason: "" };
+}
+
+function scoreProduct(product: Product, answers: QuizAnswers): ScoredProduct {
+  const preferredColors = splitCommaSeparated(answers.preferredColors);
+  const avoidedColors = splitCommaSeparated(answers.avoidColors);
+  const preferredStores = splitCommaSeparated(answers.storesLike);
+  const budgetCap = budgetCapFromRange(answers.budgetRange);
+
+  const aestheticSignal = getTagSignal(
+    answers.aesthetic,
+    product.aestheticTags,
+    fallbackAesthetics,
+    `Matches your ${formatLabel(answers.aesthetic)} aesthetic`,
+    `Leans close to your ${formatLabel(answers.aesthetic)} aesthetic`,
+  );
+  const occasionSignal = getTagSignal(
+    answers.occasion,
+    product.occasionTags,
+    fallbackOccasions,
+    `Fits your ${formatLabel(answers.occasion)} occasion`,
+    `Works as a close fit for your ${formatLabel(answers.occasion)} moment`,
+  );
+  const sizeSignal = getSizeSignal(product, answers);
+  const fitSignal = fitScore(product, answers.fitPreference);
+  const styleSignal = stylePreferenceScore(product, answers.stylePreference);
+  const colorSignal = colorScore(product, preferredColors, avoidedColors);
+  const storeSignal = storeScore(product, preferredStores);
+  const budgetSignal = budgetScore(product, budgetCap);
+
+  const creatorAlignmentScore =
+    (product.aestheticTags.includes("creator/photoshoot") ? 3 : 0) +
+    product.occasionTags.filter((tag) => creatorMomentSet.has(tag)).length;
+
+  const matchReasons = [
+    aestheticSignal.reason,
+    occasionSignal.reason,
+    fitSignal.reason,
+    styleSignal.reason,
+    colorSignal.reason,
+    storeSignal.reason,
+    sizeSignal.reason,
+    budgetSignal.reason,
+  ].filter(Boolean);
+
+  return {
+    product,
+    score:
+      aestheticSignal.score +
+      occasionSignal.score +
+      sizeSignal.score +
+      fitSignal.score +
+      styleSignal.score +
+      colorSignal.score +
+      storeSignal.score +
+      budgetSignal.score +
+      creatorAlignmentScore,
+    exactAesthetic: aestheticSignal.matchedExact,
+    exactOccasion: occasionSignal.matchedExact,
+    sizeExact: sizeSignal.exact,
+    matchedPreferredColors: colorSignal.matchedPreferredColors,
+    matchedStores: storeSignal.matchedStores,
+    matchReasons,
+    creatorAlignmentScore,
+  };
+}
+
+function pickPool(category: ProductCategory, answers: QuizAnswers) {
+  return products
+    .filter((product) => product.category === category)
+    .map((product) => scoreProduct(product, answers))
+    .sort((left, right) => right.score - left.score || left.product.price - right.product.price)
+    .slice(0, poolSizes[category]);
+}
+
 function uniqueColors(items: Product[]) {
-  return Array.from(new Set(items.flatMap((item) => item.colors))).slice(0, 4);
+  return Array.from(new Set(items.flatMap((item) => item.colors))).slice(0, 5);
 }
 
 function buildName(aesthetic: Aesthetic, occasion: Occasion, index: number) {
-  const exactNames: Record<string, string> = {
+  const key = `${aesthetic}|${occasion}`;
+  const names: Record<string, string> = {
     "old money|date": "Old Money Dinner Look",
     "streetwear|reels": "Streetwear Reel Fit",
     "minimalist|date": "Minimalist Coffee Date",
     "clean girl|daily wear": "Clean Girl Everyday",
-    "office|office": "Smart Casual Office Edit",
-    "party|party": "Party Night Look",
+    "smart casual|college": "College Smart Casual Edit",
+    "office|office": "Office Smart Casual",
+    "party|party": "Party Night Outfit",
+    "date night|date": "Date Night Espresso Edit",
     "travel|travel": "Airport Travel Look",
     "creator/photoshoot|brand content": "Brand Shoot Neutral Fit",
+    "creator/photoshoot|photoshoot": "Creator Shoot Outfit Pack",
+    "luxury neutral|wedding guest": "Luxury Neutral Event Look",
+    "gym casual|daily wear": "Gym Casual Everyday Set",
   };
 
-  const exactKey = `${aesthetic}|${occasion}`;
+  const baseName = names[key] ?? `${formatLabel(aesthetic)} ${formatLabel(occasion)} Look`;
 
-  if (exactNames[exactKey]) {
-    return index === 0 ? exactNames[exactKey] : `${exactNames[exactKey]} ${index + 1}`;
-  }
-
-  return `${formatLabel(aesthetic)} ${formatLabel(occasion)} Look ${index + 1}`;
+  return index === 0 ? baseName : `${baseName} ${index + 1}`;
 }
 
-function buildFitNote(items: Product[], answers: QuizAnswers) {
-  const topFit = items[0]?.fitType ?? "regular";
-  const bottomFit = items[1]?.fitType ?? "regular";
-  const sizeNote = answers.topSize && answers.bottomSize ? `around your ${answers.topSize}/${answers.bottomSize} size brief` : "around your saved size brief";
-
-  return `${formatLabel(topFit)} structure on top with ${bottomFit} balance below keeps the look polished ${sizeNote}.`;
-}
-
-function buildWhyItWorks(items: Product[], budgetCap: number | null, answers: QuizAnswers) {
-  const stores = Array.from(new Set(items.map((item) => item.store)));
-  const preferredColors = splitCommaSeparated(answers.preferredColors);
-  const matchingColor = items
-    .flatMap((item) => item.colors)
-    .find((color) => preferredColors.includes(normalize(color)));
-
-  if (matchingColor && budgetCap) {
-    return `${formatLabel(matchingColor)} tones keep the outfit cohesive while the mix from ${stores.slice(0, 2).join(" and ")} stays inside your target spend.`;
+function buildBudgetMatch(totalPrice: number, budgetCap: number | null) {
+  if (!budgetCap) {
+    return {
+      label: "Close to budget" as BudgetMatchLabel,
+      note: "You left the budget flexible, so FitMuse prioritized overall match quality.",
+    };
   }
 
-  if (matchingColor) {
-    return `${formatLabel(matchingColor)} tones help the outfit feel intentional, with a mix that looks styled rather than random.`;
+  if (totalPrice <= budgetCap * 0.92) {
+    return {
+      label: "Under budget" as BudgetMatchLabel,
+      note: `This look stays under your ${formatLabel(budgetLabelFromCap(budgetCap))} target.`,
+    };
   }
 
-  return `The mix of ${stores.slice(0, 2).join(" and ")} gives you a full look that feels balanced for ${formatLabel(answers.occasion || "daily wear")}.`;
+  if (totalPrice <= budgetCap * 1.05) {
+    return {
+      label: "Close to budget" as BudgetMatchLabel,
+      note: `This look lands close to your ${formatLabel(budgetLabelFromCap(budgetCap))} budget target.`,
+    };
+  }
+
+  return {
+    label: "Over budget but strong match" as BudgetMatchLabel,
+    note: `This look runs slightly over your ${formatLabel(budgetLabelFromCap(budgetCap))} target but scored as a stronger overall match.`,
+  };
 }
 
 function buildCreatorUseCase(occasion: Occasion) {
-  const useCases: Record<Occasion, string> = {
-    reels: "Best for creator reels and short-form outfit content.",
-    photoshoot: "Best for styled photoshoots and brand image days.",
-    date: "Best for date nights and polished evening content.",
-    party: "Best for event nights and party-ready captures.",
+  const labels: Record<Occasion, string> = {
+    reels: "Best for creator reels and quick outfit content.",
+    photoshoot: "Best for styled photoshoots and editorial content days.",
+    date: "Best for dinner plans, soft-date content, and polished evenings.",
+    party: "Best for event nights, nightlife posts, and higher-energy content.",
     college: "Best for campus days, coffee runs, and casual GRWM posts.",
-    office: "Best for office polish, founder meetings, and weekday content.",
-    travel: "Best for airport looks and travel-day vlogs.",
-    "wedding guest": "Best for elevated guest dressing with easy shopping links.",
-    "daily wear": "Best for everyday styling when you still want a finished look.",
-    "brand content": "Best for sponsor shoots and creator-ready brand moments.",
+    office: "Best for polished office days and founder-style weekday content.",
+    travel: "Best for airport fits, city travel days, and transit vlogs.",
+    "wedding guest": "Best for elevated guest dressing with a realistic shopping path.",
+    "daily wear": "Best for everyday styling when you still want a complete look.",
+    "brand content": "Best for sponsor shoots, product seeding, and creator-ready brand moments.",
   };
 
-  return useCases[occasion];
+  return labels[occasion];
 }
 
-function confidenceFromScore(score: number, matchMode: "exact" | "closest") {
-  const base = matchMode === "exact" ? 82 : 68;
+function buildFitNote(items: Product[], answers: QuizAnswers) {
+  const topFit = items.find((item) => item.category === "top")?.fitType ?? "regular";
+  const bottomFit = items.find((item) => item.category === "bottom")?.fitType ?? "regular";
+  const sizeSummary =
+    answers.topSize && answers.bottomSize
+      ? `around your ${answers.topSize}/${answers.bottomSize} saved sizes`
+      : "around your saved size brief";
 
-  return Math.max(58, Math.min(98, base + Math.round(score)));
+  return `${formatLabel(topFit)} volume on top with ${formatLabel(bottomFit)} balance below keeps the silhouette camera-friendly ${sizeSummary}.`;
 }
 
-function getPoolForCategory(category: ProductCategory, answers: QuizAnswers, count: number) {
-  const categoryProducts = products
-    .filter((product) => product.category === category)
-    .map((product) => scoreProduct(product, answers))
-    .sort((left, right) => right.score - left.score || left.product.price - right.product.price);
+function buildWhyItWorks(items: Product[], answers: QuizAnswers, matchedColors: string[]) {
+  const palette = uniqueColors(items);
+  const leadStores = Array.from(new Set(items.map((item) => item.store))).slice(0, 2);
 
-  const exact = categoryProducts.filter((entry) => entry.exact && entry.score > 0);
-  const fallback = categoryProducts.filter((entry) => entry.score > -8);
+  if (matchedColors.length > 0) {
+    return `${formatLabel(matchedColors[0])} tones keep the outfit aligned to your brief while ${leadStores.join(" + ")} adds a multi-store styled feel.`;
+  }
+
+  return `${palette.slice(0, 3).map(formatLabel).join(", ")} tones keep the outfit cohesive while ${leadStores.join(" + ")} gives it a creator-styled mix.`;
+}
+
+function buildMatchReasons(
+  productEntries: ScoredProduct[],
+  answers: QuizAnswers,
+  totalPrice: number,
+  budgetLabel: BudgetMatchLabel,
+) {
+  const reasons = new Set<string>();
+  const matchedColors = Array.from(
+    new Set(productEntries.flatMap((entry) => entry.matchedPreferredColors)),
+  );
+  const matchedStores = Array.from(
+    new Set(productEntries.flatMap((entry) => entry.matchedStores)),
+  );
+
+  if (answers.aesthetic) {
+    const exactCount = productEntries.filter((entry) => entry.exactAesthetic).length;
+    reasons.add(
+      exactCount >= 2
+        ? `Matches your ${formatLabel(answers.aesthetic)} aesthetic`
+        : `Leans close to your ${formatLabel(answers.aesthetic)} aesthetic`,
+    );
+  }
+
+  if (answers.occasion) {
+    const exactCount = productEntries.filter((entry) => entry.exactOccasion).length;
+    reasons.add(
+      exactCount >= 2
+        ? `Fits your ${formatLabel(answers.occasion)} occasion`
+        : `Still supports your ${formatLabel(answers.occasion)} moment`,
+    );
+  }
+
+  if (matchedColors.length > 0) {
+    reasons.add(`Uses your preferred ${formatLabel(matchedColors[0])} colors`);
+  }
+
+  if (matchedStores.length > 0) {
+    reasons.add(`Includes stores you already like: ${matchedStores.slice(0, 2).join(" + ")}`);
+  }
+
+  if (answers.fitPreference) {
+    reasons.add(`Stays close to your ${formatLabel(answers.fitPreference)} fit preference`);
+  }
+
+  if (budgetLabel === "Under budget") {
+    reasons.add(`Keeps the look under ${formatLabel(answers.budgetRange || "your target budget")}`);
+  } else if (budgetLabel === "Close to budget") {
+    reasons.add("Keeps the full outfit close to your budget range");
+  } else {
+    reasons.add(`Pushes past ${formatLabel(answers.budgetRange || "budget")} only because the overall match is stronger`);
+  }
+
+  if (productEntries.every((entry) => entry.sizeExact)) {
+    reasons.add("Available in the sizes saved in your style brief");
+  }
+
+  return Array.from(reasons);
+}
+
+function matchQualityLabel(
+  matchMode: OutfitRecommendation["matchMode"],
+  confidenceScore: number,
+  creatorAlignmentScore: number,
+) {
+  if (matchMode === "closest") {
+    return "Closest match" as MatchQualityLabel;
+  }
+
+  if (creatorAlignmentScore >= 6) {
+    return "Creator-ready" as MatchQualityLabel;
+  }
+
+  if (confidenceScore >= 90) {
+    return "Best match" as MatchQualityLabel;
+  }
+
+  return "Strong match" as MatchQualityLabel;
+}
+
+function confidenceFromScore(score: number, matchMode: OutfitRecommendation["matchMode"]) {
+  const base = matchMode === "exact" ? 76 : 64;
+  return Math.max(58, Math.min(98, base + Math.round(score / 4)));
+}
+
+function buildOutfitRecommendation(
+  productEntries: ScoredProduct[],
+  answers: QuizAnswers,
+  index: number,
+): OutfitRecommendation {
+  const items = productEntries.map((entry) => entry.product);
+  const budgetCap = budgetCapFromRange(answers.budgetRange);
+  const totalPrice = items.reduce((sum, item) => sum + item.price, 0);
+  const colorPalette = uniqueColors(items);
+  const creatorAlignmentScore = productEntries.reduce(
+    (sum, entry) => sum + entry.creatorAlignmentScore,
+    0,
+  );
+  const exactCount = productEntries.filter(
+    (entry) => entry.exactAesthetic && entry.exactOccasion && entry.sizeExact,
+  ).length;
+  const matchMode: OutfitRecommendation["matchMode"] = exactCount >= 3 ? "exact" : "closest";
+  const synergyScore =
+    (new Set(items.map((item) => item.colorFamily)).size <= 3 ? 4 : 0) +
+    (new Set(items.map((item) => item.store)).size >= 2 ? 2 : 0) +
+    creatorAlignmentScore;
+  const rawScore =
+    productEntries.reduce((sum, entry) => sum + entry.score, 0) + synergyScore;
+  const confidenceScore = confidenceFromScore(rawScore, matchMode);
+  const budgetMatch = buildBudgetMatch(totalPrice, budgetCap);
+  const matchReasons = buildMatchReasons(productEntries, answers, totalPrice, budgetMatch.label);
+  const matchedColors = Array.from(
+    new Set(productEntries.flatMap((entry) => entry.matchedPreferredColors)),
+  );
 
   return {
-    exact,
-    fallback,
-    pool: (exact.length > 0 ? exact : fallback).slice(0, count),
+    id: productEntries.map((entry) => entry.product.id).join("__"),
+    name: buildName(
+      (answers.aesthetic || "smart casual") as Aesthetic,
+      (answers.occasion || "daily wear") as Occasion,
+      index,
+    ),
+    aesthetic: (answers.aesthetic || "smart casual") as Aesthetic,
+    occasion: (answers.occasion || "daily wear") as Occasion,
+    totalPrice,
+    items: {
+      top: productEntries.find((entry) => entry.product.category === "top")!.product,
+      bottom: productEntries.find((entry) => entry.product.category === "bottom")!.product,
+      shoes: productEntries.find((entry) => entry.product.category === "shoes")!.product,
+      accessory: productEntries.find((entry) => entry.product.category === "accessory")!.product,
+      outerwear: productEntries.find((entry) => entry.product.category === "outerwear")?.product,
+    },
+    colorPalette,
+    fitNote: buildFitNote(items, answers),
+    whyItWorks: buildWhyItWorks(items, answers, matchedColors),
+    creatorUseCase: buildCreatorUseCase((answers.occasion || "daily wear") as Occasion),
+    confidenceScore,
+    matchQualityLabel: matchQualityLabel(matchMode, confidenceScore, creatorAlignmentScore),
+    budgetMatchLabel: budgetMatch.label,
+    budgetNote: budgetMatch.note,
+    matchReasons,
+    creatorAlignmentScore,
+    stores: Array.from(new Set(items.map((item) => item.store))),
+    matchMode,
+    shopUrl: `/mock-look/${productEntries[0].product.id}`,
   };
-}
-
-function sortAndTrimRecommendations(recommendations: OutfitRecommendation[], limit: number) {
-  return recommendations
-    .sort(
-      (left, right) =>
-        right.confidenceScore - left.confidenceScore || left.totalPrice - right.totalPrice,
-    )
-    .slice(0, limit);
 }
 
 export function buildOutfitRecommendations(answers: QuizAnswers, limit = 8) {
+  const topPool = pickPool("top", answers);
+  const bottomPool = pickPool("bottom", answers);
+  const shoesPool = pickPool("shoes", answers);
+  const accessoryPool = pickPool("accessory", answers);
+  const outerwearPool = pickPool("outerwear", answers);
   const budgetCap = budgetCapFromRange(answers.budgetRange);
-  const topPool = getPoolForCategory("top", answers, 5);
-  const bottomPool = getPoolForCategory("bottom", answers, 5);
-  const shoesPool = getPoolForCategory("shoes", answers, 4);
-  const accessoryPool = getPoolForCategory("accessory", answers, 4);
-  const outerwearPool = getPoolForCategory("outerwear", answers, 3);
-
-  const allRequiredPools = [topPool, bottomPool, shoesPool, accessoryPool];
-  const shouldUseFallback = allRequiredPools.some((pool) => pool.exact.length === 0);
   const recommendations: OutfitRecommendation[] = [];
-  const outerwearChoices = [undefined, ...outerwearPool.pool];
+  const outerwearChoices = [undefined, ...outerwearPool];
 
-  for (const top of topPool.pool) {
-    for (const bottom of bottomPool.pool) {
-      for (const shoes of shoesPool.pool) {
-        for (const accessory of accessoryPool.pool) {
+  for (const top of topPool) {
+    for (const bottom of bottomPool) {
+      for (const shoes of shoesPool) {
+        for (const accessory of accessoryPool) {
           for (const outerwear of outerwearChoices) {
             const productEntries = [top, bottom, shoes, accessory, outerwear].filter(
               Boolean,
@@ -377,68 +630,17 @@ export function buildOutfitRecommendations(answers: QuizAnswers, limit = 8) {
             const items = productEntries.map((entry) => entry.product);
             const totalPrice = items.reduce((sum, item) => sum + item.price, 0);
 
-            if (budgetCap && totalPrice > budgetCap * 1.35) {
+            if (budgetCap && totalPrice > budgetCap * 1.28) {
               continue;
             }
 
-            let outfitScore = productEntries.reduce((sum, entry) => sum + entry.score, 0);
-
-            const sharedStores = new Set(items.map((item) => item.store));
-            const colorPalette = uniqueColors(items);
-            const matchingAestheticCount = items.filter((item) =>
-              answers.aesthetic ? item.aestheticTags.includes(answers.aesthetic) : false,
-            ).length;
-            const matchingOccasionCount = items.filter((item) =>
-              answers.occasion ? item.occasionTags.includes(answers.occasion) : false,
-            ).length;
-
-            outfitScore += matchingAestheticCount * 1.5;
-            outfitScore += matchingOccasionCount * 1.2;
-            outfitScore += colorPalette.length <= 4 ? 2 : 0;
-            outfitScore += sharedStores.size >= 2 ? 1 : 0;
-
-            if (budgetCap) {
-              if (totalPrice <= budgetCap) {
-                outfitScore += 4;
-              } else {
-                outfitScore -= 2;
-              }
-            }
-
-            const matchMode: OutfitRecommendation["matchMode"] =
-              shouldUseFallback || productEntries.some((entry) => !entry.exact)
-                ? "closest"
-                : "exact";
-            const name = buildName(
-              (answers.aesthetic || "smart casual") as Aesthetic,
-              (answers.occasion || "daily wear") as Occasion,
+            const recommendation = buildOutfitRecommendation(
+              productEntries,
+              answers,
               recommendations.length,
             );
 
-            recommendations.push({
-              id: productEntries.map((entry) => entry.product.id).join("__"),
-              name,
-              aesthetic: (answers.aesthetic || "smart casual") as Aesthetic,
-              occasion: (answers.occasion || "daily wear") as Occasion,
-              totalPrice,
-              items: {
-                top: top.product,
-                bottom: bottom.product,
-                shoes: shoes.product,
-                accessory: accessory.product,
-                outerwear: outerwear?.product,
-              },
-              colorPalette,
-              fitNote: buildFitNote(items, answers),
-              whyItWorks: buildWhyItWorks(items, budgetCap, answers),
-              creatorUseCase: buildCreatorUseCase(
-                (answers.occasion || "daily wear") as Occasion,
-              ),
-              confidenceScore: confidenceFromScore(outfitScore, matchMode),
-              stores: Array.from(sharedStores),
-              matchMode,
-              shopUrl: top.product.url,
-            });
+            recommendations.push(recommendation);
           }
         }
       }
@@ -449,46 +651,70 @@ export function buildOutfitRecommendations(answers: QuizAnswers, limit = 8) {
     new Map(recommendations.map((recommendation) => [recommendation.id, recommendation])).values(),
   );
 
-  if (uniqueRecommendations.length > 0) {
-    return sortAndTrimRecommendations(uniqueRecommendations, limit);
-  }
-
-  const cheapestFallback = requiredCategories.map((category) =>
-    products
-      .filter((product) => product.category === category)
-      .sort((left, right) => left.price - right.price)[0],
+  const sorted = uniqueRecommendations.sort(
+    (left, right) =>
+      right.confidenceScore - left.confidenceScore ||
+      right.creatorAlignmentScore - left.creatorAlignmentScore ||
+      left.totalPrice - right.totalPrice,
   );
 
-  const fallbackItems = cheapestFallback.filter(Boolean) as Product[];
+  if (sorted.length > 0) {
+    return sorted.slice(0, limit).map((recommendation, index) => ({
+      ...recommendation,
+      name: buildName(
+        (answers.aesthetic || "smart casual") as Aesthetic,
+        (answers.occasion || "daily wear") as Occasion,
+        index,
+      ),
+    }));
+  }
+
+  const fallbackItems = requiredCategories
+    .map((category) =>
+      products
+        .filter((product) => product.category === category)
+        .sort((left, right) => left.price - right.price)[0],
+    )
+    .filter(Boolean) as Product[];
 
   if (fallbackItems.length < 4) {
     return [];
   }
 
-  return [
-    {
+  const fallbackRecommendation: OutfitRecommendation = {
       id: fallbackItems.map((item) => item.id).join("__"),
       name: "Closest FitMuse Look",
       aesthetic: (answers.aesthetic || "smart casual") as Aesthetic,
       occasion: (answers.occasion || "daily wear") as Occasion,
       totalPrice: fallbackItems.reduce((sum, item) => sum + item.price, 0),
       items: {
-        top: fallbackItems.find((item) => item.category === "top") as Product,
-        bottom: fallbackItems.find((item) => item.category === "bottom") as Product,
-        shoes: fallbackItems.find((item) => item.category === "shoes") as Product,
-        accessory: fallbackItems.find((item) => item.category === "accessory") as Product,
+        top: fallbackItems.find((item) => item.category === "top")!,
+        bottom: fallbackItems.find((item) => item.category === "bottom")!,
+        shoes: fallbackItems.find((item) => item.category === "shoes")!,
+        accessory: fallbackItems.find((item) => item.category === "accessory")!,
         outerwear: undefined,
       },
       colorPalette: uniqueColors(fallbackItems),
       fitNote: buildFitNote(fallbackItems, answers),
-      whyItWorks: "This is the closest ready-to-buy mix available in the current MVP catalog.",
+      whyItWorks: "This is the closest ready-to-buy outfit mix available in the current mock catalog.",
       creatorUseCase: buildCreatorUseCase((answers.occasion || "daily wear") as Occasion),
-      confidenceScore: 62,
+      confidenceScore: 61,
+      matchQualityLabel: "Closest match",
+      budgetMatchLabel: "Close to budget",
+      budgetNote: "This fallback prioritizes showing a complete outfit over a blank page.",
+      matchReasons: [
+        "No perfect match yet, but this is the closest full outfit in the current mock catalog",
+        answers.aesthetic
+          ? `Still leans toward your ${formatLabel(answers.aesthetic)} aesthetic`
+          : "Still keeps the outfit visually cohesive",
+      ],
+      creatorAlignmentScore: 2,
       stores: Array.from(new Set(fallbackItems.map((item) => item.store))),
-      matchMode: "closest" as const,
-      shopUrl: fallbackItems[0].url,
-    },
-  ];
+      matchMode: "closest",
+      shopUrl: `/mock-look/${fallbackItems[0].id}`,
+  };
+
+  return [fallbackRecommendation];
 }
 
 export function hasQuizAnswers(answers?: Partial<QuizAnswers> | null) {

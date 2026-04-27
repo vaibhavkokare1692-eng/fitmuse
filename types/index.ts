@@ -72,20 +72,58 @@ export type BudgetRange = "under $100" | "$100-$200" | "$200-$350" | "$350+";
 
 export type ProductCategory = "top" | "bottom" | "shoes" | "accessory" | "outerwear";
 
+export type ColorFamily =
+  | "neutral"
+  | "earth"
+  | "cool"
+  | "warm"
+  | "pastel"
+  | "monochrome"
+  | "metallic"
+  | "sport";
+
+export type ProductVisualType =
+  | "tailored"
+  | "soft-structure"
+  | "street-stack"
+  | "sport"
+  | "evening"
+  | "editorial"
+  | "accessory"
+  | "shoe"
+  | "layered";
+
+export type BudgetMatchLabel =
+  | "Under budget"
+  | "Close to budget"
+  | "Over budget but strong match";
+
+export type MatchQualityLabel =
+  | "Best match"
+  | "Strong match"
+  | "Creator-ready"
+  | "Closest match";
+
 export type Product = {
   id: string;
   name: string;
+  brand: string;
   store: string;
   category: ProductCategory;
   price: number;
   aestheticTags: Aesthetic[];
   occasionTags: Occasion[];
   colors: string[];
+  primaryColor: string;
+  colorFamily: ColorFamily;
   availableSizes: string[];
   fitType: FitPreference;
   stylePreferences: StylePreference[];
+  styleNotes: string;
   image: string;
+  visualType: ProductVisualType;
   url: string;
+  affiliateReady: boolean;
 };
 
 export type QuizAnswers = {
@@ -133,6 +171,11 @@ export type OutfitRecommendation = {
   whyItWorks: string;
   creatorUseCase: string;
   confidenceScore: number;
+  matchQualityLabel: MatchQualityLabel;
+  budgetMatchLabel: BudgetMatchLabel;
+  budgetNote: string;
+  matchReasons: string[];
+  creatorAlignmentScore: number;
   stores: string[];
   matchMode: "exact" | "closest";
   shopUrl: string;

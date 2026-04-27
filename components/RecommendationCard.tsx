@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Bookmark } from "lucide-react";
+import { Bookmark, ChevronDown } from "lucide-react";
 import { formatCurrency, formatOptionLabel } from "@/lib/utils";
 import { ShoppingLinksButton } from "@/components/ShoppingLinksButton";
 import type { OutfitRecommendation } from "@/types";
@@ -59,12 +59,41 @@ function getVisualColors(palette: string[]) {
   return resolved;
 }
 
+function getMatchBadgeClasses(label: OutfitRecommendation["matchQualityLabel"]) {
+  if (label === "Best match") {
+    return "bg-white/18 text-white";
+  }
+
+  if (label === "Creator-ready") {
+    return "bg-[#17363d]/68 text-white";
+  }
+
+  if (label === "Closest match") {
+    return "bg-black/16 text-white";
+  }
+
+  return "bg-white/12 text-white";
+}
+
+function getBudgetBadgeClasses(label: OutfitRecommendation["budgetMatchLabel"]) {
+  if (label === "Under budget") {
+    return "border-emerald-200/80 bg-emerald-50 text-emerald-900";
+  }
+
+  if (label === "Over budget but strong match") {
+    return "border-amber-200/90 bg-amber-50 text-amber-900";
+  }
+
+  return "border-line/70 bg-white/82 text-foreground";
+}
+
 export function RecommendationCard({
   recommendation,
   saved,
   onToggleSave,
 }: RecommendationCardProps) {
   const visualColors = getVisualColors(recommendation.colorPalette);
+  const topReasons = recommendation.matchReasons.slice(0, 2);
   const itemRows = [
     { label: "Top", value: recommendation.items.top.name },
     { label: "Bottom", value: recommendation.items.bottom.name },
@@ -92,7 +121,7 @@ export function RecommendationCard({
         />
         <div className="absolute -right-12 top-0 h-32 w-32 rounded-full bg-white/28 blur-3xl" />
         <div className="absolute bottom-0 left-8 h-20 w-20 rounded-full bg-black/10 blur-2xl" />
-        <div className="relative flex min-h-72 flex-col justify-between">
+        <div className="relative flex min-h-80 flex-col justify-between">
           <div className="flex items-start justify-between gap-3">
             <div className="flex flex-wrap gap-2">
               <span className="rounded-full bg-black/12 px-3 py-2 text-[11px] font-semibold uppercase tracking-[0.22em] text-white">
@@ -100,6 +129,11 @@ export function RecommendationCard({
               </span>
               <span className="rounded-full bg-white/16 px-3 py-2 text-[11px] font-semibold uppercase tracking-[0.22em] text-white">
                 {formatOptionLabel(recommendation.occasion)}
+              </span>
+              <span
+                className={`rounded-full px-3 py-2 text-[11px] font-semibold uppercase tracking-[0.22em] ${getMatchBadgeClasses(recommendation.matchQualityLabel)}`}
+              >
+                {recommendation.matchQualityLabel}
               </span>
             </div>
 
@@ -121,7 +155,7 @@ export function RecommendationCard({
             </button>
           </div>
 
-          <div className="grid gap-4 md:grid-cols-[1.05fr_0.95fr]">
+          <div className="grid gap-4 md:grid-cols-[1.08fr_0.92fr]">
             <div>
               <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-white/68">
                 FitMuse outfit
@@ -130,6 +164,20 @@ export function RecommendationCard({
               <p className="mt-4 max-w-lg text-sm leading-6 text-white/84">
                 {shorten(recommendation.fitNote, 108)}
               </p>
+              <div className="mt-4 flex flex-wrap gap-2">
+                {recommendation.items.outerwear ? (
+                  <span className="rounded-full bg-black/12 px-3 py-2 text-xs font-medium text-white">
+                    5-piece look
+                  </span>
+                ) : (
+                  <span className="rounded-full bg-black/12 px-3 py-2 text-xs font-medium text-white">
+                    4-piece look
+                  </span>
+                )}
+                <span className="rounded-full bg-white/16 px-3 py-2 text-xs font-medium text-white">
+                  {recommendation.stores.slice(0, 2).join(" + ")}
+                </span>
+              </div>
             </div>
 
             <div className="grid gap-3">
@@ -147,7 +195,31 @@ export function RecommendationCard({
                 </p>
                 <p className="mt-2 text-xl text-white">{recommendation.confidenceScore}%</p>
               </div>
+              <div className="rounded-[1.35rem] bg-white/12 px-4 py-4 backdrop-blur-md">
+                <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-white/70">
+                  Budget
+                </p>
+                <p className="mt-2 text-base text-white">{recommendation.budgetMatchLabel}</p>
+              </div>
             </div>
+          </div>
+
+          <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
+            {[
+              recommendation.items.top.category,
+              recommendation.items.bottom.category,
+              recommendation.items.shoes.category,
+              recommendation.items.accessory.category,
+            ].map((category, index) => (
+              <div
+                key={`${recommendation.id}-${category}-${index}`}
+                className="rounded-[1.3rem] border border-white/16 bg-white/10 px-3 py-3 text-center backdrop-blur-sm"
+              >
+                <p className="text-[10px] font-semibold uppercase tracking-[0.24em] text-white/66">
+                  {formatOptionLabel(category)}
+                </p>
+              </div>
+            ))}
           </div>
         </div>
       </div>
@@ -168,6 +240,26 @@ export function RecommendationCard({
           ))}
         </div>
 
+        <div className="mt-5 flex flex-wrap gap-2">
+          <span
+            className={`inline-flex items-center rounded-full border px-3 py-2 text-xs font-semibold ${getBudgetBadgeClasses(recommendation.budgetMatchLabel)}`}
+          >
+            {recommendation.budgetMatchLabel}
+          </span>
+          <span className="inline-flex items-center rounded-full border border-line/70 bg-white/82 px-3 py-2 text-xs font-semibold text-foreground">
+            {recommendation.matchQualityLabel}
+          </span>
+        </div>
+
+        <div className="mt-5 grid gap-3 sm:grid-cols-2">
+          {topReasons.map((reason) => (
+            <div key={reason} className="rounded-[1.35rem] border border-line/70 bg-white/80 p-4">
+              <p className="mini-label">Match reason</p>
+              <p className="mt-3 text-sm leading-6 text-foreground">{reason}</p>
+            </div>
+          ))}
+        </div>
+
         <div className="mt-5 grid gap-3">
           {itemRows.map((item) => (
             <div
@@ -180,23 +272,48 @@ export function RecommendationCard({
           ))}
         </div>
 
-        <div className="mt-5 grid gap-3 md:grid-cols-2">
-          <div className="rounded-[1.5rem] bg-white/74 p-5">
-            <p className="mini-label">Fit note</p>
-            <p className="mt-3 text-sm leading-6 text-foreground">
-              {shorten(recommendation.fitNote, 120)}
-            </p>
-          </div>
-          <div className="rounded-[1.5rem] bg-background/80 p-5">
-            <p className="mini-label">Why it works</p>
-            <p className="mt-3 text-sm leading-6 text-foreground">
-              {shorten(recommendation.whyItWorks, 120)}
-            </p>
-          </div>
+        <div className="mt-5 rounded-[1.5rem] bg-background/80 p-5">
+          <p className="mini-label">Fit note</p>
+          <p className="mt-3 text-sm leading-6 text-foreground">
+            {shorten(recommendation.fitNote, 120)}
+          </p>
         </div>
 
+        <details className="mt-5 rounded-[1.5rem] border border-line/70 bg-white/74 p-5">
+          <summary className="flex cursor-pointer list-none items-center justify-between gap-3 text-sm font-semibold text-foreground">
+            Why this look?
+            <ChevronDown size={16} />
+          </summary>
+          <div className="mt-4 grid gap-4">
+            <div>
+              <p className="mini-label">Full match reasons</p>
+              <div className="mt-3 flex flex-wrap gap-2">
+                {recommendation.matchReasons.map((reason) => (
+                  <span key={reason} className="chip">
+                    {reason}
+                  </span>
+                ))}
+              </div>
+            </div>
+            <div className="grid gap-3 md:grid-cols-2">
+              <div className="note-card">
+                <p className="mini-label">Creator use case</p>
+                <p className="mt-2 text-sm leading-6 text-foreground">{recommendation.creatorUseCase}</p>
+              </div>
+              <div className="note-card">
+                <p className="mini-label">Budget note</p>
+                <p className="mt-2 text-sm leading-6 text-foreground">{recommendation.budgetNote}</p>
+              </div>
+            </div>
+            <div className="note-card">
+              <p className="mini-label">Why it works</p>
+              <p className="mt-2 text-sm leading-6 text-foreground">{recommendation.whyItWorks}</p>
+            </div>
+          </div>
+        </details>
+
         <div className="mt-6 flex flex-wrap gap-3">
-          <ShoppingLinksButton />
+          <ShoppingLinksButton testId={`shop-look-${recommendation.id}`} />
         </div>
 
         <div aria-live="polite" data-testid={`save-status-${recommendation.id}`} className="mt-3 min-h-6">

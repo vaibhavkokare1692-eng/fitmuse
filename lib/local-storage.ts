@@ -4,12 +4,14 @@ import type {
   BudgetRange,
   FitPreference,
   Occasion,
+  OutfitRecommendation,
   QuizAnswers,
   StylePreference,
 } from "@/types";
 
 export const QUIZ_STORAGE_KEY = "fitmuse-quiz-answers";
 export const SAVED_LOOKS_STORAGE_KEY = "fitmuse-saved-looks";
+export const SAVED_LOOK_DETAILS_STORAGE_KEY = "fitmuse-saved-look-details";
 
 function normalize(value?: string | null) {
   return value?.trim().toLowerCase() ?? "";
@@ -205,4 +207,45 @@ export function clearSavedLookIds() {
   }
 
   window.localStorage.removeItem(SAVED_LOOKS_STORAGE_KEY);
+}
+
+export function readSavedLooks() {
+  if (typeof window === "undefined") {
+    return [];
+  }
+
+  try {
+    const raw = window.localStorage.getItem(SAVED_LOOK_DETAILS_STORAGE_KEY);
+
+    if (!raw) {
+      return [];
+    }
+
+    const parsed = JSON.parse(raw) as unknown;
+
+    if (!Array.isArray(parsed)) {
+      window.localStorage.removeItem(SAVED_LOOK_DETAILS_STORAGE_KEY);
+      return [];
+    }
+
+    return parsed.filter((entry): entry is OutfitRecommendation => {
+      if (!entry || typeof entry !== "object") {
+        return false;
+      }
+
+      const savedLook = entry as Partial<OutfitRecommendation>;
+      return typeof savedLook.id === "string" && typeof savedLook.name === "string";
+    });
+  } catch {
+    window.localStorage.removeItem(SAVED_LOOK_DETAILS_STORAGE_KEY);
+    return [];
+  }
+}
+
+export function writeSavedLooks(looks: OutfitRecommendation[]) {
+  if (typeof window === "undefined") {
+    return;
+  }
+
+  window.localStorage.setItem(SAVED_LOOK_DETAILS_STORAGE_KEY, JSON.stringify(looks));
 }
