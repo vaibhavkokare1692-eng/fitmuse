@@ -85,3 +85,44 @@ When FitMuse is ready for affiliate testing, the simplest upgrade path is:
 - optionally add future metadata like `merchantId`, `campaignId`, or `lastCheckedAt`
 
 This avoids changing the UI contract later.
+
+## Region-Aware Styling Foundation
+
+FitMuse should eventually adapt outfit recommendations based on where the user actually lives, shops, and styles themselves. That future version should consider:
+
+- country or region
+- city and climate
+- local store availability
+- culture and style preference
+- modesty preference
+- occasion norms
+- budget in the local market
+- seasonal and weather needs
+
+### Product principle
+
+FitMuse should never assume someone’s religion, culture, or clothing preference only from their country. Region-aware styling should always be guided by optional user-selected style questions instead of hardcoded assumptions.
+
+### Future quiz fields
+
+When the manual real-product layer expands, the quiz can add optional fields like:
+
+- `country/region`
+- `city` (optional)
+- `climate/season`
+- `preferred style: Western, traditional/ethnic, fusion, modest, no preference`
+- `local store preference`
+- `currency/market`
+
+### First target regions
+
+The first regions worth planning around are:
+
+- USA
+- India
+- Romania
+- Indonesia
+
+### Why this matters
+
+Most fashion apps still recommend generic outfits without considering where the user lives. FitMuse can become much more useful by ranking looks that make sense for the user’s climate, stores, budget reality, and social context while still leaving style choices in the user’s control.
