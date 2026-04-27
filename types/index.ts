@@ -199,6 +199,39 @@ export type SavedLookSnapshot = OutfitRecommendation & {
   briefSummary?: SavedLookBriefSummary;
 };
 
+export type RealProduct = {
+  id: string;
+  name: string;
+  store: string;
+  category: ProductCategory;
+  price: number;
+  currency: string;
+  colors: string[];
+  sizes: string[];
+  aestheticTags: Aesthetic[];
+  occasionTags: Occasion[];
+  fitTags: FitPreference[];
+  stylePreferenceTags: StylePreference[];
+  productUrl: string;
+  imageUrl?: string;
+  affiliateReady: boolean;
+  notes?: string;
+};
+
+export type RealOutfitPack = {
+  id: string;
+  name: string;
+  stylePreference: StylePreference;
+  aesthetic: Aesthetic;
+  occasion: Occasion;
+  budgetRange: BudgetRange;
+  totalPrice: number;
+  productIds: string[];
+  fitNote: string;
+  whyItWorks: string;
+  shopReady: boolean;
+};
+
 export type Outfit = {
   id: string;
   name: string;

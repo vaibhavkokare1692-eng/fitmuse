@@ -12,6 +12,11 @@ import {
   fitPreferenceOptions,
   occasionOptions,
 } from "@/data/mock-data";
+import {
+  getRealOutfitPacksForBrief,
+  getRealPackBudgetSummary,
+  getRealProductsForOutfitPack,
+} from "@/data/realOutfitPacks";
 import { products } from "@/data/products";
 import {
   clearStoredQuizAnswers,
@@ -39,6 +44,8 @@ import type {
   Occasion,
   OutfitRecommendation,
   QuizAnswers,
+  RealOutfitPack,
+  RealProduct,
   SavedLookSnapshot,
 } from "@/types";
 
@@ -56,6 +63,12 @@ type ResultsFilters = {
   fit: FitPreference | "";
   store: string;
   colorFamily: ColorFamily | "";
+};
+
+type ResolvedRealOutfitPack = RealOutfitPack & {
+  products: RealProduct[];
+  stores: string[];
+  budgetSummary: string;
 };
 
 const allAestheticOptions = Array.from(
@@ -253,6 +266,7 @@ export function ResultsView({ searchParamsObject = {} }: ResultsViewProps) {
   const [sort, setSort] = useState<ResultsSort>("best-match");
   const [viewMode, setViewMode] = useState<ResultsViewMode>("all");
   const [selectedSavedLookId, setSelectedSavedLookId] = useState<string | null>(null);
+  const [selectedRealPackId, setSelectedRealPackId] = useState<string | null>(null);
   const [highlightedLookId, setHighlightedLookId] = useState<string | null>(null);
   const [savedLooksMessage, setSavedLooksMessage] = useState("");
   const [pendingOpenSavedLookId, setPendingOpenSavedLookId] = useState<string | null>(null);
@@ -360,6 +374,35 @@ export function ResultsView({ searchParamsObject = {} }: ResultsViewProps) {
     [savedLooks],
   );
 
+  const curatedRealOutfitPacks = useMemo<ResolvedRealOutfitPack[]>(() => {
+    if (!quizAnswers) {
+      return [];
+    }
+
+    return getRealOutfitPacksForBrief({
+      stylePreference: quizAnswers.stylePreference,
+      aesthetic: quizAnswers.aesthetic,
+      occasion: quizAnswers.occasion,
+      budgetRange: quizAnswers.budgetRange,
+    })
+      .map((pack) => {
+        const packProducts = getRealProductsForOutfitPack(pack.productIds);
+
+        return {
+          ...pack,
+          products: packProducts,
+          stores: Array.from(new Set(packProducts.map((product) => product.store))),
+          budgetSummary: getRealPackBudgetSummary(pack.totalPrice, pack.budgetRange),
+        };
+      })
+      .filter((pack) => pack.products.length > 0);
+  }, [
+    quizAnswers?.aesthetic,
+    quizAnswers?.budgetRange,
+    quizAnswers?.occasion,
+    quizAnswers?.stylePreference,
+  ]);
+
   const savedLookIds = useMemo(() => savedRecommendations.map((savedLook) => savedLook.id), [
     savedRecommendations,
   ]);
@@ -382,6 +425,13 @@ export function ResultsView({ searchParamsObject = {} }: ResultsViewProps) {
         ? savedRecommendations.find((savedLook) => savedLook.id === selectedSavedLookId) ?? null
         : null,
     [savedRecommendations, selectedSavedLookId],
+  );
+  const selectedRealPack = useMemo(
+    () =>
+      selectedRealPackId
+        ? curatedRealOutfitPacks.find((pack) => pack.id === selectedRealPackId) ?? null
+        : null,
+    [curatedRealOutfitPacks, selectedRealPackId],
   );
   const canViewSelectedSavedLookInCurrentResults = Boolean(
     selectedSavedLook && recommendationLookup.has(selectedSavedLook.id),
@@ -965,9 +1015,92 @@ export function ResultsView({ searchParamsObject = {} }: ResultsViewProps) {
                 ))}
               </div>
 
+              {curatedRealOutfitPacks.length > 0 ? (
+                <div className="hero-card p-5 sm:p-6">
+                  <div className="flex flex-wrap items-start justify-between gap-4">
+                    <div>
+                      <p className="eyebrow !mb-0">Curated real shopping looks</p>
+                      <h3 className="mt-3 text-3xl text-foreground">
+                        Manually curated packs for this brief.
+                      </h3>
+                      <p className="mt-3 max-w-2xl text-sm leading-6 text-muted">
+                        These packs sit alongside the mock engine so FitMuse can start testing real
+                        shopping workflows one scenario at a time.
+                      </p>
+                    </div>
+                    <span className="pill">{curatedRealOutfitPacks.length} curated packs</span>
+                  </div>
+
+                  <div className="mt-6 grid gap-4 xl:grid-cols-2">
+                    {curatedRealOutfitPacks.map((pack) => (
+                      <div
+                        key={pack.id}
+                        className="rounded-[1.7rem] border border-line/70 bg-white/82 p-5 shadow-[0_18px_40px_rgba(27,21,19,0.06)]"
+                      >
+                        <div className="flex flex-wrap gap-2">
+                          <span className="chip">
+                            {formatAestheticLabel(pack.aesthetic, pack.stylePreference)}
+                          </span>
+                          <span className="chip">{formatOptionLabel(pack.occasion)}</span>
+                          <span className="chip">{pack.budgetSummary}</span>
+                        </div>
+
+                        <div className="mt-4 flex items-start justify-between gap-4">
+                          <div>
+                            <p className="mini-label">Curated pack</p>
+                            <h4 className="mt-2 text-2xl text-foreground">{pack.name}</h4>
+                          </div>
+                          <div className="rounded-full border border-line/70 bg-background/80 px-4 py-2 text-sm font-semibold text-foreground">
+                            {formatCurrency(pack.totalPrice)}
+                          </div>
+                        </div>
+
+                        <div className="mt-4 flex flex-wrap gap-2">
+                          {pack.stores.map((store) => (
+                            <span key={`${pack.id}-${store}`} className="pill">
+                              {store}
+                            </span>
+                          ))}
+                        </div>
+
+                        <div className="mt-5 grid gap-3">
+                          {pack.products.map((product) => (
+                            <div
+                              key={product.id}
+                              className="flex items-center justify-between gap-3 rounded-[1.2rem] border border-line/70 bg-background/72 px-4 py-3"
+                            >
+                              <div>
+                                <p className="mini-label">{formatOptionLabel(product.category)}</p>
+                                <p className="mt-1 text-sm text-foreground">{product.name}</p>
+                              </div>
+                              <p className="text-sm font-medium text-foreground">
+                                {formatCurrency(product.price)}
+                              </p>
+                            </div>
+                          ))}
+                        </div>
+
+                        <div className="mt-5 flex flex-wrap items-center justify-between gap-3">
+                          <p className="text-sm leading-6 text-muted">{pack.whyItWorks}</p>
+                          <button
+                            type="button"
+                            onClick={() => setSelectedRealPackId(pack.id)}
+                            className="cta-primary"
+                          >
+                            Shop Full Look
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              ) : null}
+
               <div className="rounded-[1.4rem] border border-line/70 bg-white/74 px-5 py-4">
                 <p className="text-sm leading-6 text-muted">
-                  FitMuse currently uses mock outfit data for demo purposes. Real product links and affiliate shopping feeds can be connected in a future version.
+                  FitMuse currently uses mock outfit data for demo purposes. The curated shopping packs
+                  above use manually assembled placeholder links for MVP testing, and affiliate shopping
+                  feeds can be connected later.
                 </p>
               </div>
             </>
@@ -1246,6 +1379,123 @@ export function ResultsView({ searchParamsObject = {} }: ResultsViewProps) {
                   View in current results
                 </button>
               ) : null}
+            </div>
+          </div>
+        </div>
+      ) : null}
+
+      {selectedRealPack ? (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#181311]/52 p-4 backdrop-blur-sm">
+          <div className="max-h-[90vh] w-full max-w-3xl overflow-y-auto rounded-[2rem] border border-line/70 bg-background p-6 shadow-[0_30px_80px_rgba(27,21,19,0.28)] sm:p-8">
+            <div className="flex items-start justify-between gap-4">
+              <div>
+                <p className="eyebrow !mb-0">Curated real shopping look</p>
+                <h2 className="mt-3 text-3xl text-foreground sm:text-4xl">
+                  {selectedRealPack.name}
+                </h2>
+                <p className="mt-3 max-w-2xl text-sm leading-6 text-muted">
+                  Real product links are manually curated for MVP testing.
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setSelectedRealPackId(null)}
+                className="rounded-full border border-line/70 bg-white/82 p-3 text-foreground"
+                aria-label="Close curated shopping look"
+              >
+                <X size={18} />
+              </button>
+            </div>
+
+            <div className="mt-5 flex flex-wrap gap-2">
+              <span className="chip">
+                {formatAestheticLabel(selectedRealPack.aesthetic, selectedRealPack.stylePreference)}
+              </span>
+              <span className="chip">{formatOptionLabel(selectedRealPack.occasion)}</span>
+              <span className="chip">{formatOptionLabel(selectedRealPack.budgetRange)}</span>
+              <span className="chip">{selectedRealPack.budgetSummary}</span>
+            </div>
+
+            <div className="mt-6 grid gap-4 sm:grid-cols-3">
+              <div className="rounded-[1.4rem] border border-line/70 bg-white/82 p-4">
+                <p className="mini-label">Total price</p>
+                <p className="mt-2 text-xl text-foreground">
+                  {formatCurrency(selectedRealPack.totalPrice)}
+                </p>
+              </div>
+              <div className="rounded-[1.4rem] border border-line/70 bg-white/82 p-4">
+                <p className="mini-label">Stores</p>
+                <p className="mt-2 text-sm text-foreground">{selectedRealPack.stores.join(", ")}</p>
+              </div>
+              <div className="rounded-[1.4rem] border border-line/70 bg-white/82 p-4">
+                <p className="mini-label">Shop status</p>
+                <p className="mt-2 text-sm text-foreground">
+                  {selectedRealPack.shopReady ? "Manually curated for MVP review" : "Draft only"}
+                </p>
+              </div>
+            </div>
+
+            <div className="mt-6 grid gap-4">
+              {selectedRealPack.products.map((product) => (
+                <div
+                  key={`real-pack-${selectedRealPack.id}-${product.id}`}
+                  className="rounded-[1.5rem] border border-line/70 bg-white/78 p-5"
+                >
+                  <div className="flex flex-wrap items-start justify-between gap-4">
+                    <div>
+                      <p className="mini-label">{formatOptionLabel(product.category)}</p>
+                      <h3 className="mt-2 text-xl text-foreground">{product.name}</h3>
+                      <p className="mt-2 text-sm text-muted">
+                        {product.store} • {product.currency} {product.price}
+                      </p>
+                    </div>
+                    <a
+                      href={product.productUrl}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="cta-secondary"
+                    >
+                      Replace with real link
+                    </a>
+                  </div>
+
+                  <div className="mt-4 flex flex-wrap gap-2">
+                    {product.colors.map((color) => (
+                      <span key={`${product.id}-${color}`} className="chip">
+                        {formatOptionLabel(color)}
+                      </span>
+                    ))}
+                    <span className="chip">{product.store}</span>
+                  </div>
+
+                  {product.notes ? (
+                    <p className="mt-4 text-sm leading-6 text-muted">{product.notes}</p>
+                  ) : null}
+                </div>
+              ))}
+            </div>
+
+            <div className="mt-6 grid gap-4 md:grid-cols-2">
+              <div className="rounded-[1.5rem] border border-line/70 bg-white/78 p-5">
+                <p className="mini-label">Fit note</p>
+                <p className="mt-3 text-sm leading-6 text-foreground">{selectedRealPack.fitNote}</p>
+              </div>
+              <div className="rounded-[1.5rem] border border-line/70 bg-white/78 p-5">
+                <p className="mini-label">Why it works</p>
+                <p className="mt-3 text-sm leading-6 text-foreground">
+                  {selectedRealPack.whyItWorks}
+                </p>
+              </div>
+            </div>
+
+            <div className="mt-8 flex flex-wrap gap-3">
+              <button
+                type="button"
+                onClick={() => setSelectedRealPackId(null)}
+                className="cta-secondary"
+              >
+                Close
+              </button>
             </div>
           </div>
         </div>
