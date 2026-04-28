@@ -222,33 +222,85 @@ function itemSignalKeywords(signal: string) {
   const keywords: Record<string, string[]> = {
     "oxford shirt": ["oxford"],
     "button-down shirt": ["button-down", "button down", "oxford"],
+    "white t-shirt": ["white t-shirt", "white t shirt", "white tee", "tee"],
+    "high-quality white t-shirt": ["white t-shirt", "white t shirt", "white tee", "tee"],
+    "oversized cotton/linen button-ups": ["button-up", "button up", "linen shirt", "cotton shirt", "oversized shirt"],
+    "oversized button-up": ["button-up", "button up", "oversized shirt", "oversized button-up"],
+    "silk button-up": ["silk button-up", "silk button up", "silk shirt", "button-up", "button up"],
+    "fitted knit/tube/corset tops": ["knit top", "tube top", "corset top", "ribbed top", "fitted knit"],
+    "fitted knit top": ["knit top", "ribbed top", "fitted knit"],
+    "corset-inspired top": ["corset", "corset top", "structured top"],
+    "lightweight merino/cashmere sweaters": ["merino", "cashmere", "sweater", "crewneck"],
     "knit polo": ["knit polo", "knitted polo", "polo"],
     "knitted polo": ["knit polo", "knitted polo", "polo"],
     "quarter-zip": ["quarter-zip", "quarter zip", "half-zip", "half zip"],
     "textured cardigan": ["cardigan"],
     cardigan: ["cardigan"],
     "unstructured navy blazer": ["blazer"],
+    "oversized blazer": ["oversized blazer", "blazer"],
+    "blazer dress": ["blazer dress", "dress"],
     blazer: ["blazer"],
     "suede layer": ["suede"],
     "textured jacket": ["textured", "jacket", "overshirt", "suede"],
     "crewneck": ["crewneck"],
+    "high-rise straight-leg jeans": ["high-rise", "high rise", "straight-leg", "straight leg", "jeans", "denim"],
+    "high-rise denim": ["high-rise", "high rise", "jeans", "denim"],
+    "high-rise bottoms": ["high-rise", "high rise", "trousers", "pants", "jeans", "skirt"],
+    "cropped or waist-defined tops": ["cropped", "wrap", "corset", "fitted", "waist"],
+    "light third piece": ["cardigan", "blazer", "overshirt", "layer", "half-zip", "half zip"],
+    "one anchor piece": ["blazer", "coat", "dress", "trousers", "loafers", "heels", "boots"],
+    "versatile basics": ["tee", "shirt", "cardigan", "trousers", "jeans", "skirt", "loafers", "flats"],
+    "high-low mix": ["tee", "shirt", "trousers", "jeans", "loafers", "flats", "bag"],
+    "simple outfit base": ["tee", "shirt", "trousers", "jeans", "dress", "skirt", "cardigan"],
+    "simple refined basics": ["tee", "shirt", "trousers", "jeans", "dress", "skirt", "cardigan", "flats"],
+    "neutral core pieces": ["tee", "shirt", "trousers", "jeans", "dress", "skirt", "cardigan", "bag"],
+    "tailored bottom": ["trouser", "trousers", "tailored", "chinos"],
     "tailored trousers": ["trouser", "trousers", "pleated", "front-crease", "front crease"],
     "flannel trousers": ["flannel", "trouser", "trousers"],
+    "wide-leg or straight trousers": ["wide-leg", "wide leg", "straight-leg", "straight leg", "trouser", "trousers"],
     chinos: ["chino", "chinos"],
     "dark trousers": ["trouser", "trousers"],
     "grey flannel trousers": ["flannel", "trouser", "trousers"],
     "dark clean denim": ["denim", "jeans"],
+    "baggy denim": ["baggy denim", "relaxed denim", "wide-leg jeans", "wide leg jeans", "jeans", "denim"],
+    "slip dress": ["slip dress", "dress"],
+    "maxi skirt": ["maxi skirt", "skirt"],
+    "mini skirt": ["mini skirt", "skirt"],
     "penny loafers": ["loafer", "loafers"],
     "tassel loafers": ["loafer", "loafers"],
+    "leather loafers": ["leather loafers", "loafer", "loafers"],
     loafers: ["loafer", "loafers"],
     "chelsea boots": ["chelsea", "boot", "boots"],
+    "knee-high boots": ["knee-high boots", "knee high boots", "boot", "boots"],
+    "pointed-toe flats": ["pointed-toe flats", "pointed toe flats", "pointed flats", "slingback flats"],
+    "pointed flats": ["pointed flats", "pointed-toe", "pointed toe", "slingback"],
+    "kitten heels": ["kitten heels", "kitten heel", "slingback", "heel", "heels"],
+    slingbacks: ["slingback", "slingbacks"],
     "minimal leather sneakers": ["minimal", "sneaker", "sneakers", "court sneakers", "leather sneakers"],
     "minimal sneakers": ["minimal", "sneaker", "sneakers", "court sneakers"],
+    "refined shoes": ["loafer", "loafers", "pointed", "heel", "heels", "slingback", "boot", "boots"],
     "slim leather belt": ["belt"],
+    "thin leather belts": ["thin belt", "belt"],
+    "thin belt": ["thin belt", "belt"],
     "simple analog watch": ["watch"],
     "simple dress watch": ["watch"],
+    "gold hoops": ["gold hoops", "hoops", "earrings"],
+    "dainty gold hoops": ["gold hoops", "hoops", "earrings"],
+    "simple gold jewelry": ["gold hoops", "hoops", "earrings", "chain", "necklace", "cuff"],
+    "gold jewelry": ["gold hoops", "hoops", "earrings", "chain", "necklace", "cuff"],
+    "simple chains/paperclip necklaces": ["chain", "paperclip necklace", "necklace"],
+    "simple chains": ["chain", "necklace"],
+    "minimal jewelry": ["hoops", "earrings", "chain", "necklace", "watch", "cuff"],
+    "structured handbag": ["structured bag", "handbag", "bag", "tote"],
+    "small handbag": ["small bag", "mini bag", "structured bag", "handbag"],
+    "small structured bag": ["small bag", "mini bag", "structured bag", "handbag"],
+    "scaled-down handbag": ["small bag", "mini bag", "structured bag", "shoulder bag", "handbag"],
+    "structured neutral bag": ["structured bag", "mini bag", "shoulder bag", "handbag", "tote"],
+    "only if it supports repeat wear": ["belt", "watch", "bag", "earrings", "necklace"],
+    "clean bag": ["bag", "tote", "sling", "crossbody", "weekender", "laptop bag", "handbag"],
+    "classic sunglasses": ["sunglasses", "tortoiseshell", "black sunglasses"],
+    "lightweight scarf": ["scarf"],
     "subtle fragrance": ["fragrance"],
-    "clean bag": ["bag", "tote", "sling", "crossbody", "weekender", "laptop bag"],
     "clean clothing": [],
     "coordinated accessories": ["watch", "belt", "bag"],
   };
@@ -335,7 +387,70 @@ function matchesPriorityFit(product: Product, fitSignal: string) {
     (normalizedFit === "controlled drape" && keywordMatches(productText, ["drape", "soft", "tailored"])) ||
     (normalizedFit === "skim fit" && ["slim", "regular", "classy"].includes(product.fitType)) ||
     (normalizedFit === "neat layering" && keywordMatches(productText, ["layer", "cardigan", "zip", "blazer"])) ||
-    (normalizedFit === "pressed finish" && ["classy", "regular"].includes(product.fitType))
+    (normalizedFit === "pressed finish" && ["classy", "regular"].includes(product.fitType)) ||
+    (normalizedFit === "high-rise" && keywordMatches(productText, ["high-rise", "high rise"])) ||
+    (normalizedFit === "clean line" &&
+      (["classy", "regular", "slim"].includes(product.fitType) ||
+        keywordMatches(productText, ["tailored", "straight-leg", "straight leg", "clean line"]))) ||
+    (normalizedFit === "clean vertical line" &&
+      keywordMatches(productText, ["high-rise", "high rise", "straight-leg", "straight leg", "pointed", "tailored"])) ||
+    (normalizedFit === "balanced proportions" &&
+      (["classy", "regular", "slim"].includes(product.fitType) ||
+        keywordMatches(productText, ["tailored", "structured", "balanced"]))) ||
+    (normalizedFit === "polished silhouette" &&
+      (["classy", "regular", "slim"].includes(product.fitType) ||
+        keywordMatches(productText, ["tailored", "polished", "structured", "pointed"]))) ||
+    (normalizedFit === "easy structure" &&
+      keywordMatches(productText, ["tailored", "structured", "cardigan", "blazer", "straight-leg", "straight leg"])) ||
+    (normalizedFit === "clean waist emphasis" &&
+      keywordMatches(productText, ["wrap", "belt", "high-rise", "high rise", "corset", "waist"])) ||
+    (normalizedFit === "waist definition" &&
+      keywordMatches(productText, ["belt", "high-rise", "high rise", "corset", "waist"])) ||
+    (normalizedFit === "defined waist" &&
+      keywordMatches(productText, ["belt", "high-rise", "high rise", "corset", "waist"])) ||
+    (normalizedFit === "not clingy" &&
+      (["regular", "classy", "relaxed"].includes(product.fitType) ||
+        keywordMatches(productText, ["drape", "fluid", "tailored"]))) ||
+    (normalizedFit === "waist-aware" &&
+      keywordMatches(productText, ["belt", "high-rise", "high rise", "wrap", "corset", "waist"])) ||
+    (normalizedFit === "waist-aware structure" &&
+      keywordMatches(productText, ["belt", "high-rise", "high rise", "tailored", "corset"])) ||
+    (normalizedFit === "clean skim" &&
+      (["slim", "classy", "regular"].includes(product.fitType) ||
+        keywordMatches(productText, ["slip", "drape", "fluid", "tailored"]))) ||
+    (normalizedFit === "layered without bulk" &&
+      keywordMatches(productText, ["cardigan", "blazer", "coat", "lightweight", "overshirt"])) ||
+    (normalizedFit === "long line" &&
+      keywordMatches(productText, ["maxi", "longline", "straight-leg", "straight leg", "high-rise", "high rise"])) ||
+    (normalizedFit === "clear leg line" &&
+      keywordMatches(productText, ["mini", "maxi", "pointed", "straight-leg", "straight leg"])) ||
+    (normalizedFit === "long vertical line" &&
+      keywordMatches(productText, ["high-rise", "high rise", "pointed", "straight-leg", "straight leg"])) ||
+    (normalizedFit === "breathable" &&
+      keywordMatches(productText, ["linen", "cotton", "lightweight"])) ||
+    (normalizedFit === "clean drape" &&
+      keywordMatches(productText, ["drape", "fluid", "tailored", "straight-leg", "straight leg"])) ||
+    (normalizedFit === "oversized top with structured or slimmer bottom" &&
+      ((product.category === "top" && ["relaxed", "oversized"].includes(product.fitType)) ||
+        (product.category === "bottom" && ["slim", "classy", "regular"].includes(product.fitType)))) ||
+    (normalizedFit === "belt if needed" &&
+      keywordMatches(productText, ["belt", "wrap", "corset", "waist"])) ||
+    (normalizedFit === "simple and clean" &&
+      (["classy", "regular", "slim"].includes(product.fitType) ||
+        keywordMatches(productText, ["clean", "tailored", "minimal"]))) ||
+    (normalizedFit === "clean silhouette" &&
+      (["classy", "regular", "slim"].includes(product.fitType) ||
+        keywordMatches(productText, ["tailored", "straight-leg", "straight leg", "clean"]))) ||
+    (normalizedFit === "clean and uncluttered" &&
+      (["classy", "regular", "slim"].includes(product.fitType) ||
+        keywordMatches(productText, ["clean", "minimal", "tailored"]))) ||
+    (normalizedFit === "clean basics before trend pieces" &&
+      keywordMatches(productText, ["tee", "shirt", "trouser", "jeans", "cardigan", "blazer"])) ||
+    (normalizedFit === "fitted top" &&
+      (product.category === "top" && ["slim", "classy"].includes(product.fitType))) ||
+    (normalizedFit === "relaxed bottom" &&
+      product.category === "bottom" &&
+      ["relaxed", "regular"].includes(product.fitType))
   ) {
     return true;
   }
@@ -351,20 +466,38 @@ function matchesPriorityMaterial(product: Product, materialSignal: string) {
     "oxford cotton": ["oxford"],
     merino: ["merino"],
     cashmere: ["cashmere"],
+    silk: ["silk", "satin"],
+    "light silk": ["silk", "satin"],
+    "matte satin": ["satin"],
+    "silk texture": ["silk", "satin"],
+    "satin-like matte texture": ["satin"],
     "wool blend": ["wool", "flannel"],
+    "smooth wool": ["wool", "flannel"],
+    "soft wool": ["wool", "flannel", "merino"],
     suede: ["suede"],
     linen: ["linen"],
     cotton: ["cotton", "oxford"],
+    "cotton denim": ["denim", "jeans", "cotton"],
+    "cotton blend": ["cotton"],
     "cotton-linen blend": ["linen", "cotton"],
+    "linen blend": ["linen", "cotton"],
     "fine gauge knit": ["knit"],
     "cotton knit": ["knit"],
+    "rib knit": ["ribbed", "knit"],
     "soft wool blend": ["wool", "merino", "flannel"],
     flannel: ["flannel"],
     "clean denim": ["denim", "jeans"],
     leather: ["leather"],
+    "soft leather": ["leather"],
     "smooth leather": ["leather"],
     "soft tailoring": ["tailored", "blazer"],
+    "structured suiting": ["blazer", "tailored", "suiting"],
     "structured cotton": ["cotton", "structured"],
+    "natural fibers": ["cotton", "linen", "silk", "wool", "cashmere", "merino"],
+    "textured neutrals": ["knit", "linen", "wool", "suede", "leather"],
+    "soft knit": ["knit", "merino", "cashmere"],
+    "gold-tone metal": ["gold", "metal"],
+    "thrifted leather": ["leather"],
     "polished natural textures": ["leather", "merino", "wool", "cotton", "suede"],
     "budget-friendly natural feel": ["cotton", "merino", "oxford"],
   };
@@ -405,6 +538,58 @@ function matchesAvoidSignal(product: Product, signal: string) {
     "loud rocker styling": ["studded", "graphic"],
     "over-layered costume energy": ["graphic", "contrast"],
     "costume energy": ["graphic", "contrast"],
+    "cheap shiny satin": ["satin", "glossy", "shiny"],
+    "cheap shine": ["glossy", "shiny", "plastic"],
+    "cheap shiny polyester": ["polyester", "glossy", "shiny"],
+    "plastic sheen": ["plastic", "glossy", "shiny"],
+    "plastic-looking synthetic": ["plastic", "synthetic", "glossy", "shiny"],
+    "shiny synthetic jersey": ["synthetic", "glossy", "shiny", "jersey"],
+    "busy print": ["print", "pattern"],
+    "high-contrast loud pattern": ["print", "pattern", "contrast"],
+    "too many accent colors": [],
+    "accessory overload": [],
+    "overwhelming oversized bag": ["weekender", "oversized bag"],
+    "oversized bag": ["weekender", "oversized bag"],
+    "awkward knee-length skirt": ["knee-length", "knee length"],
+    "low-rise": ["low-rise", "low rise"],
+    "clubwear shine": ["satin", "glossy", "shiny"],
+    "clubwear top": ["corset", "club", "bodycon"],
+    "nightlife styling": ["bodycon", "club", "glitter"],
+    "junior costume styling": ["graphic", "novelty", "glitter"],
+    "trend clutter": ["graphic", "novelty", "contrast"],
+    "overdesigned basics": ["cargo", "utility", "contrast stitch", "panel", "graphic"],
+    "logo-heavy accessory": ["logo", "monogram", "branding"],
+    "too casual to feel polished": ["cargo", "utility", "runner", "sport", "clip", "pouch"],
+    "random trend stacking": ["cargo", "utility", "graphic", "contrast stitch", "sequin"],
+    "fake luxury cues": ["plastic", "glossy", "shiny", "novelty"],
+    "trying too hard": ["graphic", "sequin", "glitter", "novelty"],
+    "trying too hard with add-ons": ["clip", "pouch", "novelty"],
+    "costume-office energy": ["contrast stitch", "graphic", "night", "sequin"],
+    "boxy without balance": ["boxy", "oversized"],
+    "boxy oversized layer with no waist control": ["boxy", "oversized blazer", "oversized layer"],
+    "heavy swallowed frame": ["boxy", "oversized coat", "oversized blazer"],
+    "sloppy oversized all-over": ["oversized", "baggy"],
+    "sloppy oversized shirt with wide pant and no structure": ["oversized shirt", "wide-leg", "wide leg", "baggy"],
+    "undefined waist": ["boxy", "shift"],
+    "double-oversized proportion": ["oversized", "baggy"],
+    "bodycon club dress": ["bodycon", "club", "glitter"],
+    "ultra-bright satin": ["satin", "neon", "bright"],
+    "plastic-shine satin": ["satin", "glossy", "shiny"],
+    "heavy stiff maxi with bulky knit": ["bulky", "maxi", "heavy knit"],
+    "harsh busy print": ["print", "pattern", "contrast"],
+    "frumpy heaviness": ["bulky", "heavy"],
+    "swallowed silhouette": ["boxy", "oversized"],
+    "unintentional shapelessness": ["shapeless", "boxy", "oversized"],
+    "all-soft no structure": ["draped", "soft"],
+    "all-rigid no softness": ["stiff", "boxy", "rigid"],
+    "one-note styling": ["uniform", "flat"],
+    "plastic shine": ["plastic", "glossy", "shiny"],
+    "synthetic shine": ["synthetic", "glossy", "shiny"],
+    "harsh synthetic brights": ["neon", "bright", "synthetic"],
+    "color overload": [],
+    "cheap-looking statement branding": ["logo", "branding", "monogram"],
+    "cheap plastic accessory finish": ["plastic", "acrylic"],
+    "luxury-only expectation": [],
     "over-matching": [],
     "over-accessorizing": [],
     "sloppy wrinkled garment": [],
@@ -425,6 +610,53 @@ function matchesAvoidSignal(product: Product, signal: string) {
   }
 
   return keywordMatches(text, avoidKeywords[normalizedSignal] ?? [normalizedSignal]);
+}
+
+function parseHeightToInches(height?: string | null) {
+  const normalizedHeight = normalize(height);
+
+  if (!normalizedHeight) {
+    return null;
+  }
+
+  const feetInchesMatch = normalizedHeight.match(/(\d+)\s*['ft]+\s*(\d+)?/);
+
+  if (feetInchesMatch) {
+    const feet = Number(feetInchesMatch[1] ?? 0);
+    const inches = Number(feetInchesMatch[2] ?? 0);
+
+    if (!Number.isNaN(feet) && !Number.isNaN(inches)) {
+      return feet * 12 + inches;
+    }
+  }
+
+  const centimeterMatch = normalizedHeight.match(/(\d+(?:\.\d+)?)\s*cm/);
+
+  if (centimeterMatch) {
+    const centimeters = Number(centimeterMatch[1]);
+
+    if (!Number.isNaN(centimeters)) {
+      return centimeters / 2.54;
+    }
+  }
+
+  return null;
+}
+
+function inferBodyOrFitSignal(answers: QuizAnswers) {
+  const normalizedBodyType = normalize(answers.bodyType);
+
+  if (normalizedBodyType.includes("petite")) {
+    return "petite";
+  }
+
+  const heightInches = parseHeightToInches(answers.height);
+
+  if (heightInches && heightInches <= 64) {
+    return "petite";
+  }
+
+  return "";
 }
 
 function scoreProductAgainstStyleRules(
@@ -1017,6 +1249,38 @@ function getStyleIntelligenceReasons(productEntries: ScoredProduct[], answers: Q
     );
   }
 
+  const feminineRuleHit =
+    normalize(answers.stylePreference) === "feminine" &&
+    matchedRuleNames.some((name) =>
+      [
+        "feminine clean minimal date core",
+        "feminine everyday clean core",
+        "structure and softness contrast",
+        "petite vertical line rule",
+        "natural texture quiet luxury",
+        "feminine quiet luxury no logo",
+      ].includes(normalize(name)),
+    );
+
+  if (feminineRuleHit) {
+    reasons.add("Uses clean-minimal styling with balanced structure and softness.");
+
+    if (
+      matchedRuleNames.includes("Petite Vertical Line Rule") ||
+      keywordMatches(itemText, ["high-rise", "high rise", "pointed", "slingback"])
+    ) {
+      reasons.add("High-rise lines and refined shoes help lengthen the silhouette.");
+    }
+
+    if (
+      matchedRuleNames.includes("Natural Texture Quiet Luxury") ||
+      matchedRuleNames.includes("Feminine Quiet Luxury No Logo") ||
+      keywordMatches(itemText, ["silk", "linen", "leather", "suede", "cashmere", "merino"])
+    ) {
+      reasons.add("Natural textures and neutral tones create a quiet-luxury feel without logos.");
+    }
+  }
+
   if (
     keywordMatches(itemText, ["trouser", "trousers", "chino"]) &&
     keywordMatches(itemText, ["loafer", "sneaker", "boot"])
@@ -1313,6 +1577,7 @@ export function buildOutfitRecommendations(answers: QuizAnswers, limit = 8) {
     stylePreference: answers.stylePreference,
     budget: answers.budgetRange,
     fitPreference: answers.fitPreference,
+    bodyOrFit: inferBodyOrFitSignal(answers),
     region: answers.location,
   });
   const topPool = pickPool("top", answers, matchedStyleRules);
