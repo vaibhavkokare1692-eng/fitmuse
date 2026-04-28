@@ -68,14 +68,36 @@ function normalize(value?: string) {
   return value?.trim().toLowerCase() ?? "";
 }
 
-function hasTag(tags: string[], value?: string) {
+function expandAliases(value?: string) {
   const normalizedValue = normalize(value);
 
   if (!normalizedValue) {
+    return [];
+  }
+
+  const aliasMap: Record<string, string[]> = {
+    hot: ["hot", "warm climate", "tropical", "summer"],
+    warm: ["warm", "warm climate", "tropical", "summer"],
+    tropical: ["tropical", "warm climate", "hot", "summer"],
+    cool: ["cool", "cool weather", "winter", "autumn"],
+    cold: ["cold", "cool weather", "winter"],
+    travel: ["travel"],
+    office: ["office"],
+  };
+
+  return aliasMap[normalizedValue] ?? [normalizedValue];
+}
+
+function hasTag(tags: string[], value?: string) {
+  const normalizedValues = expandAliases(value);
+
+  if (normalizedValues.length === 0) {
     return true;
   }
 
-  return tags.map(normalize).includes(normalizedValue);
+  const normalizedTags = tags.map(normalize);
+
+  return normalizedValues.some((entry) => normalizedTags.includes(entry));
 }
 
 export const styleRules: StyleRule[] = [
