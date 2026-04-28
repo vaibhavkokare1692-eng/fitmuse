@@ -100,6 +100,16 @@ function hasTag(tags: string[], value?: string) {
   return normalizedValues.some((entry) => normalizedTags.includes(entry));
 }
 
+function hasTagOrWildcard(tags: string[], value: string | undefined, wildcards: string[]) {
+  const normalizedTags = tags.map(normalize);
+
+  if (wildcards.some((wildcard) => normalizedTags.includes(normalize(wildcard)))) {
+    return true;
+  }
+
+  return hasTag(tags, value);
+}
+
 export const styleRules: StyleRule[] = [
   {
     id: "old-money-date-night-core",
@@ -784,31 +794,53 @@ export const styleRules: StyleRule[] = [
 
 export function getStyleRulesForBrief(brief: StyleRuleBrief) {
   return styleRules.filter((rule) => {
-    if (!hasTag(rule.aestheticTags, brief.aesthetic)) {
+    if (!hasTagOrWildcard(rule.aestheticTags, brief.aesthetic, ["general", "any"])) {
       return false;
     }
 
-    if (!hasTag(rule.occasionTags, brief.occasion)) {
+    if (!hasTagOrWildcard(rule.occasionTags, brief.occasion, ["general", "any"])) {
       return false;
     }
 
-    if (!hasTag(rule.stylePreferenceTags as string[], brief.stylePreference)) {
+    if (
+      !hasTagOrWildcard(rule.stylePreferenceTags as string[], brief.stylePreference, [
+        "mixed / open to all",
+        "general",
+        "any",
+      ])
+    ) {
       return false;
     }
 
-    if (!hasTag(rule.budgetTags as string[], brief.budget)) {
+    if (!hasTagOrWildcard(rule.budgetTags as string[], brief.budget, ["any", "general"])) {
       return false;
     }
 
-    if (brief.fitPreference && !hasTag(rule.bodyOrFitTags as string[], brief.fitPreference)) {
+    if (
+      brief.fitPreference &&
+      !hasTagOrWildcard(rule.bodyOrFitTags as string[], brief.fitPreference, [
+        "general",
+        "any",
+      ])
+    ) {
       return false;
     }
 
-    if (brief.region && !hasTag(rule.regionOrClimateTags, brief.region) && !hasTag(rule.regionOrClimateTags, "all regions")) {
+    if (
+      brief.region &&
+      !hasTagOrWildcard(rule.regionOrClimateTags, brief.region, ["all regions", "general", "any"])
+    ) {
       return false;
     }
 
-    if (brief.climate && !hasTag(rule.regionOrClimateTags, brief.climate) && !hasTag(rule.regionOrClimateTags, "all climates")) {
+    if (
+      brief.climate &&
+      !hasTagOrWildcard(rule.regionOrClimateTags, brief.climate, [
+        "all climates",
+        "general",
+        "any",
+      ])
+    ) {
       return false;
     }
 

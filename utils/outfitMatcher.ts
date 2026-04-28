@@ -1,3 +1,4 @@
+import { getStyleRulesForBrief, type StyleRule } from "@/data/styleRules";
 import { products } from "@/data/products";
 import {
   formatAestheticLabel,
@@ -22,6 +23,7 @@ import type {
 type ScoredProduct = {
   product: Product;
   score: number;
+  styleRuleBoost: number;
   exactAesthetic: boolean;
   fallbackAesthetic: boolean;
   exactOccasion: boolean;
@@ -33,7 +35,17 @@ type ScoredProduct = {
   matchedPreferredFamily: boolean;
   matchedStores: string[];
   matchReasons: string[];
+  matchedStyleRuleNames: string[];
+  styleRuleReasons: string[];
+  styleRuleAvoidHits: string[];
   creatorAlignmentScore: number;
+};
+
+type StyleRuleProductSignal = {
+  score: number;
+  matchedRuleNames: string[];
+  matchReasons: string[];
+  avoidHits: string[];
 };
 
 const coreCategories: ProductCategory[] = ["top", "bottom", "shoes"];
@@ -121,6 +133,41 @@ const colorFamilyMap: Record<string, ColorFamily> = {
   gray: "monochrome",
 };
 
+const quietLuxuryPalette = new Set([
+  "cream",
+  "navy",
+  "camel",
+  "forest green",
+  "burgundy",
+  "charcoal",
+  "stone",
+  "white",
+  "off-white",
+  "ivory",
+  "taupe",
+  "espresso",
+  "chocolate",
+  "tan",
+  "beige",
+  "maroon",
+  "rust",
+]);
+
+const neutralBaseColors = new Set([
+  "cream",
+  "white",
+  "off-white",
+  "ivory",
+  "stone",
+  "charcoal",
+  "camel",
+  "beige",
+  "taupe",
+  "navy",
+  "ecru",
+  "oatmeal",
+]);
+
 function normalize(value?: string | null) {
   return value?.trim().toLowerCase() ?? "";
 }
@@ -150,6 +197,339 @@ function getPreferredColorFamilies(preferredColors: string[]) {
         .filter(Boolean) as ColorFamily[],
     ),
   );
+}
+
+function buildProductSearchText(product: Product) {
+  return normalize(
+    [
+      product.name,
+      product.styleNotes,
+      product.primaryColor,
+      ...product.colors,
+      product.category,
+      product.visualType,
+      product.store,
+    ].join(" "),
+  );
+}
+
+function keywordMatches(text: string, keywords: string[]) {
+  return keywords.some((keyword) => text.includes(normalize(keyword)));
+}
+
+function itemSignalKeywords(signal: string) {
+  const normalized = normalize(signal);
+  const keywords: Record<string, string[]> = {
+    "oxford shirt": ["oxford"],
+    "button-down shirt": ["button-down", "button down", "oxford"],
+    "knit polo": ["knit polo", "knitted polo", "polo"],
+    "knitted polo": ["knit polo", "knitted polo", "polo"],
+    "quarter-zip": ["quarter-zip", "quarter zip", "half-zip", "half zip"],
+    "textured cardigan": ["cardigan"],
+    cardigan: ["cardigan"],
+    "unstructured navy blazer": ["blazer"],
+    blazer: ["blazer"],
+    "suede layer": ["suede"],
+    "textured jacket": ["textured", "jacket", "overshirt", "suede"],
+    "crewneck": ["crewneck"],
+    "tailored trousers": ["trouser", "trousers", "pleated", "front-crease", "front crease"],
+    "flannel trousers": ["flannel", "trouser", "trousers"],
+    chinos: ["chino", "chinos"],
+    "dark trousers": ["trouser", "trousers"],
+    "grey flannel trousers": ["flannel", "trouser", "trousers"],
+    "dark clean denim": ["denim", "jeans"],
+    "penny loafers": ["loafer", "loafers"],
+    "tassel loafers": ["loafer", "loafers"],
+    loafers: ["loafer", "loafers"],
+    "chelsea boots": ["chelsea", "boot", "boots"],
+    "minimal leather sneakers": ["minimal", "sneaker", "sneakers", "court sneakers", "leather sneakers"],
+    "minimal sneakers": ["minimal", "sneaker", "sneakers", "court sneakers"],
+    "slim leather belt": ["belt"],
+    "simple analog watch": ["watch"],
+    "simple dress watch": ["watch"],
+    "subtle fragrance": ["fragrance"],
+    "clean bag": ["bag", "tote", "sling", "crossbody", "weekender", "laptop bag"],
+    "clean clothing": [],
+    "coordinated accessories": ["watch", "belt", "bag"],
+  };
+
+  return keywords[normalized] ?? [normalized];
+}
+
+function matchesPrioritySignal(product: Product, signal: string) {
+  const text = buildProductSearchText(product);
+  const normalizedSignal = normalize(signal);
+
+  if (normalizedSignal === "top") {
+    return product.category === "top";
+  }
+
+  if (normalizedSignal === "bottom") {
+    return product.category === "bottom";
+  }
+
+  if (normalizedSignal === "shoes") {
+    return product.category === "shoes";
+  }
+
+  if (normalizedSignal === "accessory" || normalizedSignal === "accessories") {
+    return product.category === "accessory";
+  }
+
+  if (normalizedSignal === "outerwear") {
+    return product.category === "outerwear";
+  }
+
+  return keywordMatches(text, itemSignalKeywords(signal));
+}
+
+function matchesPriorityColor(product: Product, color: string) {
+  const normalizedColor = normalize(color);
+  const normalizedProductColors = product.colors.map(normalize);
+
+  if (normalizedColor === "quiet palette") {
+    return normalizedProductColors.some((entry) => quietLuxuryPalette.has(entry));
+  }
+
+  if (normalizedColor === "neutral base" || normalizedColor === "monochrome neutrals") {
+    return normalizedProductColors.some((entry) => neutralBaseColors.has(entry));
+  }
+
+  if (normalizedColor === "low-contrast neutrals" || normalizedColor === "soft neutrals") {
+    return (
+      normalizedProductColors.some((entry) => neutralBaseColors.has(entry)) ||
+      product.colorFamily === "neutral" ||
+      product.colorFamily === "earth"
+    );
+  }
+
+  if (normalizedColor === "muted accent" || normalizedColor === "muted premium tones") {
+    return (
+      normalizedProductColors.some((entry) => quietLuxuryPalette.has(entry)) &&
+      !["neon", "electric blue", "royal blue"].includes(product.primaryColor)
+    );
+  }
+
+  if (normalizedColor === "same quiet-luxury palette") {
+    return normalizedProductColors.some((entry) => quietLuxuryPalette.has(entry));
+  }
+
+  return normalizedProductColors.includes(normalizedColor) || normalize(product.primaryColor) === normalizedColor;
+}
+
+function matchesPriorityFit(product: Product, fitSignal: string) {
+  const normalizedFit = normalize(fitSignal);
+  const productText = buildProductSearchText(product);
+
+  if (!normalizedFit) {
+    return false;
+  }
+
+  if (
+    normalizedFit === normalize(product.fitType) ||
+    (normalizedFit === "slim-straight" && ["slim", "regular"].includes(product.fitType)) ||
+    (normalizedFit === "clean tailoring" && ["classy", "regular", "slim"].includes(product.fitType)) ||
+    (normalizedFit === "soft structure" &&
+      (product.visualType === "soft-structure" || product.visualType === "tailored")) ||
+    (normalizedFit === "clean shoulder" && keywordMatches(productText, ["shoulder", "structured", "tailored"])) ||
+    (normalizedFit === "controlled drape" && keywordMatches(productText, ["drape", "soft", "tailored"])) ||
+    (normalizedFit === "skim fit" && ["slim", "regular", "classy"].includes(product.fitType)) ||
+    (normalizedFit === "neat layering" && keywordMatches(productText, ["layer", "cardigan", "zip", "blazer"])) ||
+    (normalizedFit === "pressed finish" && ["classy", "regular"].includes(product.fitType))
+  ) {
+    return true;
+  }
+
+  return false;
+}
+
+function matchesPriorityMaterial(product: Product, materialSignal: string) {
+  const text = buildProductSearchText(product);
+  const normalizedMaterial = normalize(materialSignal);
+
+  const materialKeywords: Record<string, string[]> = {
+    "oxford cotton": ["oxford"],
+    merino: ["merino"],
+    cashmere: ["cashmere"],
+    "wool blend": ["wool", "flannel"],
+    suede: ["suede"],
+    linen: ["linen"],
+    cotton: ["cotton", "oxford"],
+    "cotton-linen blend": ["linen", "cotton"],
+    "fine gauge knit": ["knit"],
+    "cotton knit": ["knit"],
+    "soft wool blend": ["wool", "merino", "flannel"],
+    flannel: ["flannel"],
+    "clean denim": ["denim", "jeans"],
+    leather: ["leather"],
+    "smooth leather": ["leather"],
+    "soft tailoring": ["tailored", "blazer"],
+    "structured cotton": ["cotton", "structured"],
+    "polished natural textures": ["leather", "merino", "wool", "cotton", "suede"],
+    "budget-friendly natural feel": ["cotton", "merino", "oxford"],
+  };
+
+  return keywordMatches(text, materialKeywords[normalizedMaterial] ?? [normalizedMaterial]);
+}
+
+function matchesAvoidSignal(product: Product, signal: string) {
+  const normalizedSignal = normalize(signal);
+  const text = buildProductSearchText(product);
+  const normalizedColors = product.colors.map(normalize);
+
+  const avoidKeywords: Record<string, string[]> = {
+    "visible logos": ["logo", "logos"],
+    "loud branding": ["logo", "branding", "monogram"],
+    "loud monograms": ["monogram"],
+    "oversized branding": ["logo", "branding"],
+    "brand-led statement pieces": ["logo", "graphic", "monogram"],
+    "graphic tee": ["graphic"],
+    "chunky sneakers": ["chunky", "skate", "runner"],
+    "chunky loud sneakers": ["chunky", "skate", "runner"],
+    "patent leather shoes": ["patent", "glossy"],
+    "patent finish": ["patent", "glossy"],
+    "glossy synthetic": ["glossy", "synthetic", "nylon"],
+    "shiny synthetic": ["synthetic", "glossy", "nylon"],
+    "high-shine suiting": ["high-shine", "glossy"],
+    "sport polo styling": ["sport"],
+    "technical sportswear": ["technical", "sport"],
+    "technical-looking fabric noise": ["technical", "nylon"],
+    "sport-golf styling": ["sport", "golf"],
+    "hype-sneaker energy": ["chunky", "skate", "runner"],
+    "distressed denim": ["distress", "rips", "whisker", "faded"],
+    "heavy fading": ["faded"],
+    "skinny jeans": ["skinny"],
+    "extra slim pants": ["extra slim"],
+    "trend-heavy leg shape": ["skinny"],
+    "shiny faux leather": ["glossy", "patent"],
+    "loud rocker styling": ["studded", "graphic"],
+    "over-layered costume energy": ["graphic", "contrast"],
+    "costume energy": ["graphic", "contrast"],
+    "over-matching": [],
+    "over-accessorizing": [],
+    "sloppy wrinkled garment": [],
+    "messy presentation": [],
+    "too many themed pieces": [],
+    "too many matching signals": [],
+  };
+
+  if (
+    normalizedSignal === "more than 3 colors" ||
+    normalizedSignal === "overly bright saturated shirt colors"
+  ) {
+    return normalizedColors.length > 3;
+  }
+
+  if (normalizedSignal === "clashing leather tones") {
+    return product.category === "accessory" && !keywordMatches(text, ["belt", "watch", "bag"]);
+  }
+
+  return keywordMatches(text, avoidKeywords[normalizedSignal] ?? [normalizedSignal]);
+}
+
+function scoreProductAgainstStyleRules(
+  product: Product,
+  rules: StyleRule[],
+  budgetCap: number | null,
+) {
+  if (rules.length === 0) {
+    return {
+      score: 0,
+      matchedRuleNames: [],
+      matchReasons: [],
+      avoidHits: [],
+    } satisfies StyleRuleProductSignal;
+  }
+
+  const matchedRuleNames = new Set<string>();
+  const matchReasons = new Set<string>();
+  const avoidHits = new Set<string>();
+  let score = 0;
+  const categoryTarget = budgetTargetForCategory(product.category, budgetCap);
+
+  for (const rule of rules) {
+    let localScore = 0;
+
+    const prioritizedItemHit = rule.prioritize.items.some((signal) =>
+      matchesPrioritySignal(product, signal),
+    );
+    const prioritizedColorHit = rule.prioritize.colors.some((signal) =>
+      matchesPriorityColor(product, signal),
+    );
+    const prioritizedFitHit = rule.prioritize.fits.some((signal) =>
+      matchesPriorityFit(product, signal),
+    );
+    const prioritizedMaterialHit = rule.prioritize.materials.some((signal) =>
+      matchesPriorityMaterial(product, signal),
+    );
+    const prioritizedShoeHit = rule.prioritize.shoes.some((signal) =>
+      matchesPrioritySignal(product, signal),
+    );
+    const prioritizedAccessoryHit = rule.prioritize.accessories.some((signal) =>
+      matchesPrioritySignal(product, signal),
+    );
+
+    if (prioritizedItemHit) {
+      localScore += 2;
+    }
+
+    if (prioritizedColorHit) {
+      localScore += 1;
+    }
+
+    if (prioritizedFitHit) {
+      localScore += 1;
+    }
+
+    if (prioritizedMaterialHit) {
+      localScore += 1;
+    }
+
+    if (prioritizedShoeHit) {
+      localScore += product.category === "shoes" ? 2 : 1;
+    }
+
+    if (prioritizedAccessoryHit) {
+      localScore += product.category === "accessory" ? 2 : 1;
+    }
+
+    if (
+      rule.id === "budget-100-200-core-outfit" &&
+      budgetCap &&
+      coreCategories.includes(product.category) &&
+      categoryTarget &&
+      product.price <= categoryTarget * 1.03
+    ) {
+      localScore += 2;
+    }
+
+    const localAvoidHits = [
+      ...rule.avoid.items,
+      ...rule.avoid.colors,
+      ...rule.avoid.fits,
+      ...rule.avoid.materials,
+      ...rule.avoid.styleSignals,
+    ].filter((signal) => matchesAvoidSignal(product, signal));
+
+    if (localAvoidHits.length > 0) {
+      localScore -= Math.min(4, localAvoidHits.length * 2);
+      localAvoidHits.forEach((signal) => avoidHits.add(signal));
+    }
+
+    if (localScore > 0) {
+      matchedRuleNames.add(rule.name);
+      matchReasons.add(rule.matchReason);
+    }
+
+    score += Math.max(-4, Math.min(4, localScore));
+  }
+
+  return {
+    score: Math.max(-12, Math.min(16, score)),
+    matchedRuleNames: Array.from(matchedRuleNames),
+    matchReasons: Array.from(matchReasons).slice(0, 4),
+    avoidHits: Array.from(avoidHits),
+  } satisfies StyleRuleProductSignal;
 }
 
 export function budgetCapFromRange(range?: string | null) {
@@ -420,7 +800,11 @@ function budgetScore(product: Product, budgetCap: number | null) {
   return { score: -10, reason: "" };
 }
 
-function scoreProduct(product: Product, answers: QuizAnswers): ScoredProduct {
+function scoreProduct(
+  product: Product,
+  answers: QuizAnswers,
+  matchedStyleRules: StyleRule[],
+): ScoredProduct {
   const preferredColors = splitCommaSeparated(answers.preferredColors);
   const avoidedColors = splitCommaSeparated(answers.avoidColors);
   const preferredStores = splitCommaSeparated(answers.storesLike);
@@ -447,6 +831,7 @@ function scoreProduct(product: Product, answers: QuizAnswers): ScoredProduct {
   const colorSignal = colorScore(product, preferredColors, avoidedColors);
   const storeSignal = storeScore(product, preferredStores);
   const budgetSignal = budgetScore(product, budgetCap);
+  const styleRuleSignal = scoreProductAgainstStyleRules(product, matchedStyleRules, budgetCap);
 
   const creatorAlignmentScore =
     (product.aestheticTags.includes("creator/photoshoot") ? 3 : 0) +
@@ -461,6 +846,7 @@ function scoreProduct(product: Product, answers: QuizAnswers): ScoredProduct {
     storeSignal.reason,
     sizeSignal.reason,
     budgetSignal.reason,
+    ...styleRuleSignal.matchReasons,
   ].filter(Boolean);
 
   return {
@@ -474,7 +860,9 @@ function scoreProduct(product: Product, answers: QuizAnswers): ScoredProduct {
       colorSignal.score +
       storeSignal.score +
       budgetSignal.score +
+      styleRuleSignal.score +
       creatorAlignmentScore,
+    styleRuleBoost: styleRuleSignal.score,
     exactAesthetic: aestheticSignal.matchedExact,
     exactOccasion: occasionSignal.matchedExact,
     fallbackAesthetic: aestheticSignal.matchedFallback,
@@ -486,14 +874,17 @@ function scoreProduct(product: Product, answers: QuizAnswers): ScoredProduct {
     matchedPreferredFamily: colorSignal.matchedPreferredFamily,
     matchedStores: storeSignal.matchedStores,
     matchReasons,
+    matchedStyleRuleNames: styleRuleSignal.matchedRuleNames,
+    styleRuleReasons: styleRuleSignal.matchReasons,
+    styleRuleAvoidHits: styleRuleSignal.avoidHits,
     creatorAlignmentScore,
   };
 }
 
-function pickPool(category: ProductCategory, answers: QuizAnswers) {
+function pickPool(category: ProductCategory, answers: QuizAnswers, matchedStyleRules: StyleRule[]) {
   return products
     .filter((product) => product.category === category)
-    .map((product) => scoreProduct(product, answers))
+    .map((product) => scoreProduct(product, answers, matchedStyleRules))
     .sort((left, right) => right.score - left.score || left.product.price - right.product.price)
     .slice(0, poolSizes[category]);
 }
@@ -603,6 +994,51 @@ function buildWhyItWorks(items: Product[], answers: QuizAnswers, matchedColors: 
   return `${palette.slice(0, 3).map(formatLabel).join(", ")} tones keep the outfit cohesive while ${leadStores.join(" + ")} gives it a polished multi-store finish.`;
 }
 
+function getStyleIntelligenceReasons(productEntries: ScoredProduct[], answers: QuizAnswers) {
+  const reasons = new Set<string>();
+  const matchedRuleNames = Array.from(
+    new Set(productEntries.flatMap((entry) => entry.matchedStyleRuleNames)),
+  );
+  const styleRuleReasons = Array.from(
+    new Set(productEntries.flatMap((entry) => entry.styleRuleReasons)),
+  );
+  const avoidHits = productEntries.flatMap((entry) => entry.styleRuleAvoidHits);
+  const itemText = normalize(productEntries.map((entry) => entry.product.name).join(" "));
+
+  if (matchedRuleNames.length > 0 && answers.aesthetic) {
+    const aestheticLabel = formatAestheticLabel(answers.aesthetic, answers.stylePreference);
+    const occasionLabel =
+      answers.occasion === "date"
+        ? "date-night"
+        : normalize(formatLabel(answers.occasion || "")).replace(/\s+/g, "-");
+
+    reasons.add(
+      `Matches ${aestheticLabel} ${occasionLabel || "style"} rules from FitMuse's style intelligence.`,
+    );
+  }
+
+  if (
+    keywordMatches(itemText, ["trouser", "trousers", "chino"]) &&
+    keywordMatches(itemText, ["loafer", "sneaker", "boot"])
+  ) {
+    reasons.add("Prioritizes tailored trousers, clean shoes, and quiet-luxury colors.");
+  }
+
+  if (avoidHits.length === 0 || matchedRuleNames.includes("Avoid Logos")) {
+    reasons.add("Keeps the look polished by avoiding loud logos and overdesigned pieces.");
+  }
+
+  for (const reason of styleRuleReasons) {
+    reasons.add(reason);
+
+    if (reasons.size >= 3) {
+      break;
+    }
+  }
+
+  return Array.from(reasons).slice(0, 3);
+}
+
 function buildMatchReasons(
   productEntries: ScoredProduct[],
   answers: QuizAnswers,
@@ -610,6 +1046,7 @@ function buildMatchReasons(
   budgetLabel: BudgetMatchLabel,
 ) {
   const reasons = new Set<string>();
+  const styleIntelligenceReasons = getStyleIntelligenceReasons(productEntries, answers);
   const aestheticLabel = formatAestheticLabel(answers.aesthetic, answers.stylePreference);
   const matchedColors = Array.from(
     new Set(productEntries.flatMap((entry) => entry.matchedPreferredColors)),
@@ -621,6 +1058,8 @@ function buildMatchReasons(
   const usesAvoidedColor = productEntries.some((entry) =>
     entry.product.colors.some((color) => avoidedColors.includes(normalize(color))),
   );
+
+  styleIntelligenceReasons.forEach((reason) => reasons.add(reason));
 
   if (answers.aesthetic) {
     const exactCount = productEntries.filter((entry) => entry.exactAesthetic).length;
@@ -707,6 +1146,13 @@ function buildConfidenceScore(
   const matchedStoreCount = Array.from(
     new Set(productEntries.flatMap((entry) => entry.matchedStores)),
   ).length;
+  const styleRuleCoverage = productEntries.filter(
+    (entry) => entry.matchedStyleRuleNames.length > 0,
+  ).length;
+  const totalStyleRuleBoost = productEntries.reduce(
+    (sum, entry) => sum + Math.max(0, entry.styleRuleBoost),
+    0,
+  );
   const allSizeMatched = sizeExactCount === productEntries.length;
   const paletteTight = new Set(items.map((item) => item.colorFamily)).size <= 3;
   const withinBudget = budgetCap ? totalPrice <= budgetCap : false;
@@ -774,6 +1220,12 @@ function buildConfidenceScore(
 
   if (matchedStoreCount > 0) {
     confidence += 4;
+  }
+
+  if (styleRuleCoverage >= 2) {
+    confidence += Math.min(8, Math.round(totalStyleRuleBoost / 4));
+  } else if (styleRuleCoverage === 1) {
+    confidence += Math.min(4, Math.round(totalStyleRuleBoost / 6));
   }
 
   if (paletteTight) {
@@ -855,11 +1307,19 @@ function buildOutfitRecommendation(
 }
 
 export function buildOutfitRecommendations(answers: QuizAnswers, limit = 8) {
-  const topPool = pickPool("top", answers);
-  const bottomPool = pickPool("bottom", answers);
-  const shoesPool = pickPool("shoes", answers);
-  const accessoryPool = pickPool("accessory", answers);
-  const outerwearPool = pickPool("outerwear", answers);
+  const matchedStyleRules = getStyleRulesForBrief({
+    aesthetic: answers.aesthetic,
+    occasion: answers.occasion,
+    stylePreference: answers.stylePreference,
+    budget: answers.budgetRange,
+    fitPreference: answers.fitPreference,
+    region: answers.location,
+  });
+  const topPool = pickPool("top", answers, matchedStyleRules);
+  const bottomPool = pickPool("bottom", answers, matchedStyleRules);
+  const shoesPool = pickPool("shoes", answers, matchedStyleRules);
+  const accessoryPool = pickPool("accessory", answers, matchedStyleRules);
+  const outerwearPool = pickPool("outerwear", answers, matchedStyleRules);
   const budgetCap = budgetCapFromRange(answers.budgetRange);
   const recommendations: OutfitRecommendation[] = [];
   const accessoryChoices = [undefined, ...accessoryPool];
