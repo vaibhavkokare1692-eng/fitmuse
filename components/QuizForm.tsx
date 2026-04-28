@@ -262,10 +262,10 @@ export function QuizForm() {
         <div>
           <p className="eyebrow !mb-0 text-accent-3">Style quiz</p>
           <h2 className="mt-4 text-4xl leading-tight text-white sm:text-5xl">
-            Build your creator styling brief.
+            Build your personal style brief.
           </h2>
           <p className="mt-4 max-w-xl text-white/72">
-            Six quick steps. Save once. Reuse anytime you want new looks.
+            Six quick steps. Save once. Reuse anytime you want complete looks for new occasions.
           </p>
         </div>
 

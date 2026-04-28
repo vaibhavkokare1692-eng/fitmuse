@@ -15,8 +15,8 @@ export default function QuizPage() {
             Tell FitMuse your vibe, your fit, and your budget.
           </h1>
           <p className="mt-4 max-w-2xl text-base leading-7 sm:text-lg sm:leading-8">
-            A premium multi-step brief that turns body data, aesthetics, occasions, and budget into
-            creator-ready outfit recommendations.
+            Build a personalized style brief so FitMuse can recommend complete looks for your body,
+            occasion, budget, and aesthetic.
           </p>
         </div>
 

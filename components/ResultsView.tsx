@@ -977,7 +977,7 @@ export function ResultsView({ searchParamsObject = {} }: ResultsViewProps) {
                 {sortedRecommendations.length === 1 ? "look" : "looks"} ranked for your brief.
               </h2>
               <p className="mt-3 max-w-2xl">
-                The engine is balancing fit, occasion, colors, stores, and spend range using the current mock catalog.
+                FitMuse is balancing fit, occasion, colors, stores, spend range, and style intelligence using the current curated mock catalog.
               </p>
             </div>
             <div className="flex flex-wrap gap-2">
@@ -1098,9 +1098,8 @@ export function ResultsView({ searchParamsObject = {} }: ResultsViewProps) {
 
               <div className="rounded-[1.4rem] border border-line/70 bg-white/74 px-5 py-4">
                 <p className="text-sm leading-6 text-muted">
-                  FitMuse currently uses mock outfit data for demo purposes. The curated shopping packs
-                  above use manually assembled placeholder links for MVP testing, and affiliate shopping
-                  feeds can be connected later.
+                  FitMuse currently uses curated mock data for MVP testing. Real shopping links and
+                  affiliate product feeds can be connected in a future version.
                 </p>
               </div>
             </>

@@ -254,7 +254,7 @@ export const outfits: Outfit[] = [
       top: "Fine-knit ivory polo",
       bottom: "Tailored espresso trousers",
       shoes: "Tan leather loafers",
-      accessories: "Pearl hoops and structured mini bag",
+      accessories: "Slim leather belt and analog watch",
       outerwear: "Camel trench coat",
     },
     estimatedPrice: 198,
@@ -262,7 +262,7 @@ export const outfits: Outfit[] = [
       "The higher rise and long trouser line visually lengthen the legs, while the soft knit top keeps the torso polished without feeling stiff.",
     whyItSuits:
       "This look works beautifully for balanced or hourglass proportions because it defines the waist and keeps the palette elevated for camera-friendly closeups.",
-    creatorUseCase: "Best for dinner reels, upscale dates, and quiet luxury brand content.",
+    creatorUseCase: "Best for upscale dates, dinner plans, and refined evening moments.",
     colors: ["cream", "camel", "espresso"],
     stores: ["Mango", "Zara", "Aldo"],
     fitPreferences: ["Classy", "Slim fit", "Modest"],
