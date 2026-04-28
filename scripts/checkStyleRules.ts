@@ -50,6 +50,36 @@ const checks: RuleCheck[] = [
     },
     expectedRuleNames: ["Oxford Shirt Core"],
   },
+  {
+    label: "Feminine Clean Minimal Date",
+    brief: {
+      aesthetic: "clean minimal",
+      occasion: "date",
+      stylePreference: "feminine",
+      budget: "$100-$200",
+    },
+    expectedRuleNames: [
+      "Feminine Clean Minimal Date Core",
+      "Structure and Softness Contrast",
+      "Natural Texture Quiet Luxury",
+      "Budget High-Low Anchor Piece",
+    ],
+  },
+  {
+    label: "Feminine Petite Everyday Clean",
+    brief: {
+      aesthetic: "clean girl",
+      occasion: "daily wear",
+      stylePreference: "feminine",
+      bodyOrFit: "petite",
+    },
+    expectedRuleNames: [
+      "Feminine Everyday Clean Core",
+      "Petite Vertical Line Rule",
+      "Petite Skirt Length Rule",
+      "White Tee and Straight Jean Formula",
+    ],
+  },
 ];
 
 function confidenceRank(confidence: string) {

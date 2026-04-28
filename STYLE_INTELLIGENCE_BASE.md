@@ -929,3 +929,777 @@ This module can also support:
 - clearer result explanations
 - stronger real-product pack curation
 - future climate and region-aware style adjustments
+
+---
+
+## Rule Set: Feminine Clean / Minimal / Quiet Luxury Date & Everyday System
+
+### A. Key principles
+
+#### Intentional simplicity
+
+- Start with fewer, stronger pieces.
+- Let proportion, material, and color discipline do most of the work.
+- Avoid adding items just to make the outfit feel "styled."
+
+#### Quality over quantity
+
+- A smaller number of better-looking pieces usually reads more premium than many trend-led pieces.
+- The outfit should feel calm, selective, and repeatable.
+
+#### Structure vs softness
+
+- The strongest feminine clean looks balance one structured signal with one softer signal.
+- Examples:
+  - structured blazer + fluid dress
+  - tailored trousers + silk shirt
+  - fitted knit + relaxed denim
+
+#### Subtle luxury through fabric and fit
+
+- Quiet luxury should come from material, drape, tailoring, and restraint.
+- Natural fibers and clean construction matter more than overt branding.
+
+#### Third-piece rule
+
+- A blazer, cardigan, sweater, scarf, or structured bag can make a simple outfit feel finished.
+- The third piece should elevate the look, not overwhelm it.
+
+#### Clean Girl vs Quiet Luxury distinction
+
+- Clean Girl is often fresher, more youthful, and wellness-coded.
+- Quiet Luxury is more mature, fabric-focused, and tailoring-driven.
+- They overlap, but they are not identical.
+
+### B. Outfit formulas
+
+#### 1. Basic white T-shirt + high-rise straight-leg jeans + leather loafers + gold hoops
+
+- Best occasion: daily wear, casual date, coffee run, low-key dinner
+- Colors: white, blue denim, camel, cream, gold
+- Fit notes: the tee should sit cleanly at the shoulder; denim should be high-rise and straight rather than sloppy
+- Why it works: simple, repeatable, flattering, and easy to make polished
+- Budget-friendly version: cotton white tee + straight denim + loafers or pointed flats
+
+#### 2. Oversized blazer as dress + thin belt + knee-high boots
+
+- Best occasion: date night, dinner, event-adjacent evening
+- Colors: black, charcoal, camel, cream
+- Fit notes: define the waist with a belt or choose a blazer dress cut that still shows shape
+- Why it works: combines power and softness while staying minimal
+- Budget-friendly version: oversized blazer over a simple slip or mini dress with tall boots
+
+#### 3. Silk button-up + tailored trousers + pointed-toe flats
+
+- Best occasion: office, date, drinks, dinner
+- Colors: cream, stone, navy, charcoal
+- Fit notes: the shirt should drape softly; trousers should create a clean line through the leg
+- Why it works: a classic quiet-luxury pairing that feels polished without looking severe
+- Budget-friendly version: silky matte blouse + tailored trousers + pointed flats
+
+#### 4. Fitted knit or corset top + baggy denim + kitten heels
+
+- Best occasion: casual date, daytime-to-evening transition, party-lite
+- Colors: cream, black, stone, denim blue
+- Fit notes: the top should define the waist to balance the looser bottom
+- Why it works: contrast makes the silhouette look intentional instead of accidental
+- Budget-friendly version: ribbed knit top + relaxed denim + slingbacks or flats
+
+#### 5. Slip dress layered with blazer or sweater
+
+- Best occasion: date night, dinner, soft evening setting
+- Colors: black, champagne, sage, cream
+- Fit notes: let the dress skim rather than cling; use the third piece to add polish
+- Why it works: layering softens the dress and makes it feel more refined
+- Budget-friendly version: matte slip dress + lightweight cardigan or blazer
+
+#### 6. Maxi skirt + knit or top + boots
+
+- Best occasion: everyday, office, date, modest styling
+- Colors: cream, olive, charcoal, brown
+- Fit notes: keep the waist clear so the long line stays elegant rather than heavy
+- Why it works: texture and verticality help the look feel premium
+- Budget-friendly version: simple maxi skirt + ribbed knit + sleek boots
+
+### C. Product selection rules
+
+#### Tops
+
+##### High-quality white T-shirts
+
+- Recommend: crisp cotton with clean neckline and shoulder line
+- Avoid: thin clingy jersey, slogans, novelty trims
+- Price target: low to mid tier if the fit is strong
+- Fit: neat shoulder, clean torso line
+- Materials: cotton, structured cotton jersey
+- Colors: white, off-white, cream
+- Why: best simple foundation for clean minimal styling
+
+##### Oversized cotton or linen button-ups
+
+- Recommend: white, cream, pale blue, soft stripe
+- Avoid: overly boxy cuts with no balance
+- Price target: accessible core item
+- Fit: intentionally oversized, but not swallowed by fabric
+- Materials: cotton poplin, linen, cotton-linen blends
+- Colors: white, pale blue, beige
+- Why: effortless third-piece or base-layer option
+
+##### Silk button-ups
+
+- Recommend: matte or softly lustrous drape
+- Avoid: cheap shiny satin
+- Price target: one investment-style anchor if possible
+- Fit: fluid, clean, not clingy
+- Materials: silk, matte satin, rayon only if it does not look cheap
+- Colors: cream, stone, navy, charcoal
+- Why: strong quiet-luxury signal when styled simply
+
+##### Fitted knit, tube, or corset tops
+
+- Recommend: ribbed, clean, body-skimming pieces
+- Avoid: clubwear shine or overbuilt detailing
+- Price target: accessible to mid tier
+- Fit: fitted enough to balance wider bottoms
+- Materials: rib knit, cotton knit, soft stretch knit
+- Colors: cream, black, taupe, brown
+- Why: helps define the body when paired with relaxed bottoms
+
+##### Lightweight merino or cashmere sweaters
+
+- Recommend: crewnecks, fine knits, clean sleeves
+- Avoid: bulky novelty knits in this system
+- Price target: mid tier if budget allows
+- Fit: smooth, clean, lightly structured
+- Materials: merino, cashmere, cotton-cashmere blends
+- Colors: cream, camel, charcoal, sage
+- Why: adds expensive-looking softness through material
+
+#### Bottoms
+
+##### High-rise straight-leg denim
+
+- Recommend: clean blue, dark blue, black
+- Avoid: rips, whiskering, heavy fading
+- Price target: strong budget anchor
+- Fit: high-rise, straight, long clean line
+- Materials: cotton denim
+- Colors: blue, dark indigo, black
+- Why: easiest daily clean base
+
+##### Tailored trousers
+
+- Recommend: flat-front or softly pleated options
+- Avoid: puddling hems or ultra-tight cuts
+- Price target: worth prioritizing if the user needs polish
+- Fit: high-rise or mid-high rise, straight or wide-clean line
+- Materials: wool blend, cotton blend, crepe
+- Colors: charcoal, navy, camel, stone
+- Why: instantly lifts the outfit
+
+##### Wide-leg or straight trousers
+
+- Recommend: drape with controlled waistband
+- Avoid: shapeless volume with no upper-body balance
+- Fit: clean waist, long leg line
+- Why: premium without stiffness
+
+##### Baggy denim only with fitted tops
+
+- Recommend: relaxed jeans balanced by a small top or defined waist
+- Avoid: oversized top + oversized bottom together
+- Why: keeps the look intentional instead of sloppy
+
+#### Dresses and skirts
+
+##### Slip dresses
+
+- Recommend: matte, fluid, logo-free
+- Avoid: nightclub shine
+- Why: easiest feminine quiet-luxury date piece when layered well
+
+##### Blazer dresses
+
+- Recommend: clean lapel, waist definition, refined boots or flats
+- Avoid: stiff costume-office versions
+- Why: mixes authority and softness
+
+##### Silk or textured maxi skirts
+
+- Recommend: long clean line, waist emphasis
+- Avoid: heavy volume with no structure
+- Why: elegant and versatile
+
+##### Mini skirts for petite frames when appropriate
+
+- Recommend: if the user is petite and comfortable showing leg line
+- Avoid: assuming every petite user wants shorter hemlines
+- Why: can extend the visual leg line more than awkward knee-length cuts
+
+##### Avoid knee-length skirts for petite users when they cut the leg line
+
+- Why: they can interrupt proportion and shorten the silhouette
+
+#### Shoes
+
+- pointed-toe flats
+- loafers
+- kitten heels and slingbacks
+- knee-high boots
+- minimalist neutral sneakers
+
+#### Accessories
+
+- dainty gold hoops
+- simple chains or paperclip necklaces
+- thin leather belts
+- silk or satin scarves
+- structured small or medium handbags
+- tortoiseshell or black classic sunglasses
+
+### D. Color rules
+
+- Core neutrals: beige, camel, cream, white, navy, charcoal, black
+- Earth tones: suede tan, brown, olive
+- Soft accents: sage, matcha green, soft pastels
+- Avoid neon, ultra-brights, loud high-contrast patterns
+- Use texture to add depth to neutral outfits
+- Let one muted accent support the outfit instead of building around many accent colors
+
+### E. Fit and silhouette rules
+
+- Petite users: high-rise bottoms + pointed-toe shoes
+- Maintain a vertical line whenever possible
+- If the bottom is loose, keep the top fitted
+- If the top is oversized, balance with a slimmer or more structured bottom, or define the waist
+- Use sleeve rolls or a visible skin-to-boot gap to prevent heaviness
+- Avoid overwhelming bags for petite frames
+
+### F. Material rules
+
+- Prioritize cotton, linen, silk, wool, cashmere, leather, and suede
+- Use ribbed knits, herringbone, houndstooth, silk, and suede for depth
+- Avoid synthetic shiny or plastic-looking fabrics
+
+### G. Expensive vs cheap signals
+
+#### Expensive signals
+
+- precise tailoring
+- no visible logos
+- natural materials
+- cohesive hardware
+- structured bags
+- balanced proportions
+
+#### Cheap signals
+
+- visible logos
+- plastic synthetic sheen
+- junior or costume-like styling
+- overwhelming patterns
+- too many accessories at once
+
+### H. Budget strategy
+
+- Shop closet first where possible
+- Use a high-low mix
+- Invest in one anchor piece
+- Use vintage or secondhand for silk scarves, leather pieces, or unique jewelry
+- Prioritize versatile basics before trend pieces
+
+### I. App-ready IF/THEN rules
+
+#### Rule 1: Feminine Clean Minimal Date Core
+
+- IF user selects:
+  - aesthetic: clean girl, clean minimal, minimalist, quiet luxury
+  - occasion: date
+  - style preference: feminine
+  - budget: any
+  - body/proportion: general
+  - region/climate: any
+  - modesty preference: any
+- THEN prioritize:
+  - items: fitted top, tailored bottom, refined shoes
+  - colors: cream, camel, navy, charcoal
+  - fits: balanced and polished
+  - materials: cotton, linen, silk, leather
+  - shoes: loafers, pointed flats, kitten heels
+  - accessories: gold hoops, structured handbag
+- AVOID: loud graphics, logos, neon, cheap shine
+- WHY: clean-minimal date styling needs restraint plus softness
+- SCORING IMPACT: high
+- MATCH REASON: The neutral palette keeps the look clean while the refined accessories add just enough polish.
+- CONFIDENCE: high
+
+#### Rule 2: Feminine Everyday Clean Core
+
+- IF user selects:
+  - aesthetic: clean girl, clean minimal, minimalist
+  - occasion: daily wear or everyday
+  - style preference: feminine
+  - budget: any
+  - body/proportion: general
+  - region/climate: any
+  - modesty preference: any
+- THEN prioritize:
+  - items: white tee, high-rise denim, light third piece
+  - colors: white, cream, camel, sage, navy
+  - fits: easy structure with clean waist emphasis
+  - materials: cotton, linen, soft leather
+  - shoes: loafers, pointed flats, minimal sneakers
+  - accessories: gold hoops, small handbag
+- AVOID: clutter, high-contrast pattern, shiny synthetic jersey
+- WHY: everyday clean styling should feel easy but intentional
+- SCORING IMPACT: high
+- MATCH REASON: The outfit stays simple and wearable while still looking intentional through fit and texture.
+- CONFIDENCE: high
+
+#### Rule 3: White Tee and Straight Jean Formula
+
+- IF user selects:
+  - aesthetic: clean girl, clean minimal, minimalist
+  - occasion: date, daily wear, everyday
+  - style preference: feminine
+  - budget: under $100 to $200-$350
+  - body/proportion: general or petite
+  - region/climate: warm or mild
+  - modesty preference: any
+- THEN prioritize:
+  - items: white tee, high-rise straight denim
+  - colors: white, blue, camel, cream
+  - fits: high-rise, clean vertical line
+  - materials: cotton denim, structured cotton
+  - shoes: leather loafers or pointed flats
+  - accessories: gold hoops, thin belt
+- AVOID: distressed denim, slogan tee, low-rise denim
+- WHY: this is the strongest daily high-low clean formula
+- SCORING IMPACT: high
+- MATCH REASON: A crisp tee and clean high-rise denim create a simple base that still feels polished.
+- CONFIDENCE: high
+
+#### Rule 4: Structured Blazer Balance
+
+- IF user selects:
+  - aesthetic: clean minimal, quiet luxury
+  - occasion: date, office, everyday
+  - style preference: feminine
+  - budget: $100-$200 and up
+  - body/proportion: general or petite
+  - region/climate: mild or cool
+  - modesty preference: any
+- THEN prioritize:
+  - items: oversized blazer, blazer dress, thin belt
+  - colors: camel, charcoal, black, cream
+  - fits: waist definition plus clean shoulder
+  - materials: wool blend, structured suiting
+  - shoes: knee-high boots, loafers, pointed flats
+  - accessories: structured handbag, simple chain
+- AVOID: boxy overwhelm, cheap suiting sheen
+- WHY: structure gives polish but needs softness or waist control
+- SCORING IMPACT: high
+- MATCH REASON: The structured blazer balances the softness of the outfit so it feels polished instead of flat.
+- CONFIDENCE: high
+
+#### Rule 5: Silk Shirt Tailored Trouser Polish
+
+- IF user selects:
+  - aesthetic: quiet luxury, clean minimal
+  - occasion: date, office, dinner
+  - style preference: feminine
+  - budget: $100-$200 and up
+  - body/proportion: general
+  - region/climate: warm or mild
+  - modesty preference: any
+- THEN prioritize:
+  - items: silk button-up, tailored trousers
+  - colors: cream, stone, navy, charcoal
+  - fits: fluid shirt with clean trouser line
+  - materials: silk, matte satin, wool blend
+  - shoes: pointed flats, kitten heels, loafers
+  - accessories: simple chain, structured handbag
+- AVOID: cheap shiny satin, sloppy oversized shirt with wide pant
+- WHY: fluid texture plus tailored structure feels premium fast
+- SCORING IMPACT: high
+- MATCH REASON: The fluid shirt and tailored trouser pairing keeps the look polished without feeling stiff.
+- CONFIDENCE: high
+
+#### Rule 6: Fitted Top and Relaxed Denim Balance
+
+- IF user selects:
+  - aesthetic: clean girl, clean minimal
+  - occasion: date, daily wear, everyday
+  - style preference: feminine
+  - budget: any
+  - body/proportion: general or petite
+  - region/climate: warm or mild
+  - modesty preference: any
+- THEN prioritize:
+  - items: fitted knit top, corset-inspired top, relaxed denim
+  - colors: cream, black, stone, blue
+  - fits: fitted top with relaxed bottom
+  - materials: rib knit, cotton denim, soft leather
+  - shoes: kitten heels, pointed flats, minimal sneakers
+  - accessories: small handbag, gold hoops
+- AVOID: oversized top with oversized bottom
+- WHY: contrast is what makes the silhouette feel intentional
+- SCORING IMPACT: high
+- MATCH REASON: The fitted top balances the relaxed denim so the outfit feels intentional.
+- CONFIDENCE: high
+
+#### Rule 7: Slip Dress Layering Rule
+
+- IF user selects:
+  - aesthetic: quiet luxury, clean minimal
+  - occasion: date, dinner, everyday
+  - style preference: feminine
+  - budget: $100-$200 and up
+  - body/proportion: general or petite
+  - region/climate: mild or cool
+  - modesty preference: moderate layering okay
+- THEN prioritize:
+  - items: slip dress, blazer, light sweater
+  - colors: black, champagne, sage, cream
+  - fits: clean skim with balanced layer
+  - materials: silk, matte satin, soft wool
+  - shoes: kitten heels, pointed flats, boots
+  - accessories: simple chain, structured bag
+- AVOID: clubwear shine, clingy unbalanced styling
+- WHY: a third piece makes the dress feel refined
+- SCORING IMPACT: medium
+- MATCH REASON: The extra layer gives the slip dress a polished finish instead of making it feel too bare.
+- CONFIDENCE: medium
+
+#### Rule 8: Maxi Skirt Texture Balance
+
+- IF user selects:
+  - aesthetic: clean minimal, quiet luxury, minimalist
+  - occasion: everyday, date, office
+  - style preference: feminine
+  - budget: any
+  - body/proportion: general, petite, or modest
+  - region/climate: mild or cool
+  - modesty preference: balanced to modest
+- THEN prioritize:
+  - items: maxi skirt, fitted knit, light sweater
+  - colors: cream, olive, charcoal, brown
+  - fits: long line plus clear waist
+  - materials: silk texture, rib knit, wool blend
+  - shoes: boots, pointed flats, kitten heels
+  - accessories: thin belt, small bag
+- AVOID: waistless volume, busy print
+- WHY: long lines only feel premium when the structure stays clear
+- SCORING IMPACT: medium
+- MATCH REASON: The long line feels refined because the waist and textures keep the outfit controlled.
+- CONFIDENCE: medium
+
+#### Rule 9: Petite Vertical Line Rule
+
+- IF user selects:
+  - aesthetic: clean girl, clean minimal, minimalist, quiet luxury
+  - occasion: date, daily wear, office
+  - style preference: feminine
+  - budget: any
+  - body/proportion: petite
+  - region/climate: any
+  - modesty preference: any
+- THEN prioritize:
+  - items: high-rise bottoms, cropped or waist-defined tops
+  - colors: tonal neutrals
+  - fits: long vertical line
+  - materials: structured cotton, smooth wool, soft leather
+  - shoes: pointed-toe flats, kitten heels, sleek boots
+  - accessories: smaller handbag scale
+- AVOID: oversized bag, heavy horizontal breaks
+- WHY: petite styling often improves when the eye moves vertically
+- SCORING IMPACT: high
+- MATCH REASON: The high-rise waist and pointed toe help create a longer vertical line.
+- CONFIDENCE: high
+
+#### Rule 10: Petite Skirt Length Rule
+
+- IF user selects:
+  - aesthetic: clean girl, clean minimal
+  - occasion: date, daily wear, everyday
+  - style preference: feminine
+  - budget: any
+  - body/proportion: petite
+  - region/climate: any
+  - modesty preference: any
+- THEN prioritize:
+  - items: mini skirt or full-length clean maxi
+  - colors: neutral palette
+  - fits: clear leg line
+  - materials: structured cotton, silk texture
+  - shoes: pointed flats, boots, kitten heels
+  - accessories: lightweight accessories
+- AVOID: awkward knee-length cuts that shorten the leg line
+- WHY: some lengths interrupt proportion more than they help
+- SCORING IMPACT: medium
+- MATCH REASON: The silhouette keeps the leg line cleaner instead of cutting it off at the knee.
+- CONFIDENCE: medium
+
+#### Rule 11: Oversized Top Balance Rule
+
+- IF user selects:
+  - aesthetic: clean minimal, clean girl
+  - occasion: daily wear, date
+  - style preference: feminine
+  - budget: any
+  - body/proportion: general, oversized preference, or petite
+  - region/climate: any
+  - modesty preference: any
+- THEN prioritize:
+  - items: oversized button-up, light blazer, structured bottom
+  - colors: white, cream, beige, navy
+  - fits: oversized top with structured or slimmer bottom
+  - materials: cotton, linen, soft tailoring
+  - shoes: loafers, pointed flats, minimal sneakers
+  - accessories: thin belt, small bag
+- AVOID: double-oversized proportions
+- WHY: the shape needs a counterbalance
+- SCORING IMPACT: high
+- MATCH REASON: The oversized layer feels cleaner because the rest of the outfit keeps the shape controlled.
+- CONFIDENCE: high
+
+#### Rule 12: Structure and Softness Contrast
+
+- IF user selects:
+  - aesthetic: quiet luxury, clean minimal
+  - occasion: date, office, everyday
+  - style preference: feminine
+  - budget: any
+  - body/proportion: general
+  - region/climate: any
+  - modesty preference: any
+- THEN prioritize:
+  - items: structured blazer, soft dress, fluid blouse, clean trouser
+  - colors: cream, camel, black, navy
+  - fits: one structured piece plus one soft piece
+  - materials: wool, silk, linen, soft leather
+  - shoes: kitten heels, loafers, pointed flats
+  - accessories: simple gold jewelry
+- AVOID: all-soft or all-rigid styling
+- WHY: balance gives the look depth
+- SCORING IMPACT: high
+- MATCH REASON: The contrast between soft and structured pieces makes the look feel polished and balanced.
+- CONFIDENCE: high
+
+#### Rule 13: Natural Texture Quiet Luxury
+
+- IF user selects:
+  - aesthetic: quiet luxury, clean minimal, minimalist
+  - occasion: date, office, everyday
+  - style preference: feminine
+  - budget: any
+  - body/proportion: general
+  - region/climate: any
+  - modesty preference: any
+- THEN prioritize:
+  - items: simple refined basics
+  - colors: cream, camel, brown, olive, charcoal
+  - fits: clean skim and intentional drape
+  - materials: cotton, linen, silk, wool, cashmere, leather, suede
+  - shoes: leather loafers, pointed flats, boots
+  - accessories: structured bag, silk scarf
+- AVOID: synthetic shine, fake-luxury satin
+- WHY: texture signals quiet luxury better than logos
+- SCORING IMPACT: high
+- MATCH REASON: Natural textures like silk, linen, and leather create a quiet-luxury feel without logos.
+- CONFIDENCE: high
+
+#### Rule 14: Neutral Palette Depth
+
+- IF user selects:
+  - aesthetic: clean minimal, quiet luxury, clean girl
+  - occasion: date, daily wear, office, everyday
+  - style preference: feminine
+  - budget: any
+  - body/proportion: general
+  - region/climate: any
+  - modesty preference: any
+- THEN prioritize:
+  - items: neutral core pieces
+  - colors: beige, camel, cream, white, navy, charcoal, black
+  - fits: simple and clean
+  - materials: textured neutrals
+  - shoes: neutral leather shoes
+  - accessories: gold jewelry, structured neutral bag
+- AVOID: neon or loud contrast pattern
+- WHY: depth should come from texture and tone shifts
+- SCORING IMPACT: high
+- MATCH REASON: The neutral palette keeps the outfit refined while texture adds enough depth to avoid feeling flat.
+- CONFIDENCE: high
+
+#### Rule 15: Soft Accent Discipline
+
+- IF user selects:
+  - aesthetic: clean girl, clean minimal, quiet luxury
+  - occasion: daily wear, date, everyday
+  - style preference: feminine
+  - budget: any
+  - body/proportion: general
+  - region/climate: any
+  - modesty preference: any
+- THEN prioritize:
+  - items: neutral base with one soft accent
+  - colors: sage, matcha, soft pastel, brown, olive
+  - fits: clean silhouette
+  - materials: cotton, linen, soft knit
+  - shoes: neutral shoes
+  - accessories: simple gold jewelry
+- AVOID: too many accent colors or neon pops
+- WHY: one muted accent keeps the outfit interesting without losing calm
+- SCORING IMPACT: medium
+- MATCH REASON: A muted accent adds interest without breaking the clean, expensive-looking palette.
+- CONFIDENCE: medium
+
+#### Rule 16: Feminine Quiet Luxury No Logo
+
+- IF user selects:
+  - aesthetic: quiet luxury, clean minimal, minimalist
+  - occasion: date, office, everyday
+  - style preference: feminine
+  - budget: any
+  - body/proportion: general
+  - region/climate: any
+  - modesty preference: any
+- THEN prioritize:
+  - items: logo-free basics, structured bag, refined shoes
+  - colors: neutral palette
+  - fits: clean lines and precise tailoring
+  - materials: natural fibers, leather, suede
+  - shoes: loafers, pointed flats, boots
+  - accessories: minimal jewelry
+- AVOID: visible logo belt, logo-heavy bag, plastic sheen
+- WHY: quiet luxury needs polish instead of brand display
+- SCORING IMPACT: high
+- MATCH REASON: The look feels more elevated because it relies on proportion and texture instead of logos.
+- CONFIDENCE: high
+
+#### Rule 17: Minimal Accessories Warmth
+
+- IF user selects:
+  - aesthetic: clean girl, clean minimal, quiet luxury
+  - occasion: date, daily wear, everyday
+  - style preference: feminine
+  - budget: any
+  - body/proportion: general or petite
+  - region/climate: any
+  - modesty preference: any
+- THEN prioritize:
+  - items: simple outfit base
+  - colors: neutral palette with warm metal accents
+  - fits: uncluttered
+  - materials: gold-tone metal, silk scarf, leather bag
+  - shoes: refined neutral shoes
+  - accessories: dainty gold hoops, simple chains, thin belt, classic sunglasses
+- AVOID: accessory overload or plastic-looking jewelry
+- WHY: a few warm accessories can finish the outfit better than many random ones
+- SCORING IMPACT: medium
+- MATCH REASON: The minimal jewelry adds warmth without taking over the outfit.
+- CONFIDENCE: medium
+
+#### Rule 18: Budget High-Low Anchor Piece
+
+- IF user selects:
+  - aesthetic: clean girl, clean minimal, quiet luxury, minimalist
+  - occasion: date, daily wear, office
+  - style preference: feminine
+  - budget: under $100 or $100-$200
+  - body/proportion: general
+  - region/climate: any
+  - modesty preference: any
+- THEN prioritize:
+  - items: one anchor piece, versatile basics, high-low mix
+  - colors: repeat-wear neutrals
+  - fits: basics before trend pieces
+  - materials: cotton, linen, thrifted leather, silk scarf
+  - shoes: versatile loafers, pointed flats, neutral sneakers
+  - accessories: only if they improve repeat wear
+- AVOID: too many trend pieces, budget dilution
+- WHY: concentrating the spend usually reads better than spreading it thin
+- SCORING IMPACT: high
+- MATCH REASON: The outfit feels more elevated because the budget is focused on the pieces that matter most.
+- CONFIDENCE: high
+
+#### Rule 19: Warm Climate Light Fabric Feminine
+
+- IF user selects:
+  - aesthetic: clean girl, clean minimal, quiet luxury, minimalist
+  - occasion: daily wear, date, travel, everyday
+  - style preference: feminine
+  - budget: any
+  - body/proportion: general
+  - region/climate: warm climate, hot, tropical
+  - modesty preference: any
+- THEN prioritize:
+  - items: cotton tee, linen shirt, lightweight dress, airy trouser
+  - colors: cream, white, sage, stone, olive
+  - fits: breathable and clean
+  - materials: linen, cotton, light silk
+  - shoes: loafers, pointed flats, refined minimal sandals
+  - accessories: lightweight scarf, small structured bag
+- AVOID: heavy synthetic layers or sticky clingy fabrics
+- WHY: warm-weather outfits still need polish, just with lighter fabric logic
+- SCORING IMPACT: medium
+- MATCH REASON: The light fabric keeps the outfit polished while still making sense for warm weather.
+- CONFIDENCE: medium
+
+#### Rule 20: Office Clean Minimal Polish
+
+- IF user selects:
+  - aesthetic: clean minimal, minimalist, quiet luxury, smart casual
+  - occasion: office
+  - style preference: feminine
+  - budget: any
+  - body/proportion: general
+  - region/climate: any
+  - modesty preference: any
+- THEN prioritize:
+  - items: tailored trousers, silk button-up, lightweight sweater, structured blazer
+  - colors: navy, cream, charcoal, camel
+  - fits: clean drape with waist-aware structure
+  - materials: silk, cotton, wool blend, cashmere
+  - shoes: loafers, pointed flats, slingbacks
+  - accessories: structured bag, simple jewelry
+- AVOID: nightlife styling, cheap shine, busy print
+- WHY: office-ready clean minimalism needs calm structure and quiet polish
+- SCORING IMPACT: high
+- MATCH REASON: The tailored pieces keep the outfit polished and office-ready without looking severe.
+- CONFIDENCE: high
+
+### J. User-facing match reasons
+
+- The high-rise waist and pointed toe help create a longer vertical line.
+- The structured blazer balances the softness of the dress for a polished date look.
+- Natural textures like silk, linen, and leather create a quiet-luxury feel without logos.
+- The fitted top balances the relaxed denim so the outfit feels intentional.
+- The neutral palette keeps the look clean while the gold jewelry adds warmth.
+- The outfit stays simple and wearable while still looking intentional through fit and texture.
+- The long line feels refined because the waist and textures keep the outfit controlled.
+- A muted accent adds interest without breaking the clean, expensive-looking palette.
+- The light fabric keeps the outfit polished while still making sense for warm weather.
+- The tailored pieces keep the outfit polished and office-ready without looking severe.
+
+### K. Limitations
+
+- Clean Girl and Quiet Luxury overlap, but they are not identical.
+- Clean Girl can be more youthful and wellness-oriented.
+- Quiet Luxury is more mature and more focused on material and fit.
+- Petite rules should only apply when the user indicates petite sizing or height strongly suggests it.
+- Do not assume body type, modesty, or cultural preference without user input.
+- These rules are guidance, not universal law.
+
+### Future implementation notes for this module
+
+Later these rules can become:
+
+- style scoring weights
+- product filters
+- match reasons
+- quiz questions
+- real product curation criteria
+- budget fallback logic
+- regional and cultural styling rules
