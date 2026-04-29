@@ -9,8 +9,8 @@ import type {
 } from "@/types";
 
 export const brandName = "FitMuse";
-export const headerTagline = "Digital Styling Assistant";
-export const brandTagline = "Your digital stylist for creator-ready outfits.";
+export const headerTagline = "Outfit-Board Stylist";
+export const brandTagline = "Complete outfit boards for real budgets, real stores, and real life.";
 
 export const navLinks: NavLink[] = [
   { label: "Home", href: "/" },
@@ -24,17 +24,17 @@ export const navLinks: NavLink[] = [
 ];
 
 export const heroMetrics = [
-  { label: "Creator scenarios", value: "6+" },
-  { label: "Sample outfit packs", value: "8" },
+  { label: "Closet upload", value: "Not required" },
+  { label: "Sample outfit boards", value: "8" },
   { label: "Average styling time", value: "Under 10 min" },
 ];
 
 export const homeFeatures: Feature[] = [
   {
-    eyebrow: "Built for creators",
-    title: "Looks that work on camera and in real life",
+    eyebrow: "Built for real life",
+    title: "Looks that work for plans, not just inspiration boards",
     description:
-      "Plan reels, campus looks, dates, and brand shoots without opening ten shopping tabs.",
+      "Build date, office, travel, and event looks without opening ten shopping tabs.",
   },
   {
     eyebrow: "Personalized by measurements",
@@ -220,6 +220,192 @@ export const bodyTypeOptions = [
 ];
 
 export const commonSizes = ["XXS", "XS", "S", "M", "L", "XL", "XXL"];
+
+export const supportedStoreOptions = [
+  "H&M",
+  "Zara",
+  "Uniqlo",
+  "Mango",
+  "ASOS",
+  "COS",
+  "Abercrombie",
+  "Amazon Fashion",
+  "Nike",
+  "Adidas",
+  "Nordstrom Rack",
+  "Urban Outfitters",
+];
+
+export const quickStartTemplates = [
+  {
+    id: "first-date",
+    label: "First date",
+    description: "Polished, flattering, and easy to wear.",
+    values: {
+      stylePreference: "feminine",
+      aesthetic: "clean girl",
+      occasion: "date",
+      budgetRange: "$100-$200",
+      fitPreference: "classy",
+      preferredColors: "cream, camel, sage",
+      storesLike: "Zara, Mango, COS",
+    },
+  },
+  {
+    id: "job-interview",
+    label: "Job interview",
+    description: "Work-safe confidence with clean structure.",
+    values: {
+      stylePreference: "mixed / open to all",
+      aesthetic: "office",
+      occasion: "office",
+      budgetRange: "$200-$350",
+      fitPreference: "regular",
+      preferredColors: "navy, stone, charcoal",
+      storesLike: "COS, Uniqlo, Mango",
+    },
+  },
+  {
+    id: "office-day",
+    label: "Office day",
+    description: "Smart, repeatable, and budget-aware.",
+    values: {
+      stylePreference: "mixed / open to all",
+      aesthetic: "smart casual",
+      occasion: "office",
+      budgetRange: "$100-$200",
+      fitPreference: "regular",
+      preferredColors: "soft white, navy, camel",
+      storesLike: "Uniqlo, COS, Zara",
+    },
+  },
+  {
+    id: "airport-travel",
+    label: "Airport / travel",
+    description: "Comfort-forward layers that still look put together.",
+    values: {
+      stylePreference: "mixed / open to all",
+      aesthetic: "travel",
+      occasion: "travel",
+      budgetRange: "$100-$200",
+      fitPreference: "relaxed",
+      preferredColors: "stone, camel, sage",
+      storesLike: "Uniqlo, Zara, COS",
+    },
+  },
+  {
+    id: "wedding-guest",
+    label: "Wedding guest",
+    description: "Elevated event dressing without overdoing it.",
+    values: {
+      stylePreference: "feminine",
+      aesthetic: "luxury neutral",
+      occasion: "wedding guest",
+      budgetRange: "$200-$350",
+      fitPreference: "classy",
+      preferredColors: "champagne, taupe, charcoal",
+      storesLike: "Mango, Nordstrom Rack, Zara",
+    },
+  },
+  {
+    id: "birthday-dinner",
+    label: "Birthday dinner",
+    description: "Going-out energy with budget discipline.",
+    values: {
+      stylePreference: "feminine",
+      aesthetic: "party",
+      occasion: "party",
+      budgetRange: "$100-$200",
+      fitPreference: "classy",
+      preferredColors: "black, plum, gold",
+      storesLike: "ASOS, Zara, Mango",
+    },
+  },
+  {
+    id: "casual-weekend",
+    label: "Casual weekend",
+    description: "Low effort, still intentional.",
+    values: {
+      stylePreference: "mixed / open to all",
+      aesthetic: "minimalist",
+      occasion: "daily wear",
+      budgetRange: "$100-$200",
+      fitPreference: "relaxed",
+      preferredColors: "cream, navy, stone",
+      storesLike: "Uniqlo, COS, H&M",
+    },
+  },
+  {
+    id: "concert-night",
+    label: "Concert",
+    description: "Statement styling without losing comfort.",
+    values: {
+      stylePreference: "mixed / open to all",
+      aesthetic: "streetwear",
+      occasion: "party",
+      budgetRange: "$100-$200",
+      fitPreference: "oversized",
+      preferredColors: "charcoal, stone, black",
+      storesLike: "ASOS, Adidas, Urban Outfitters",
+    },
+  },
+  {
+    id: "brunch-look",
+    label: "Brunch",
+    description: "Soft polish for daylight plans.",
+    values: {
+      stylePreference: "feminine",
+      aesthetic: "clean girl",
+      occasion: "daily wear",
+      budgetRange: "$100-$200",
+      fitPreference: "regular",
+      preferredColors: "cream, soft white, sage",
+      storesLike: "Mango, Zara, COS",
+    },
+  },
+  {
+    id: "creator-shoot",
+    label: "Creator shoot",
+    description: "Content-ready boards with clearer visual impact.",
+    values: {
+      stylePreference: "mixed / open to all",
+      aesthetic: "creator/photoshoot",
+      occasion: "photoshoot",
+      budgetRange: "$200-$350",
+      fitPreference: "trendy",
+      preferredColors: "cream, charcoal, taupe",
+      storesLike: "ASOS, Zara, Mango",
+    },
+  },
+  {
+    id: "quiet-luxury-budget",
+    label: "Quiet luxury under budget",
+    description: "Premium-looking basics without luxury pricing.",
+    values: {
+      stylePreference: "masculine",
+      aesthetic: "old money",
+      occasion: "date",
+      budgetRange: "$100-$200",
+      fitPreference: "slim",
+      preferredColors: "cream, espresso, sage",
+      storesLike: "Zara, Mango, H&M, ASOS",
+    },
+  },
+  {
+    id: "clean-minimal-everyday",
+    label: "Clean minimal everyday",
+    description: "Simple outfit boards that still feel elevated.",
+    values: {
+      stylePreference: "feminine",
+      aesthetic: "clean girl",
+      occasion: "daily wear",
+      budgetRange: "$100-$200",
+      fitPreference: "regular",
+      preferredColors: "cream, navy, beige",
+      storesLike: "COS, Uniqlo, Mango",
+    },
+  },
+] as const;
 
 export const defaultQuizValues: QuizFormValues = {
   name: "Ava",

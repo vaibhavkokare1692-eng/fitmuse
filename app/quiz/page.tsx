@@ -23,8 +23,8 @@ export default function QuizPage() {
         <div className="hidden gap-4 xl:grid xl:grid-cols-3">
           {[
             { label: "Fast to finish", value: "6 steps" },
-            { label: "Inputs covered", value: "Measurements + style" },
-            { label: "Output", value: "Complete outfit pack" },
+            { label: "Inputs covered", value: "Budget + fit + stores" },
+            { label: "Output", value: "Complete outfit boards" },
           ].map((item) => (
             <div key={item.label} className="metric-card">
               <p className="mini-label">{item.label}</p>

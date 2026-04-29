@@ -15,7 +15,7 @@ export function ComparisonSection({
       {showIntro ? (
         <SectionHeading
           eyebrow="Why it feels different"
-          title="A creator-focused styling assistant, not another generic fashion tool"
+          title="A practical outfit-board stylist, not another closet-heavy fashion tool"
           description="FitMuse is built around complete outfit discovery, not closet organization, single-brand selling, or expensive human styling."
         />
       ) : null}

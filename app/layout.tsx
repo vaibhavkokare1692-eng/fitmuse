@@ -6,11 +6,11 @@ import { Navbar } from "@/components/Navbar";
 
 export const metadata: Metadata = {
   title: {
-    default: `${brandName} | Digital Styling Assistant`,
+    default: `${brandName} | Outfit-Board Stylist`,
     template: `%s | ${brandName}`,
   },
   description:
-    "An affordable digital stylist MVP for creators, influencers, students, and young professionals who need complete outfits fast.",
+    "Build complete outfits that fit your budget, style, stores, and life without uploading your full closet first.",
 };
 
 export default function RootLayout({

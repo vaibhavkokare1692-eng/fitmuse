@@ -1,6 +1,7 @@
 import { getStyleRulesForBrief, type StyleRule } from "../data/styleRules.ts";
 import { products } from "../data/products.ts";
 import {
+  formatCurrency,
   formatAestheticLabel,
   isCreatorOccasion,
   splitCommaSeparated,
@@ -12,11 +13,13 @@ import type {
   ColorFamily,
   FitPreference,
   MatchQualityLabel,
+  OutfitSmartSwap,
   Occasion,
   OutfitRecommendation,
   Product,
   ProductCategory,
   QuizAnswers,
+  RecommendationPriceLineItem,
   StylePreference,
 } from "@/types";
 
@@ -1356,6 +1359,351 @@ function buildWhyItWorks(items: Product[], answers: QuizAnswers, matchedColors: 
   return `${palette.slice(0, 3).map(formatLabel).join(", ")} tones keep the outfit cohesive while ${leadStores.join(" + ")} gives it a polished multi-store finish.`;
 }
 
+function buildPriceBreakdown(items: Product[]): RecommendationPriceLineItem[] {
+  const orderedCategories: ProductCategory[] = ["top", "bottom", "shoes", "accessory", "outerwear"];
+
+  return orderedCategories
+    .map((category) => items.find((item) => item.category === category))
+    .filter(Boolean)
+    .map((item) => ({
+      label: formatLabel(item!.category),
+      itemName: item!.name,
+      price: item!.price,
+    }));
+}
+
+function buildOccasionMatchLabel(productEntries: ScoredProduct[]) {
+  const exactOccasionCount = productEntries.filter((entry) => entry.exactOccasion).length;
+  const fallbackOccasionCount = productEntries.filter((entry) => entry.fallbackOccasion).length;
+
+  if (exactOccasionCount >= 2) {
+    return "High occasion match";
+  }
+
+  if (exactOccasionCount >= 1 || fallbackOccasionCount >= 1) {
+    return "Good occasion match";
+  }
+
+  return "Flexible occasion match";
+}
+
+function buildStyleMatchLabel(productEntries: ScoredProduct[]) {
+  const exactAestheticCount = productEntries.filter((entry) => entry.exactAesthetic).length;
+  const fallbackAestheticCount = productEntries.filter((entry) => entry.fallbackAesthetic).length;
+
+  if (exactAestheticCount >= 2) {
+    return "High style match";
+  }
+
+  if (exactAestheticCount >= 1 || fallbackAestheticCount >= 1) {
+    return "Good style match";
+  }
+
+  return "Closest style match";
+}
+
+function buildColorHarmonyLabel(
+  items: Product[],
+  matchedColors: string[],
+  productEntries: ScoredProduct[],
+) {
+  const familyCount = new Set(items.map((item) => item.colorFamily)).size;
+  const matchedPreferredFamilyCount = productEntries.filter(
+    (entry) => entry.matchedPreferredFamily,
+  ).length;
+
+  if (matchedColors.length > 0 && familyCount <= 2) {
+    return "Strong color harmony";
+  }
+
+  if (matchedColors.length > 0 || matchedPreferredFamilyCount >= 2 || familyCount <= 3) {
+    return "Balanced color harmony";
+  }
+
+  return "Directional palette mix";
+}
+
+function buildFitConfidenceLabel(productEntries: ScoredProduct[]) {
+  const fitExactCount = productEntries.filter((entry) => entry.fitExact).length;
+  const fitAlignedCount = productEntries.filter((entry) => entry.fitAligned).length;
+  const sizeExactCount = productEntries.filter((entry) => entry.sizeExact).length;
+
+  if (fitExactCount >= 2 && sizeExactCount >= Math.max(3, productEntries.length - 1)) {
+    return "High fit confidence";
+  }
+
+  if (fitAlignedCount >= 2) {
+    return "Good fit confidence";
+  }
+
+  return "Exploratory fit confidence";
+}
+
+function buildSizeCompatibilityLabel(productEntries: ScoredProduct[], answers: QuizAnswers) {
+  const sizeExactCount = productEntries.filter((entry) => entry.sizeExact).length;
+  const requestedAnySize = Boolean(answers.topSize || answers.bottomSize || answers.shoeSize);
+
+  if (!requestedAnySize) {
+    return "Open size mix";
+  }
+
+  if (sizeExactCount === productEntries.length) {
+    return "All saved sizes available";
+  }
+
+  if (sizeExactCount >= Math.max(2, productEntries.length - 1)) {
+    return "Mostly size-compatible";
+  }
+
+  return "Some size guesswork";
+}
+
+function buildStoreMatchLabel(productEntries: ScoredProduct[], answers: QuizAnswers) {
+  const matchedStoreCount = Array.from(
+    new Set(productEntries.flatMap((entry) => entry.matchedStores)),
+  ).length;
+  const preferredStores = splitCommaSeparated(answers.storesLike);
+  const storeCount = new Set(productEntries.map((entry) => entry.product.store)).size;
+
+  if (matchedStoreCount >= 2) {
+    return "Preferred store match";
+  }
+
+  if (matchedStoreCount === 1) {
+    return "Partial store match";
+  }
+
+  if (preferredStores.length === 0) {
+    return storeCount <= 2 ? "Tight store mix" : "Open-store mix";
+  }
+
+  return "Mixed-store match";
+}
+
+function buildFitTags(items: Product[], answers: QuizAnswers) {
+  const tags = new Set<string>();
+  const heightInches = parseHeightToInches(answers.height);
+  const itemText = normalize(items.map((item) => `${item.name} ${item.styleNotes}`).join(" "));
+
+  if (answers.fitPreference) {
+    tags.add(`${formatLabel(answers.fitPreference)} fit`);
+  }
+
+  if (inferBodyOrFitSignal(answers) === "petite") {
+    tags.add("Petite-friendly");
+  } else if (heightInches && heightInches >= 71) {
+    tags.add("Tall-friendly");
+  }
+
+  if (
+    (answers.topSize && ["xl", "xxl"].includes(normalize(answers.topSize))) ||
+    (answers.bottomSize && ["xl", "xxl"].includes(normalize(answers.bottomSize)))
+  ) {
+    tags.add("Plus-size available");
+  }
+
+  if (answers.occasion === "office" || answers.occasion === "brand content") {
+    tags.add("Work-safe");
+  }
+
+  if (
+    answers.occasion === "travel" ||
+    keywordMatches(itemText, ["sneaker", "cardigan", "layer", "lightweight", "relaxed"])
+  ) {
+    tags.add("Travel-friendly");
+  }
+
+  if (!keywordMatches(itemText, ["silk", "suede", "cashmere", "dry clean", "delicate"])) {
+    tags.add("Low-maintenance fabric");
+  }
+
+  return Array.from(tags).slice(0, 4);
+}
+
+function buildStylingSummary(
+  answers: QuizAnswers,
+  budgetLabel: BudgetMatchLabel,
+  matchedColors: string[],
+  items: Product[],
+) {
+  const aestheticLabel = answers.aesthetic
+    ? formatAestheticLabel(answers.aesthetic, answers.stylePreference).toLowerCase()
+    : "style-led";
+  const fitLabel = answers.fitPreference
+    ? `${formatLabel(answers.fitPreference).toLowerCase()} fit`
+    : "balanced fit";
+  const colorLabel =
+    matchedColors.length > 0
+      ? `${formatLabel(matchedColors[0]).toLowerCase()}-led palette`
+      : `${uniqueColors(items)[0] ? formatLabel(uniqueColors(items)[0]).toLowerCase() : "neutral"} palette`;
+  const budgetVoice =
+    budgetLabel === "Within budget"
+      ? "built to stay inside budget"
+      : budgetLabel === "Near budget"
+        ? "kept close to budget"
+        : budgetLabel === "Stretch upgrade"
+          ? "with one stretch-upgrade move"
+          : "with a deliberate over-budget tradeoff";
+
+  return `${aestheticLabel} board with a ${fitLabel}, ${colorLabel}, and ${budgetVoice}.`;
+}
+
+function getSwapReferenceItem(items: Product[], mode: OutfitSmartSwap["type"]) {
+  const coreItems = items.filter((item) => item.category !== "accessory");
+
+  if (mode === "cheaper" || mode === "premium") {
+    return [...coreItems].sort((left, right) => right.price - left.price)[0] ?? items[0];
+  }
+
+  if (mode === "casual") {
+    return (
+      items.find((item) => item.category === "shoes" && keywordMatches(normalize(item.name), ["loafer", "boot", "heel"])) ??
+      items.find((item) => item.category === "outerwear") ??
+      items.find((item) => item.category === "top") ??
+      items[0]
+    );
+  }
+
+  return (
+    items.find((item) => item.category === "shoes" && keywordMatches(normalize(item.name), ["sneaker"])) ??
+    items.find((item) => item.category === "top" && keywordMatches(normalize(item.name), ["tee", "t-shirt", "shirt"])) ??
+    items.find((item) => item.category === "bottom" && keywordMatches(normalize(item.name), ["denim", "jeans"])) ??
+    items[0]
+  );
+}
+
+function isCasualSignal(product: Product) {
+  return keywordMatches(buildProductSearchText(product), [
+    "sneaker",
+    "sneakers",
+    "tee",
+    "t-shirt",
+    "t shirt",
+    "denim",
+    "jeans",
+    "relaxed",
+    "bomber",
+    "cardigan",
+  ]);
+}
+
+function isDressySignal(product: Product) {
+  return keywordMatches(buildProductSearchText(product), [
+    "loafer",
+    "loafers",
+    "heel",
+    "heels",
+    "chelsea",
+    "blazer",
+    "tailored",
+    "trouser",
+    "trousers",
+    "silk",
+    "merino",
+    "cashmere",
+  ]);
+}
+
+function findSmartSwap(
+  mode: OutfitSmartSwap["type"],
+  items: Product[],
+  answers: QuizAnswers,
+  matchedStyleRules: StyleRule[],
+) {
+  const reference = getSwapReferenceItem(items, mode);
+
+  if (!reference) {
+    return null;
+  }
+
+  const referenceScore = scoreProduct(reference, answers, matchedStyleRules).score;
+  const candidates = products
+    .filter((product) => product.category === reference.category && product.id !== reference.id)
+    .map((product) => scoreProduct(product, answers, matchedStyleRules))
+    .filter((entry) => {
+      if (mode === "cheaper") {
+        return entry.product.price < reference.price - 8 && entry.score >= referenceScore - 8;
+      }
+
+      if (mode === "premium") {
+        return entry.product.price > reference.price + 8 && entry.score >= referenceScore - 4;
+      }
+
+      if (mode === "casual") {
+        return isCasualSignal(entry.product) && entry.score >= referenceScore - 6;
+      }
+
+      return isDressySignal(entry.product) && entry.score >= referenceScore - 6;
+    })
+    .sort((left, right) => {
+      if (mode === "cheaper") {
+        return left.product.price - right.product.price || right.score - left.score;
+      }
+
+      if (mode === "premium") {
+        return right.score - left.score || left.product.price - right.product.price;
+      }
+
+      return right.score - left.score || left.product.price - right.product.price;
+    });
+
+  const candidate = candidates[0]?.product;
+
+  if (!candidate) {
+    return null;
+  }
+
+  const priceDelta = candidate.price - reference.price;
+
+  if (mode === "cheaper") {
+    return {
+      type: mode,
+      label: "Cheaper swap",
+      suggestion: `Swap ${reference.name} for ${candidate.name}.`,
+      reason: `Saves about ${formatCurrency(Math.abs(priceDelta))} while keeping the board close to your brief.`,
+      priceDelta,
+    } satisfies OutfitSmartSwap;
+  }
+
+  if (mode === "premium") {
+    return {
+      type: mode,
+      label: "More premium swap",
+      suggestion: `Upgrade ${reference.name} to ${candidate.name}.`,
+      reason: `Adds a stronger finishing piece for about ${formatCurrency(Math.abs(priceDelta))} more.`,
+      priceDelta,
+    } satisfies OutfitSmartSwap;
+  }
+
+  if (mode === "casual") {
+    return {
+      type: mode,
+      label: "More casual swap",
+      suggestion: `Trade ${reference.name} for ${candidate.name}.`,
+      reason: "Softens the look into a more everyday version without losing the overall vibe.",
+      priceDelta,
+    } satisfies OutfitSmartSwap;
+  }
+
+  return {
+    type: mode,
+    label: "More dressy swap",
+    suggestion: `Trade ${reference.name} for ${candidate.name}.`,
+    reason: "Sharpens the outfit for a more elevated occasion finish.",
+    priceDelta,
+  } satisfies OutfitSmartSwap;
+}
+
+function buildSmartSwaps(
+  items: Product[],
+  answers: QuizAnswers,
+  matchedStyleRules: StyleRule[],
+) {
+  return (["cheaper", "premium", "casual", "dressy"] as const)
+    .map((mode) => findSmartSwap(mode, items, answers, matchedStyleRules))
+    .filter(Boolean) as OutfitSmartSwap[];
+}
+
 function getStyleIntelligenceReasons(productEntries: ScoredProduct[], answers: QuizAnswers) {
   const reasons = new Set<string>();
   const matchedRuleNames = Array.from(
@@ -1665,6 +2013,7 @@ function buildOutfitRecommendation(
   const matchedColors = Array.from(
     new Set(productEntries.flatMap((entry) => entry.matchedPreferredColors)),
   );
+  const priceBreakdown = buildPriceBreakdown(items);
 
   return {
     id: productEntries.map((entry) => entry.product.id).join("__"),
@@ -1696,6 +2045,16 @@ function buildOutfitRecommendation(
     matchReasons,
     creatorAlignmentScore,
     stores: Array.from(new Set(items.map((item) => item.store))),
+    priceBreakdown,
+    occasionMatch: buildOccasionMatchLabel(productEntries),
+    styleMatch: buildStyleMatchLabel(productEntries),
+    colorHarmony: buildColorHarmonyLabel(items, matchedColors, productEntries),
+    fitConfidence: buildFitConfidenceLabel(productEntries),
+    sizeCompatibility: buildSizeCompatibilityLabel(productEntries, answers),
+    storeMatch: buildStoreMatchLabel(productEntries, answers),
+    fitTags: buildFitTags(items, answers),
+    stylingSummary: buildStylingSummary(answers, budgetMatch.label, matchedColors, items),
+    smartSwaps: [],
     matchMode,
     shopUrl: `/mock-look/${productEntries[0].product.id}`,
   };
@@ -1886,15 +2245,26 @@ export function buildOutfitRecommendations(answers: QuizAnswers, limit = 8) {
   );
 
   if (sorted.length > 0) {
-    return selectBudgetBalancedRecommendations(sorted, budgetCap, limit).map((recommendation, index) => ({
-      ...recommendation,
-      name: buildName(
-        (answers.aesthetic || "smart casual") as Aesthetic,
-        (answers.occasion || "daily wear") as Occasion,
-        answers.stylePreference,
-        index,
-      ),
-    }));
+    return selectBudgetBalancedRecommendations(sorted, budgetCap, limit).map((recommendation, index) => {
+      const recommendationItems = [
+        recommendation.items.top,
+        recommendation.items.bottom,
+        recommendation.items.shoes,
+        recommendation.items.accessory,
+        recommendation.items.outerwear,
+      ].filter(Boolean) as Product[];
+
+      return {
+        ...recommendation,
+        name: buildName(
+          (answers.aesthetic || "smart casual") as Aesthetic,
+          (answers.occasion || "daily wear") as Occasion,
+          answers.stylePreference,
+          index,
+        ),
+        smartSwaps: buildSmartSwaps(recommendationItems, answers, matchedStyleRules),
+      };
+    });
   }
 
   const fallbackItems = [...coreCategories, "accessory" as const]
@@ -1911,37 +2281,57 @@ export function buildOutfitRecommendations(answers: QuizAnswers, limit = 8) {
 
   const fallbackBudgetMatch = buildBudgetMatch(fallbackItems, budgetCap);
   const fallbackRecommendation: OutfitRecommendation = {
-      id: fallbackItems.map((item) => item.id).join("__"),
-      name: "Closest FitMuse Look",
-      aesthetic: (answers.aesthetic || "smart casual") as Aesthetic,
-      occasion: (answers.occasion || "daily wear") as Occasion,
-      totalPrice: fallbackItems.reduce((sum, item) => sum + item.price, 0),
-      items: {
-        top: fallbackItems.find((item) => item.category === "top")!,
-        bottom: fallbackItems.find((item) => item.category === "bottom")!,
-        shoes: fallbackItems.find((item) => item.category === "shoes")!,
-        accessory: fallbackItems.find((item) => item.category === "accessory"),
-        outerwear: undefined,
-      },
-      colorPalette: uniqueColors(fallbackItems),
-      colorFamilies: uniqueColorFamilies(fallbackItems),
-      fitNote: buildFitNote(fallbackItems, answers),
-      whyItWorks: "This is the closest ready-to-buy outfit mix available in the current mock catalog.",
-      creatorUseCase: buildCreatorUseCase((answers.occasion || "daily wear") as Occasion),
-      confidenceScore: 49,
-      matchQualityLabel: "Closest match",
-      budgetMatchLabel: fallbackBudgetMatch.label,
-      budgetNote: "This fallback prioritizes showing a complete outfit over a blank page while staying as close to your budget as the current catalog allows.",
-      matchReasons: [
-        "No perfect match yet, but this is the closest full outfit in the current mock catalog",
-        answers.aesthetic
-          ? `Still leans toward your ${formatAestheticLabel(answers.aesthetic, answers.stylePreference)} aesthetic`
-          : "Still keeps the outfit visually cohesive",
-      ],
-      creatorAlignmentScore: 2,
-      stores: Array.from(new Set(fallbackItems.map((item) => item.store))),
-      matchMode: "closest",
-      shopUrl: `/mock-look/${fallbackItems[0].id}`,
+    id: fallbackItems.map((item) => item.id).join("__"),
+    name: "Closest FitMuse Look",
+    aesthetic: (answers.aesthetic || "smart casual") as Aesthetic,
+    occasion: (answers.occasion || "daily wear") as Occasion,
+    totalPrice: fallbackItems.reduce((sum, item) => sum + item.price, 0),
+    items: {
+      top: fallbackItems.find((item) => item.category === "top")!,
+      bottom: fallbackItems.find((item) => item.category === "bottom")!,
+      shoes: fallbackItems.find((item) => item.category === "shoes")!,
+      accessory: fallbackItems.find((item) => item.category === "accessory"),
+      outerwear: undefined,
+    },
+    colorPalette: uniqueColors(fallbackItems),
+    colorFamilies: uniqueColorFamilies(fallbackItems),
+    fitNote: buildFitNote(fallbackItems, answers),
+    whyItWorks: "This is the closest ready-to-buy outfit mix available in the current mock catalog.",
+    creatorUseCase: buildCreatorUseCase((answers.occasion || "daily wear") as Occasion),
+    confidenceScore: 49,
+    matchQualityLabel: "Closest match",
+    budgetMatchLabel: fallbackBudgetMatch.label,
+    budgetNote:
+      "This fallback prioritizes showing a complete outfit over a blank page while staying as close to your budget as the current catalog allows.",
+    matchReasons: [
+      "No perfect match yet, but this is the closest full outfit in the current mock catalog",
+      answers.aesthetic
+        ? `Still leans toward your ${formatAestheticLabel(answers.aesthetic, answers.stylePreference)} aesthetic`
+        : "Still keeps the outfit visually cohesive",
+    ],
+    creatorAlignmentScore: 2,
+    stores: Array.from(new Set(fallbackItems.map((item) => item.store))),
+    priceBreakdown: buildPriceBreakdown(fallbackItems),
+    occasionMatch: "Flexible occasion match",
+    styleMatch: answers.aesthetic ? "Closest style match" : "Directional style match",
+    colorHarmony:
+      uniqueColorFamilies(fallbackItems).length <= 3 ? "Balanced color harmony" : "Directional palette mix",
+    fitConfidence: "Exploratory fit confidence",
+    sizeCompatibility:
+      answers.topSize || answers.bottomSize || answers.shoeSize
+        ? "Some size guesswork"
+        : "Open size mix",
+    storeMatch: splitCommaSeparated(answers.storesLike).length > 0 ? "Mixed-store match" : "Open-store mix",
+    fitTags: buildFitTags(fallbackItems, answers),
+    stylingSummary: buildStylingSummary(
+      answers,
+      fallbackBudgetMatch.label,
+      [],
+      fallbackItems,
+    ),
+    smartSwaps: buildSmartSwaps(fallbackItems, answers, matchedStyleRules),
+    matchMode: "closest",
+    shopUrl: `/mock-look/${fallbackItems[0].id}`,
   };
 
   return [fallbackRecommendation];

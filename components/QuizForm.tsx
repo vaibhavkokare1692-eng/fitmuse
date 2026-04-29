@@ -26,7 +26,9 @@ import {
   commonSizes,
   fitPreferenceOptions,
   occasionOptions,
+  quickStartTemplates,
   stylePreferenceOptions,
+  supportedStoreOptions,
 } from "@/data/mock-data";
 import {
   buildResultsSearch,
@@ -35,7 +37,7 @@ import {
   writeStoredQuizAnswers,
 } from "@/lib/local-storage";
 import { formatAestheticLabel, formatCurrency, formatOptionLabel } from "@/lib/utils";
-import { buildOutfitRecommendations, emptyQuizAnswers, hasQuizAnswers } from "@/utils/outfitMatcher";
+import { buildOutfitRecommendations, emptyQuizAnswers } from "@/utils/outfitMatcher";
 import type { QuizAnswers } from "@/types";
 
 const quizSteps = [
@@ -102,25 +104,13 @@ function getStepError(stepIndex: number, values: QuizAnswers) {
 export function QuizForm() {
   const router = useRouter();
   const formSurfaceRef = useRef<HTMLDivElement | null>(null);
+  const [storedBrief] = useState<QuizAnswers | null>(() => readStoredQuizAnswers());
   const [isPending, startTransition] = useTransition();
-  const [hasStoredBrief, setHasStoredBrief] = useState(false);
-  const [showSavedBriefPrompt, setShowSavedBriefPrompt] = useState(false);
+  const [hasStoredBrief, setHasStoredBrief] = useState(Boolean(storedBrief));
+  const [showSavedBriefPrompt, setShowSavedBriefPrompt] = useState(Boolean(storedBrief));
   const [currentStep, setCurrentStep] = useState(0);
   const [stepError, setStepError] = useState<string | null>(null);
-  const [formValues, setFormValues] = useState<QuizAnswers>(emptyQuizAnswers);
-
-  useEffect(() => {
-    const stored = readStoredQuizAnswers();
-
-    if (stored && hasQuizAnswers(stored)) {
-      setFormValues(stored);
-      setHasStoredBrief(true);
-      setShowSavedBriefPrompt(true);
-    } else {
-      setFormValues(emptyQuizAnswers());
-      setHasStoredBrief(false);
-    }
-  }, []);
+  const [formValues, setFormValues] = useState<QuizAnswers>(storedBrief ?? emptyQuizAnswers());
 
   useEffect(() => {
     if (typeof window === "undefined" || showSavedBriefPrompt) {
@@ -148,6 +138,34 @@ export function QuizForm() {
     setFormValues((current) => ({ ...current, [name]: value }));
   }
 
+  function toggleCommaSeparatedValue(name: keyof QuizAnswers, value: string) {
+    setStepError(null);
+    setFormValues((current) => {
+      const entries = (current[name] ?? "")
+        .split(",")
+        .map((entry) => entry.trim())
+        .filter(Boolean);
+      const exists = entries.some((entry) => entry.toLowerCase() === value.toLowerCase());
+      const next = exists
+        ? entries.filter((entry) => entry.toLowerCase() !== value.toLowerCase())
+        : [...entries, value];
+
+      return {
+        ...current,
+        [name]: next.join(", "),
+      };
+    });
+  }
+
+  function applyQuickStartTemplate(template: (typeof quickStartTemplates)[number]) {
+    setStepError(null);
+    setFormValues((current) => ({
+      ...current,
+      ...template.values,
+      location: current.location || "United States",
+    }));
+  }
+
   function goToStep(nextStep: number) {
     setStepError(null);
     setCurrentStep(Math.max(0, Math.min(nextStep, quizSteps.length - 1)));
@@ -157,6 +175,7 @@ export function QuizForm() {
     clearStoredQuizAnswers();
     setCurrentStep(0);
     setStepError(null);
+    setHasStoredBrief(false);
     setFormValues(emptyQuizAnswers());
     setShowSavedBriefPrompt(false);
   }
@@ -265,7 +284,7 @@ export function QuizForm() {
             Build your personal style brief.
           </h2>
           <p className="mt-4 max-w-xl text-white/72">
-            Six quick steps. Save once. Reuse anytime you want complete looks for new occasions.
+            Six quick steps. Save once. Reuse anytime you want complete outfit boards for new plans, budgets, and stores.
           </p>
         </div>
 
@@ -374,10 +393,30 @@ export function QuizForm() {
           >
             {currentStep === 0 ? (
               <div className="grid gap-5 md:grid-cols-2">
+                <div className="md:col-span-2 rounded-[1.6rem] border border-line/70 bg-background/74 p-5">
+                  <p className="mini-label">Quick-start templates</p>
+                  <p className="mt-2 max-w-2xl text-sm leading-6 text-foreground">
+                    Start with a proven brief instead of building from zero. FitMuse will prefill the vibe, occasion, budget, and store direction for you.
+                  </p>
+                  <div className="mt-4 grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
+                    {quickStartTemplates.map((template) => (
+                      <button
+                        key={template.id}
+                        type="button"
+                        onClick={() => applyQuickStartTemplate(template)}
+                        className="rounded-[1.35rem] border border-line/70 bg-white/82 p-4 text-left transition hover:-translate-y-0.5 hover:border-accent hover:text-accent"
+                      >
+                        <p className="text-sm font-semibold text-foreground">{template.label}</p>
+                        <p className="mt-2 text-xs leading-5 text-muted">{template.description}</p>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
                 <div className="md:col-span-2">
                   <p className="mini-label">Step 1</p>
                   <p className="mt-2 max-w-2xl text-sm">
-                    This becomes the saved profile FitMuse uses on future visits.
+                    This becomes the saved profile FitMuse uses on future visits. You do not need to upload a full wardrobe first.
                   </p>
                 </div>
 
@@ -666,6 +705,29 @@ export function QuizForm() {
                     className="field"
                     placeholder="Zara, Mango, ASOS"
                   />
+                  <div className="mt-3 flex flex-wrap gap-2">
+                    {supportedStoreOptions.map((store) => {
+                      const selected = formValues.storesLike
+                        .split(",")
+                        .map((entry) => entry.trim().toLowerCase())
+                        .includes(store.toLowerCase());
+
+                      return (
+                        <button
+                          key={store}
+                          type="button"
+                          onClick={() => toggleCommaSeparatedValue("storesLike", store)}
+                          className={`rounded-full border px-3 py-2 text-xs font-medium ${
+                            selected
+                              ? "border-foreground bg-foreground text-white"
+                              : "border-line/70 bg-white/82 text-foreground hover:border-accent hover:text-accent"
+                          }`}
+                        >
+                          {store}
+                        </button>
+                      );
+                    })}
+                  </div>
                 </div>
               </div>
             ) : null}
@@ -678,6 +740,9 @@ export function QuizForm() {
                     <h4 className="mt-3 text-3xl text-foreground">
                       {formValues.name ? `${formValues.name}'s FitMuse profile` : "Your FitMuse profile"}
                     </h4>
+                    <p className="mt-3 max-w-2xl text-sm leading-6 text-foreground">
+                      FitMuse is about to turn your vibe, budget, occasion, colors, fit, and store preferences into complete outfit boards.
+                    </p>
 
                     <div className="mt-5 flex flex-wrap gap-2">
                       {[
@@ -708,7 +773,32 @@ export function QuizForm() {
                           <p className="mini-label">{item.label}</p>
                           <p className="mt-2 text-sm text-foreground">{item.value}</p>
                         </div>
-                      ))}
+                        ))}
+                    </div>
+
+                    <div className="mt-5 rounded-[1.4rem] border border-line/70 bg-white/78 p-4">
+                      <p className="mini-label">Style DNA preview</p>
+                      <p className="mt-3 text-sm leading-6 text-foreground">
+                        {[
+                          formValues.aesthetic
+                            ? `${formatAestheticLabel(formValues.aesthetic, formValues.stylePreference).toLowerCase()} base`
+                            : "",
+                          formValues.fitPreference
+                            ? `${formatOptionLabel(formValues.fitPreference).toLowerCase()} fit`
+                            : "",
+                          formValues.preferredColors
+                            ? `${formValues.preferredColors.toLowerCase()} color mood`
+                            : "",
+                          formValues.storesLike
+                            ? `${formValues.storesLike} store mix`
+                            : "",
+                          formValues.occasion
+                            ? `${formatOptionLabel(formValues.occasion).toLowerCase()} focus`
+                            : "",
+                        ]
+                          .filter(Boolean)
+                          .join(", ") || "Your brief will get a fuller Style DNA summary on the results page."}
+                      </p>
                     </div>
                   </div>
 

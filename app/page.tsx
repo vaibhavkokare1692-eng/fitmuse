@@ -15,7 +15,7 @@ import { HeroPreview } from "@/components/HeroPreview";
 import { MotionReveal } from "@/components/MotionReveal";
 import { OutfitCard } from "@/components/OutfitCard";
 import { PricingCard } from "@/components/PricingCard";
-import { creatorUseCases, outfits, pricingPlans } from "@/data/mock-data";
+import { outfits, pricingPlans } from "@/data/mock-data";
 
 export const metadata: Metadata = {
   title: "Home",
@@ -24,75 +24,75 @@ export const metadata: Metadata = {
 const problemCards = [
   {
     title: "Too many tabs",
-    text: "Search everywhere. Decide nowhere.",
+    text: "You know the vibe. The shopping journey still gets messy fast.",
   },
   {
-    title: "Unsure about fit",
-    text: "Good pieces, wrong proportions.",
+    title: "Unclear fit reality",
+    text: "The item looks good alone, but the full outfit still feels off.",
   },
   {
-    title: "No complete outfit plan",
-    text: "Random items, no finished look.",
+    title: "No finished board",
+    text: "Plenty of inspiration, not enough believable complete looks.",
   },
 ];
 
 const howItWorksSteps = [
   {
     label: "01",
-    title: "Share your measurements",
-    text: "Add sizes and body cues.",
+    title: "Describe your style brief",
+    text: "Set the vibe, occasion, fit, and budget first.",
   },
   {
     label: "02",
-    title: "Choose your aesthetic",
-    text: "Pick the vibe you want.",
+    title: "Choose stores and colors",
+    text: "Tell FitMuse what feels buyable and what to avoid.",
   },
   {
     label: "03",
-    title: "Pick occasion and budget",
-    text: "Keep every look realistic.",
+    title: "Lock the spend range",
+    text: "Keep each outfit board grounded in a real budget.",
   },
   {
     label: "04",
-    title: "Get complete outfit suggestions",
-    text: "See the full outfit pack.",
+    title: "Get full outfit boards",
+    text: "See complete looks with reasoning, swaps, and store context.",
   },
 ];
 
 const featureCards = [
   {
-    title: "Smart outfit matching",
-    description: "Full looks ranked around your style brief.",
+    title: "Complete outfit boards",
+    description: "FitMuse builds full looks, not disconnected product suggestions.",
     icon: Sparkles,
     variant: "matching" as const,
   },
   {
-    title: "Measurement-based fit notes",
-    description: "Short fit guidance that feels useful fast.",
+    title: "Fit + size-aware guidance",
+    description: "Quick size cues and fit notes keep the styling grounded in reality.",
     icon: Ruler,
     variant: "fit" as const,
   },
   {
-    title: "Occasion-based looks",
-    description: "Looks for reels, dates, office days, and more.",
+    title: "Occasion-based styling",
+    description: "Date night, office day, travel, creator shoot, and more.",
     icon: CalendarDays,
     variant: "occasion" as const,
   },
   {
-    title: "Budget-aware outfit packs",
-    description: "Outfit ideas that stay inside your spend range.",
+    title: "Budget-first outfit logic",
+    description: "Most looks stay within budget, with a few smart stretch upgrades.",
     icon: Wallet,
     variant: "budget" as const,
   },
   {
-    title: "Multi-store product links",
-    description: "One look, multiple stores, less searching.",
+    title: "Preferred-store matching",
+    description: "Boards prioritize stores you already trust and actually shop from.",
     icon: Link2,
     variant: "links" as const,
   },
   {
     title: "Saved favorites",
-    description: "Keep the best looks in one calmer shortlist.",
+    description: "Keep your best boards in a shortlist without rebuilding the search.",
     icon: Bookmark,
     variant: "saved" as const,
   },
@@ -122,14 +122,20 @@ const appPreviewTiles = [
 ];
 
 const whyDifferentPoints = [
-  "Complete looks, not random products",
-  "Built around your measurements",
-  "Made for creator-ready moments",
+  "No mandatory closet upload",
+  "Budget-aware from the first click",
+  "Built around stores, fit, and real-life occasions",
 ];
 
 export default function HomePage() {
   const featuredLooks = outfits.slice(0, 3);
-  const heroChips = creatorUseCases.slice(0, 5);
+  const heroChips = [
+    "Complete outfit boards",
+    "Budget-aware styling",
+    "Preferred stores",
+    "Color avoid logic",
+    "No full closet upload",
+  ];
 
   return (
     <>
@@ -144,16 +150,15 @@ export default function HomePage() {
               <div className="relative grid gap-12 xl:grid-cols-[0.96fr_1.04fr] xl:items-center">
                 <div className="space-y-7">
                   <div className="space-y-5">
-                    <span className="pill">For creators, influencers, students, and young professionals</span>
+                    <span className="pill">For shoppers who want full looks without the closet-upload chore</span>
                     <div className="space-y-5">
                       <p className="eyebrow">Premium digital styling</p>
                       <h1 className="max-w-4xl text-5xl leading-[0.9] text-foreground sm:text-6xl lg:text-7xl">
-                        Creator-ready outfits, styled around you.
+                        Build complete outfits that actually fit your budget, style, and life.
                       </h1>
                       <p className="max-w-2xl text-lg leading-8">
-                        FitMuse builds complete looks from your measurements, aesthetic, occasion, and
-                        budget <span aria-hidden="true">&mdash;</span> so you can stop scrolling and
-                        start showing up styled.
+                        Describe your vibe, budget, occasion, preferred stores, colors, and fit.
+                        FitMuse turns it into full outfit boards in minutes <span aria-hidden="true">&mdash;</span> no full closet upload required.
                       </p>
                     </div>
                   </div>
@@ -189,7 +194,7 @@ export default function HomePage() {
             <div className="mb-10 max-w-3xl">
               <p className="eyebrow">The problem</p>
               <h2 className="section-title text-foreground">What should I wear today?</h2>
-              <p className="mt-5 max-w-2xl">That question gets expensive fast when you have content, class, work, or plans.</p>
+              <p className="mt-5 max-w-2xl">Most wardrobe apps start with cataloging. FitMuse starts with intent, budget, occasion, and the outfit you need right now.</p>
             </div>
 
             <div className="grid gap-4 md:grid-cols-3">
@@ -212,7 +217,7 @@ export default function HomePage() {
           <div className="shell">
             <div className="mb-10 max-w-3xl">
               <p className="eyebrow">How it works</p>
-              <h2 className="section-title text-foreground">Four quick steps. One calm flow.</h2>
+              <h2 className="section-title text-foreground">Four quick steps. Full boards, fast.</h2>
             </div>
 
             <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
@@ -234,10 +239,10 @@ export default function HomePage() {
             <div className="mb-10 flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
               <div className="max-w-3xl">
                 <p className="eyebrow">Feature showcase</p>
-                <h2 className="section-title text-foreground">A cleaner way to discover full outfits.</h2>
+                <h2 className="section-title text-foreground">A faster, more practical alternative to closet-heavy styling apps.</h2>
               </div>
               <p className="max-w-md text-sm leading-6 text-muted">
-                Each feature is designed to make the styling flow feel fast, premium, and usable.
+                The product is designed to feel premium, decisive, and shoppable from the very first brief.
               </p>
             </div>
 
@@ -261,9 +266,9 @@ export default function HomePage() {
           <div className="shell grid gap-8 xl:grid-cols-[0.88fr_1.12fr] xl:items-start">
             <div className="max-w-3xl">
               <p className="eyebrow">App preview</p>
-              <h2 className="section-title text-foreground">See the product before you even take the quiz.</h2>
+              <h2 className="section-title text-foreground">See how FitMuse turns a brief into a board.</h2>
               <p className="mt-5 max-w-2xl">
-                FitMuse is meant to feel like a calm fashion-tech app, not a crowded shopping page.
+                The flow is built for believable outfit boards, not a noisy e-commerce grid or a closet catalog.
               </p>
             </div>
 
@@ -287,7 +292,7 @@ export default function HomePage() {
             <div className="mb-10 flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
               <div className="max-w-3xl">
                 <p className="eyebrow">Sample looks</p>
-                <h2 className="section-title text-foreground">Ready-to-buy looks, not isolated pieces.</h2>
+                <h2 className="section-title text-foreground">Complete looks, not random product picks.</h2>
               </div>
               <Link href="/results" className="cta-secondary">
                 View all looks
@@ -308,7 +313,7 @@ export default function HomePage() {
           <div className="shell">
             <div className="mb-10 max-w-3xl">
               <p className="eyebrow">Why FitMuse feels different</p>
-              <h2 className="section-title text-foreground">Three reasons it lands faster.</h2>
+              <h2 className="section-title text-foreground">Why FitMuse feels more practical than a closet-first app.</h2>
             </div>
 
             <div className="grid gap-4 md:grid-cols-3">
@@ -329,7 +334,7 @@ export default function HomePage() {
             <div className="mb-10 flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
               <div className="max-w-3xl">
                 <p className="eyebrow">Pricing</p>
-                <h2 className="section-title text-foreground">Simple plans for everyday styling and creator packs.</h2>
+                <h2 className="section-title text-foreground">Simple plans for everyday styling and premium outfit packs.</h2>
               </div>
               <Link href="/pricing" className="cta-secondary">
                 View pricing

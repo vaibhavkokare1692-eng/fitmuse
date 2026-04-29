@@ -159,6 +159,20 @@ export type OutfitRecommendationItems = {
   outerwear?: Product;
 };
 
+export type RecommendationPriceLineItem = {
+  label: string;
+  itemName: string;
+  price: number;
+};
+
+export type OutfitSmartSwap = {
+  type: "cheaper" | "premium" | "casual" | "dressy";
+  label: string;
+  suggestion: string;
+  reason: string;
+  priceDelta?: number;
+};
+
 export type OutfitRecommendation = {
   id: string;
   name: string;
@@ -178,6 +192,16 @@ export type OutfitRecommendation = {
   matchReasons: string[];
   creatorAlignmentScore: number;
   stores: string[];
+  priceBreakdown: RecommendationPriceLineItem[];
+  occasionMatch: string;
+  styleMatch: string;
+  colorHarmony: string;
+  fitConfidence: string;
+  sizeCompatibility: string;
+  storeMatch: string;
+  fitTags: string[];
+  stylingSummary: string;
+  smartSwaps: OutfitSmartSwap[];
   matchMode: "exact" | "closest";
   shopUrl: string;
 };

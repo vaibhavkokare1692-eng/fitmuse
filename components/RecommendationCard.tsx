@@ -189,6 +189,23 @@ export function RecommendationCard({
         </div>
       </div>
 
+      <div className="mt-3 grid gap-3 px-2 sm:grid-cols-2">
+        {[
+          { label: "Occasion match", value: recommendation.occasionMatch },
+          { label: "Style match", value: recommendation.styleMatch },
+          { label: "Fit confidence", value: recommendation.fitConfidence },
+          { label: "Store match", value: recommendation.storeMatch },
+        ].map((item) => (
+          <div
+            key={item.label}
+            className="rounded-[1.2rem] border border-line/70 bg-background/78 px-4 py-3"
+          >
+            <p className="mini-label">{item.label}</p>
+            <p className="mt-2 text-sm text-foreground">{item.value}</p>
+          </div>
+        ))}
+      </div>
+
       <div className="flex flex-1 flex-col p-2 pt-5">
         <div className="flex flex-wrap gap-2">
           {recommendation.colorPalette.map((color) => (
@@ -212,9 +229,25 @@ export function RecommendationCard({
             {recommendation.budgetMatchLabel}
           </span>
           <span className="inline-flex items-center rounded-full border border-line/70 bg-white/82 px-3 py-2 text-xs font-semibold text-foreground">
+            {recommendation.colorHarmony}
+          </span>
+          <span className="inline-flex items-center rounded-full border border-line/70 bg-white/82 px-3 py-2 text-xs font-semibold text-foreground">
+            {recommendation.sizeCompatibility}
+          </span>
+          <span className="inline-flex items-center rounded-full border border-line/70 bg-white/82 px-3 py-2 text-xs font-semibold text-foreground">
             {recommendation.matchQualityLabel}
           </span>
         </div>
+
+        {recommendation.fitTags.length > 0 ? (
+          <div className="mt-3 flex flex-wrap gap-2">
+            {recommendation.fitTags.map((tag) => (
+              <span key={tag} className="chip">
+                {tag}
+              </span>
+            ))}
+          </div>
+        ) : null}
 
         <div className="mt-5 grid gap-3 sm:grid-cols-2">
           {topReasons.map((reason) => (
@@ -223,6 +256,11 @@ export function RecommendationCard({
               <p className="mt-3 text-sm leading-6 text-foreground">{reason}</p>
             </div>
           ))}
+        </div>
+
+        <div className="mt-5 rounded-[1.5rem] border border-line/70 bg-white/80 p-5">
+          <p className="mini-label">Why this outfit works</p>
+          <p className="mt-3 text-sm leading-6 text-foreground">{recommendation.stylingSummary}</p>
         </div>
 
         <div className="mt-5 grid gap-3">
@@ -250,6 +288,19 @@ export function RecommendationCard({
             <ChevronDown size={16} />
           </summary>
           <div className="mt-4 grid gap-4">
+            <div className="grid gap-3 md:grid-cols-2">
+              {recommendation.priceBreakdown.map((lineItem) => (
+                <div key={`${recommendation.id}-${lineItem.label}`} className="note-card">
+                  <p className="mini-label">{lineItem.label}</p>
+                  <div className="mt-2 flex items-start justify-between gap-3">
+                    <p className="text-sm leading-6 text-foreground">{lineItem.itemName}</p>
+                    <p className="text-sm font-semibold text-foreground">
+                      {formatCurrency(lineItem.price)}
+                    </p>
+                  </div>
+                </div>
+              ))}
+            </div>
             <div>
               <p className="mini-label">Full match reasons</p>
               <div className="mt-3 flex flex-wrap gap-2">
@@ -276,6 +327,28 @@ export function RecommendationCard({
             </div>
           </div>
         </details>
+
+        {recommendation.smartSwaps.length > 0 ? (
+          <div className="mt-5 rounded-[1.5rem] border border-line/70 bg-white/78 p-5">
+            <p className="mini-label">Smart swaps</p>
+            <div className="mt-4 grid gap-3 md:grid-cols-2">
+              {recommendation.smartSwaps.map((swap) => (
+                <div key={`${recommendation.id}-${swap.type}`} className="note-card">
+                  <p className="mini-label">{swap.label}</p>
+                  <p className="mt-2 text-sm font-medium text-foreground">{swap.suggestion}</p>
+                  <p className="mt-2 text-sm leading-6 text-foreground">{swap.reason}</p>
+                  {typeof swap.priceDelta === "number" ? (
+                    <p className="mt-2 text-xs font-semibold uppercase tracking-[0.18em] text-muted">
+                      {swap.priceDelta > 0
+                        ? `+${formatCurrency(swap.priceDelta)}`
+                        : `-${formatCurrency(Math.abs(swap.priceDelta))}`}
+                    </p>
+                  ) : null}
+                </div>
+              ))}
+            </div>
+          </div>
+        ) : null}
 
         <div className="mt-6 flex flex-wrap gap-3">
           <ShoppingLinksButton className="cta-secondary" testId={`shop-look-${recommendation.id}`} />

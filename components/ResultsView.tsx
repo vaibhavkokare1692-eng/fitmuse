@@ -55,6 +55,7 @@ type ResultsViewProps = {
 
 type ResultsSort = "best-match" | "lowest-price" | "highest-confidence" | "creator-ready";
 type ResultsViewMode = "all" | "saved";
+type BudgetViewMode = "balanced" | "stay-under";
 
 type ResultsFilters = {
   aesthetic: Aesthetic | "";
@@ -155,6 +156,13 @@ function mergeLeadingValue(primary: string, source: string) {
   return Array.from(new Set(values)).join(", ");
 }
 
+function splitDisplayValues(value?: string) {
+  return (value ?? "")
+    .split(",")
+    .map((entry) => entry.trim())
+    .filter(Boolean);
+}
+
 function getActiveFilterChips(
   filters: ResultsFilters,
   stylePreference: QuizAnswers["stylePreference"] = "",
@@ -249,6 +257,76 @@ function formatSavedAt(savedAt: string) {
   })}`;
 }
 
+function describeBudgetPersonality(budgetRange?: BudgetRange | "") {
+  if (budgetRange === "under $100") {
+    return "value-first and practical";
+  }
+
+  if (budgetRange === "$100-$200") {
+    return "budget-conscious with room for one polished upgrade";
+  }
+
+  if (budgetRange === "$200-$350") {
+    return "balanced premium without overspending";
+  }
+
+  if (budgetRange === "$350+") {
+    return "premium-flexible and quality-led";
+  }
+
+  return "open-budget and flexible";
+}
+
+function describeColorMood(preferredColors: string[]) {
+  if (preferredColors.length === 0) {
+    return "open palette";
+  }
+
+  if (preferredColors.length === 1) {
+    return `${formatOptionLabel(preferredColors[0])} focus`;
+  }
+
+  return `${preferredColors.slice(0, 3).map(formatOptionLabel).join(", ")} mood`;
+}
+
+function describeSizeFitNotes(answers: QuizAnswers) {
+  const notes = [
+    answers.fitPreference ? `${formatOptionLabel(answers.fitPreference)} fit` : "",
+    answers.topSize ? `top ${answers.topSize}` : "",
+    answers.bottomSize ? `bottom ${answers.bottomSize}` : "",
+    answers.shoeSize ? `shoe ${answers.shoeSize}` : "",
+  ].filter(Boolean);
+
+  return notes.length > 0 ? notes.join(" • ") : "Open sizing notes";
+}
+
+function buildStyleDnaSummary(
+  answers: QuizAnswers,
+  preferredColors: string[],
+  preferredStores: string[],
+) {
+  const aesthetic = answers.aesthetic
+    ? `${formatAestheticLabel(answers.aesthetic, answers.stylePreference).toLowerCase()} base`
+    : "flexible aesthetic base";
+  const fit = answers.fitPreference
+    ? `${formatOptionLabel(answers.fitPreference).toLowerCase()} fit`
+    : "open fit direction";
+  const colorMood =
+    preferredColors.length > 0
+      ? `${preferredColors.slice(0, 3).map((color) => formatOptionLabel(color).toLowerCase()).join(", ")} colors`
+      : "an open color palette";
+  const stores =
+    preferredStores.length > 0
+      ? `${preferredStores.slice(0, 2).join(" + ")} store mix`
+      : "an open store mix";
+  const occasion =
+    answers.occasion && answers.occasion !== "daily wear"
+      ? `${getOccasionResultsDescriptor(answers.occasion)} flexibility`
+      : "everyday flexibility";
+
+  return `Your Style DNA: ${aesthetic}, ${fit}, ${colorMood}, ${stores}, and ${occasion}.`;
+}
+
 export function ResultsView({ searchParamsObject = {} }: ResultsViewProps) {
   const router = useRouter();
   const searchSignature = useMemo(() => JSON.stringify(searchParamsObject), [searchParamsObject]);
@@ -260,11 +338,15 @@ export function ResultsView({ searchParamsObject = {} }: ResultsViewProps) {
     return hasQuizAnswers(normalized) ? normalized : null;
   }, [searchSignature]);
 
-  const [quizAnswers, setQuizAnswers] = useState<QuizAnswers | null>(searchAnswers);
-  const [savedLooks, setSavedLooks] = useState<SavedLookSnapshot[]>([]);
+  const [localQuizAnswers, setLocalQuizAnswers] = useState<QuizAnswers | null>(() =>
+    searchAnswers ?? readStoredQuizAnswers(),
+  );
+  const quizAnswers = searchAnswers ?? localQuizAnswers;
+  const [savedLooks, setSavedLooks] = useState<SavedLookSnapshot[]>(() => readSavedLooks());
   const [filters, setFilters] = useState<ResultsFilters>(buildBaseFilters(searchAnswers));
   const [sort, setSort] = useState<ResultsSort>("best-match");
   const [viewMode, setViewMode] = useState<ResultsViewMode>("all");
+  const [budgetViewMode, setBudgetViewMode] = useState<BudgetViewMode>("balanced");
   const [selectedSavedLookId, setSelectedSavedLookId] = useState<string | null>(null);
   const [selectedRealPackId, setSelectedRealPackId] = useState<string | null>(null);
   const [highlightedLookId, setHighlightedLookId] = useState<string | null>(null);
@@ -276,18 +358,9 @@ export function ResultsView({ searchParamsObject = {} }: ResultsViewProps) {
 
   useEffect(() => {
     if (searchAnswers && hasQuizAnswers(searchAnswers)) {
-      setQuizAnswers(searchAnswers);
       writeStoredQuizAnswers(searchAnswers);
-      return;
     }
-
-    const stored = readStoredQuizAnswers();
-    setQuizAnswers(stored && hasQuizAnswers(stored) ? stored : null);
   }, [searchAnswers]);
-
-  useEffect(() => {
-    setSavedLooks(readSavedLooks());
-  }, []);
 
   useEffect(() => {
     const nextKey = [
@@ -305,6 +378,7 @@ export function ResultsView({ searchParamsObject = {} }: ResultsViewProps) {
     filtersSeedRef.current = nextKey;
     setFilters((current) => (sameFilters(current, nextFilters) ? current : nextFilters));
   }, [
+    quizAnswers,
     quizAnswers?.aesthetic,
     quizAnswers?.occasion,
     quizAnswers?.budgetRange,
@@ -364,6 +438,15 @@ export function ResultsView({ searchParamsObject = {} }: ResultsViewProps) {
     () => sortRecommendations(filteredRecommendations, sort),
     [filteredRecommendations, sort],
   );
+  const visibleRecommendations = useMemo(() => {
+    if (budgetViewMode === "stay-under") {
+      return sortedRecommendations.filter(
+        (recommendation) => recommendation.budgetMatchLabel === "Within budget",
+      );
+    }
+
+    return sortedRecommendations;
+  }, [budgetViewMode, sortedRecommendations]);
 
   const savedRecommendations = useMemo(
     () =>
@@ -396,29 +479,31 @@ export function ResultsView({ searchParamsObject = {} }: ResultsViewProps) {
         };
       })
       .filter((pack) => pack.products.length > 0);
-  }, [
-    quizAnswers?.aesthetic,
-    quizAnswers?.budgetRange,
-    quizAnswers?.occasion,
-    quizAnswers?.stylePreference,
-  ]);
+  }, [quizAnswers]);
 
   const savedLookIds = useMemo(() => savedRecommendations.map((savedLook) => savedLook.id), [
     savedRecommendations,
   ]);
 
   const activeFilterChips = getActiveFilterChips(filters, quizAnswers?.stylePreference ?? "");
-  const weakRecommendationCount = sortedRecommendations.filter(
+  const weakRecommendationCount = visibleRecommendations.filter(
     (recommendation) => recommendation.confidenceScore < 55,
   ).length;
   const isClosestOnly =
-    sortedRecommendations.length > 0 &&
-    weakRecommendationCount >= Math.ceil(sortedRecommendations.length * 0.6);
+    visibleRecommendations.length > 0 &&
+    weakRecommendationCount >= Math.ceil(visibleRecommendations.length * 0.6);
   const resultsDescriptor = getOccasionResultsDescriptor(
     filters.occasion || quizAnswers?.occasion || "",
   );
   const preferredColors = splitCommaSeparated(quizAnswers?.preferredColors);
-  const preferredStores = splitCommaSeparated(quizAnswers?.storesLike);
+  const preferredStores = splitDisplayValues(quizAnswers?.storesLike);
+  const topRecommendation = visibleRecommendations[0] ?? sortedRecommendations[0] ?? null;
+  const styleDnaSummary = quizAnswers
+    ? buildStyleDnaSummary(quizAnswers, preferredColors, preferredStores)
+    : "";
+  const budgetPersonality = describeBudgetPersonality(quizAnswers?.budgetRange ?? "");
+  const colorMood = describeColorMood(preferredColors);
+  const fitSizeNotes = quizAnswers ? describeSizeFitNotes(quizAnswers) : "Open sizing notes";
   const selectedSavedLook = useMemo(
     () =>
       selectedSavedLookId
@@ -521,7 +606,7 @@ export function ResultsView({ searchParamsObject = {} }: ResultsViewProps) {
 
   function handleStartNewQuiz() {
     clearStoredQuizAnswers();
-    setQuizAnswers(null);
+    setLocalQuizAnswers(null);
     setFilters(buildBaseFilters(null));
     router.push("/quiz");
   }
@@ -538,6 +623,7 @@ export function ResultsView({ searchParamsObject = {} }: ResultsViewProps) {
 
     setSelectedSavedLookId(null);
     setViewMode("all");
+    setBudgetViewMode("balanced");
     setPendingOpenSavedLookId(savedLookId);
     setFilters((current) => {
       const next = buildBaseFilters(quizAnswers);
@@ -550,27 +636,29 @@ export function ResultsView({ searchParamsObject = {} }: ResultsViewProps) {
       return;
     }
 
-    if (sortedRecommendations.some((recommendation) => recommendation.id === pendingOpenSavedLookId)) {
-      if (highlightLookCard(pendingOpenSavedLookId)) {
-        setPendingOpenSavedLookId(null);
+    const timeoutId = window.setTimeout(() => {
+      if (
+        sortedRecommendations.some(
+          (recommendation) => recommendation.id === pendingOpenSavedLookId,
+        )
+      ) {
+        if (highlightLookCard(pendingOpenSavedLookId)) {
+          setPendingOpenSavedLookId(null);
+        }
+
+        return;
       }
 
-      return;
-    }
+      if (recommendations.length === 0) {
+        return;
+      }
 
-    if (recommendations.length === 0) {
-      return;
-    }
+      setTemporarySavedLooksMessage("This saved look is not part of your current results set.");
+      setPendingOpenSavedLookId(null);
+    }, 0);
 
-    setTemporarySavedLooksMessage("This saved look is not part of your current results set.");
-    setPendingOpenSavedLookId(null);
+    return () => window.clearTimeout(timeoutId);
   }, [pendingOpenSavedLookId, recommendations, sortedRecommendations, viewMode]);
-
-  useEffect(() => {
-    if (selectedSavedLookId && !savedLooks.some((savedLook) => savedLook.id === selectedSavedLookId)) {
-      setSelectedSavedLookId(null);
-    }
-  }, [savedLooks, selectedSavedLookId]);
 
   useEffect(() => {
     return () => {
@@ -659,7 +747,7 @@ export function ResultsView({ searchParamsObject = {} }: ResultsViewProps) {
             {savedRecommendations.length} saved {savedRecommendations.length === 1 ? "look" : "looks"}
           </span>
           {viewMode === "all" ? (
-            <span className="pill">{sortedRecommendations.length} ranked recommendations</span>
+            <span className="pill">{visibleRecommendations.length} ranked recommendations</span>
           ) : null}
         </div>
 
@@ -763,6 +851,43 @@ export function ResultsView({ searchParamsObject = {} }: ResultsViewProps) {
                     ),
                   )}
                 </div>
+              </div>
+
+              <div className="rounded-[1.5rem] border border-white/12 bg-white/10 p-5">
+                <p className="mini-label !text-white/62">Style DNA</p>
+                <p className="mt-3 text-sm leading-6 text-white/82">{styleDnaSummary}</p>
+                <div className="mt-4 grid gap-3 sm:grid-cols-2">
+                  <div className="rounded-[1.2rem] border border-white/10 bg-black/10 p-4">
+                    <p className="mini-label !text-white/58">Budget personality</p>
+                    <p className="mt-2 text-sm text-white/92">{budgetPersonality}</p>
+                  </div>
+                  <div className="rounded-[1.2rem] border border-white/10 bg-black/10 p-4">
+                    <p className="mini-label !text-white/58">Preferred color mood</p>
+                    <p className="mt-2 text-sm text-white/92">{colorMood}</p>
+                  </div>
+                  <div className="rounded-[1.2rem] border border-white/10 bg-black/10 p-4">
+                    <p className="mini-label !text-white/58">Avoided colors</p>
+                    <p className="mt-2 text-sm text-white/92">
+                      {quizAnswers.avoidColors
+                        ? splitCommaSeparated(quizAnswers.avoidColors)
+                            .map((color) => formatOptionLabel(color))
+                            .join(", ")
+                        : "None set"}
+                    </p>
+                  </div>
+                  <div className="rounded-[1.2rem] border border-white/10 bg-black/10 p-4">
+                    <p className="mini-label !text-white/58">Size / fit notes</p>
+                    <p className="mt-2 text-sm text-white/92">{fitSizeNotes}</p>
+                  </div>
+                </div>
+                {topRecommendation ? (
+                  <div className="mt-4 rounded-[1.2rem] border border-white/10 bg-black/12 p-4">
+                    <p className="mini-label !text-white/58">Styling summary</p>
+                    <p className="mt-2 text-sm leading-6 text-white/88">
+                      {topRecommendation.stylingSummary}
+                    </p>
+                  </div>
+                ) : null}
               </div>
             </motion.div>
 
@@ -934,17 +1059,43 @@ export function ResultsView({ searchParamsObject = {} }: ResultsViewProps) {
                       Keep the grid focused on the kind of result you want first.
                     </p>
                   </div>
-                  <select
-                    value={sort}
-                    onChange={(event) => setSort(event.target.value as ResultsSort)}
-                    className="filter-select max-w-xs"
-                  >
-                    {sortOptions.map((option) => (
-                      <option key={option.value} value={option.value}>
-                        {option.label}
-                      </option>
-                    ))}
-                  </select>
+                  <div className="flex flex-wrap items-center gap-3">
+                    <div className="inline-flex rounded-full border border-line/70 bg-white/82 p-1">
+                      <button
+                        type="button"
+                        onClick={() => setBudgetViewMode("balanced")}
+                        className={`rounded-full px-3 py-2 text-xs font-semibold transition ${
+                          budgetViewMode === "balanced"
+                            ? "bg-foreground text-white"
+                            : "text-foreground"
+                        }`}
+                      >
+                        Balanced mix
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setBudgetViewMode("stay-under")}
+                        className={`rounded-full px-3 py-2 text-xs font-semibold transition ${
+                          budgetViewMode === "stay-under"
+                            ? "bg-foreground text-white"
+                            : "text-foreground"
+                        }`}
+                      >
+                        Stay under budget
+                      </button>
+                    </div>
+                    <select
+                      value={sort}
+                      onChange={(event) => setSort(event.target.value as ResultsSort)}
+                      className="filter-select max-w-xs"
+                    >
+                      {sortOptions.map((option) => (
+                        <option key={option.value} value={option.value}>
+                          {option.label}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
                 </div>
               </div>
             </motion.div>
@@ -973,8 +1124,8 @@ export function ResultsView({ searchParamsObject = {} }: ResultsViewProps) {
             <div>
               <p className="eyebrow !mb-0">Results</p>
               <h2 className="mt-3 text-4xl text-foreground">
-                {sortedRecommendations.length} {resultsDescriptor}{" "}
-                {sortedRecommendations.length === 1 ? "look" : "looks"} ranked for your brief.
+                {visibleRecommendations.length} {resultsDescriptor}{" "}
+                {visibleRecommendations.length === 1 ? "look" : "looks"} ranked for your brief.
               </h2>
               <p className="mt-3 max-w-2xl">
                 FitMuse is balancing fit, occasion, colors, stores, spend range, and style intelligence using the current curated mock catalog.
@@ -983,26 +1134,42 @@ export function ResultsView({ searchParamsObject = {} }: ResultsViewProps) {
             <div className="flex flex-wrap gap-2">
               <span className="pill">{sortOptions.find((option) => option.value === sort)?.label}</span>
               {filters.maxBudget ? <span className="pill">{formatOptionLabel(filters.maxBudget)}</span> : null}
+              <span className="pill">
+                {budgetViewMode === "stay-under" ? "Stay under budget" : "Balanced mix"}
+              </span>
             </div>
           </div>
 
-          {sortedRecommendations.length === 0 ? (
+          {visibleRecommendations.length === 0 ? (
             <div className="glass-panel p-6 sm:p-8">
               <p className="mini-label">No looks in current filter mix</p>
               <h2 className="mt-3 text-4xl text-foreground">Try widening one filter to bring more looks back.</h2>
               <p className="mt-4 max-w-2xl">
-                The recommendation engine still has mock inventory, but the current combination of store, color family, fit, and budget is too narrow.
+                {budgetViewMode === "stay-under"
+                  ? "The current brief has no fully within-budget looks under this filter mix. Switch back to Balanced mix to see the closest near-budget options too."
+                  : "The recommendation engine still has mock inventory, but the current combination of store, color family, fit, and budget is too narrow."}
               </p>
               <div className="mt-6">
-                <button type="button" onClick={resetFiltersToBrief} className="cta-primary">
-                  Reset to brief
-                </button>
+                <div className="flex flex-wrap gap-3">
+                  <button type="button" onClick={resetFiltersToBrief} className="cta-primary">
+                    Reset to brief
+                  </button>
+                  {budgetViewMode === "stay-under" ? (
+                    <button
+                      type="button"
+                      onClick={() => setBudgetViewMode("balanced")}
+                      className="cta-secondary"
+                    >
+                      View balanced mix
+                    </button>
+                  ) : null}
+                </div>
               </div>
             </div>
           ) : (
             <>
               <div className="grid gap-6 xl:grid-cols-2">
-                {sortedRecommendations.map((recommendation) => (
+                {visibleRecommendations.map((recommendation) => (
                   <RecommendationCard
                     key={recommendation.id}
                     cardId={`look-${recommendation.id}`}

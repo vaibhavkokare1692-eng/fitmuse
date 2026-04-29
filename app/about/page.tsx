@@ -15,9 +15,8 @@ export default function AboutPage() {
             Personal styling should feel useful, modern, and affordable.
           </h1>
           <p className="mt-5 max-w-2xl text-lg leading-8">
-            FitMuse was created to help creators, influencers, students, and young professionals
-            find outfits faster, feel more confident, and stop wasting time on endless product
-            searches.
+            FitMuse was created to help people build believable complete outfits faster, feel more
+            confident, and stop wasting time on endless product searches.
           </p>
         </div>
 
@@ -40,8 +39,8 @@ export default function AboutPage() {
             text: "Good styling should not be locked behind expensive services or confusing shopping experiences.",
           },
           {
-            title: "Creator-first utility",
-            text: "Small creators need fresh outfits often, especially for reels, shoots, collabs, events, and content days.",
+            title: "Intent-first utility",
+            text: "Start with the plan, budget, stores, fit, and occasion instead of uploading your whole closet first.",
           },
           {
             title: "Faster confidence",
@@ -63,7 +62,7 @@ export default function AboutPage() {
             <h2 className="mt-4 text-4xl text-white">See how the styling brief actually works.</h2>
             <p className="mt-4 max-w-2xl text-white/76">
               The quiz is the clearest way to understand the product: measurements, aesthetic,
-              occasion, budget, then a creator-ready outfit pack.
+              occasion, budget, and store preferences translated into complete outfit boards.
             </p>
           </div>
 
