@@ -34,6 +34,12 @@ type Scenario = {
     noCreatorCopy?: boolean;
     avoidUtilitySignals?: boolean;
     requireVerticalLineSignal?: boolean;
+    requireSmartSwaps?: boolean;
+    requireOfficeSignals?: boolean;
+    requireTravelSignals?: boolean;
+    requireCreatorSignals?: boolean;
+    requireOldMoneySignals?: boolean;
+    avoidPetiteBagIssue?: boolean;
   };
 };
 
@@ -47,6 +53,7 @@ type ScenarioResult = {
   budgetLabelMismatchCount: number;
   averageConfidence: number;
   fallbackWarning: boolean;
+  styleDnaSummary: string;
   warnings: string[];
   criticalIssues: string[];
 };
@@ -80,6 +87,8 @@ const keyScenarios: Scenario[] = [
       maxStretch: 2,
       noFallback: true,
       noCreatorCopy: true,
+      requireOldMoneySignals: true,
+      requireSmartSwaps: true,
     },
   },
   {
@@ -107,6 +116,7 @@ const keyScenarios: Scenario[] = [
       noFallback: true,
       noCreatorCopy: true,
       avoidUtilitySignals: true,
+      requireSmartSwaps: true,
     },
   },
   {
@@ -134,6 +144,8 @@ const keyScenarios: Scenario[] = [
       noFallback: true,
       noCreatorCopy: true,
       requireVerticalLineSignal: true,
+      requireSmartSwaps: true,
+      avoidPetiteBagIssue: true,
     },
   },
   {
@@ -160,6 +172,8 @@ const keyScenarios: Scenario[] = [
       maxStretch: 2,
       noFallback: true,
       noCreatorCopy: true,
+      requireOfficeSignals: true,
+      requireSmartSwaps: true,
     },
   },
   {
@@ -186,6 +200,8 @@ const keyScenarios: Scenario[] = [
       maxStretch: 2,
       noFallback: true,
       noCreatorCopy: true,
+      requireTravelSignals: true,
+      requireSmartSwaps: true,
     },
   },
   {
@@ -212,6 +228,53 @@ const keyScenarios: Scenario[] = [
       maxStretch: 2,
       noFallback: true,
       noCreatorCopy: true,
+      requireTravelSignals: true,
+      requireSmartSwaps: true,
+    },
+  },
+  {
+    label: "Creator Photoshoot $200-$350",
+    key: true,
+    brief: {
+      stylePreference: "mixed / open to all",
+      aesthetic: "creator/photoshoot",
+      occasion: "photoshoot",
+      budgetRange: "$200-$350",
+      fitPreference: "regular",
+      location: "United States",
+      height: "5'8\"",
+      topSize: "M",
+      bottomSize: "M",
+      shoeSize: "10",
+      preferredColors: "cream, charcoal, plum",
+      avoidColors: "neon green",
+      storesLike: "ASOS, Zara, Mango",
+    },
+    expectations: {
+      descriptor: "creator-ready",
+      mostlyWithinOrNear: true,
+      maxStretch: 2,
+      requireCreatorSignals: true,
+      requireSmartSwaps: true,
+    },
+  },
+  {
+    label: "Under $100 Common Scenario",
+    key: true,
+    brief: {
+      stylePreference: "mixed / open to all",
+      aesthetic: "smart casual",
+      occasion: "daily wear",
+      budgetRange: "under $100",
+      fitPreference: "regular",
+      location: "United States",
+      height: "5'7\"",
+      topSize: "M",
+      bottomSize: "M",
+      shoeSize: "9",
+      preferredColors: "stone, cream",
+      avoidColors: "neon green",
+      storesLike: "H&M, Target, Uniqlo",
     },
   },
 ];
@@ -409,6 +472,134 @@ const matrixTemplates: Array<Omit<Scenario, "brief"> & { brief: Omit<Scenario["b
       storesLike: "ASOS, Nike, Adidas",
     },
   },
+  {
+    label: "Matrix Androgynous Quiet Luxury Office",
+    brief: {
+      stylePreference: "androgynous",
+      aesthetic: "luxury neutral",
+      occasion: "office",
+      location: "United States",
+      height: "6'1\"",
+      topSize: "M",
+      bottomSize: "M",
+      shoeSize: "11",
+      preferredColors: "cream, charcoal, stone",
+      avoidColors: "neon green",
+      storesLike: "COS, Uniqlo, Mango",
+    },
+  },
+  {
+    label: "Matrix Androgynous Streetwear Reels",
+    brief: {
+      stylePreference: "androgynous",
+      aesthetic: "streetwear",
+      occasion: "reels",
+      location: "United States",
+      height: "5'9\"",
+      topSize: "M",
+      bottomSize: "M",
+      shoeSize: "10",
+      preferredColors: "charcoal, stone, plum",
+      avoidColors: "neon green",
+      storesLike: "ASOS, Adidas, Nike",
+    },
+  },
+  {
+    label: "Matrix Masculine Gym Casual College",
+    brief: {
+      stylePreference: "masculine",
+      aesthetic: "gym casual",
+      occasion: "college",
+      location: "United States",
+      height: "5'11\"",
+      topSize: "L",
+      bottomSize: "M",
+      shoeSize: "11",
+      preferredColors: "stone, navy, charcoal",
+      avoidColors: "neon green",
+      storesLike: "Nike, Adidas, Amazon Fashion",
+    },
+  },
+  {
+    label: "Matrix Mixed Creator Photoshoot",
+    brief: {
+      stylePreference: "mixed / open to all",
+      aesthetic: "creator/photoshoot",
+      occasion: "photoshoot",
+      location: "United States",
+      height: "5'8\"",
+      topSize: "M",
+      bottomSize: "M",
+      shoeSize: "10",
+      preferredColors: "cream, charcoal, plum",
+      avoidColors: "neon green",
+      storesLike: "ASOS, Zara, Mango",
+    },
+  },
+  {
+    label: "Matrix Feminine Travel",
+    brief: {
+      stylePreference: "feminine",
+      aesthetic: "travel",
+      occasion: "travel",
+      location: "United States",
+      height: "5'4\"",
+      topSize: "S",
+      bottomSize: "S",
+      shoeSize: "7",
+      preferredColors: "stone, camel, sage",
+      avoidColors: "neon green",
+      storesLike: "Uniqlo, Mango, Zara",
+    },
+  },
+  {
+    label: "Matrix Feminine Old Money Wedding Guest",
+    brief: {
+      stylePreference: "feminine",
+      aesthetic: "old money",
+      occasion: "wedding guest",
+      location: "United States",
+      height: "5'5\"",
+      topSize: "M",
+      bottomSize: "M",
+      shoeSize: "8",
+      preferredColors: "cream, burgundy, camel",
+      avoidColors: "neon green",
+      storesLike: "Mango, Zara, Nordstrom Rack",
+    },
+  },
+  {
+    label: "Matrix Mixed Office Core",
+    brief: {
+      stylePreference: "mixed / open to all",
+      aesthetic: "office",
+      occasion: "office",
+      location: "United States",
+      height: "5'8\"",
+      topSize: "M",
+      bottomSize: "M",
+      shoeSize: "10",
+      preferredColors: "navy, stone, camel",
+      avoidColors: "neon green",
+      storesLike: "COS, Mango, Zara",
+    },
+  },
+  {
+    label: "Matrix Androgynous Minimalist Daily Wear",
+    brief: {
+      stylePreference: "androgynous",
+      aesthetic: "minimalist",
+      occasion: "daily wear",
+      location: "United States",
+      height: "5'8\"",
+      topSize: "M",
+      bottomSize: "M",
+      shoeSize: "10",
+      preferredColors: "cream, navy, stone",
+      avoidColors: "neon green",
+      storesLike: "Uniqlo, COS, Mango",
+    },
+  },
 ];
 
 const matrixScenarios: Scenario[] = matrixTemplates.flatMap((template) =>
@@ -541,6 +732,17 @@ function hasSavedSnapshotShapeIssue(recommendation?: OutfitRecommendation) {
     recommendation.items.top &&
     recommendation.items.bottom &&
     recommendation.items.shoes &&
+    Array.isArray(recommendation.priceBreakdown) &&
+    recommendation.priceBreakdown.length >= 3 &&
+    typeof recommendation.occasionMatch === "string" &&
+    typeof recommendation.styleMatch === "string" &&
+    typeof recommendation.colorHarmony === "string" &&
+    typeof recommendation.fitConfidence === "string" &&
+    typeof recommendation.sizeCompatibility === "string" &&
+    typeof recommendation.storeMatch === "string" &&
+    Array.isArray(recommendation.fitTags) &&
+    typeof recommendation.stylingSummary === "string" &&
+    Array.isArray(recommendation.smartSwaps) &&
     recommendation.budgetMatchLabel &&
     recommendation.budgetNote &&
     Array.isArray(recommendation.matchReasons) &&
@@ -548,9 +750,128 @@ function hasSavedSnapshotShapeIssue(recommendation?: OutfitRecommendation) {
   );
 }
 
+function buildStyleDnaSummary(brief: QuizAnswers) {
+  const colorValues = brief.preferredColors
+    .split(",")
+    .map((entry) => entry.trim())
+    .filter(Boolean);
+  const storeValues = brief.storesLike
+    .split(",")
+    .map((entry) => entry.trim())
+    .filter(Boolean);
+  const aesthetic = brief.aesthetic
+    ? `${formatAestheticLabel(brief.aesthetic, brief.stylePreference).toLowerCase()} base`
+    : "flexible aesthetic base";
+  const fit = brief.fitPreference ? `${brief.fitPreference.toLowerCase()} fit` : "open fit direction";
+  const colors = colorValues.length > 0 ? `${colorValues.slice(0, 3).join(", ").toLowerCase()} colors` : "open palette";
+  const stores = storeValues.length > 0 ? `${storeValues.slice(0, 2).join(" + ")} stores` : "open-store mix";
+  const occasion =
+    brief.occasion && brief.occasion !== "daily wear"
+      ? `${getOccasionResultsDescriptor(brief.occasion)} flexibility`
+      : "everyday flexibility";
+
+  return `Your Style DNA: ${aesthetic}, ${fit}, ${colors}, ${stores}, and ${occasion}.`;
+}
+
+function hasOldMoneyMismatch(recommendations: OutfitRecommendation[]) {
+  return recommendations.slice(0, 5).some((recommendation) => {
+    const text = [
+      recommendation.items.top.name,
+      recommendation.items.bottom.name,
+      recommendation.items.shoes.name,
+      recommendation.items.accessory?.name ?? "",
+      recommendation.items.outerwear?.name ?? "",
+      recommendation.fitNote,
+      recommendation.whyItWorks,
+    ]
+      .join(" ")
+      .toLowerCase();
+
+    return ["graphic", "logo", "chunky sneaker", "chunky", "distressed", "cargo"].some((signal) =>
+      text.includes(signal),
+    );
+  });
+}
+
+function hasOfficeMismatch(recommendations: OutfitRecommendation[]) {
+  return recommendations.slice(0, 5).some((recommendation) => {
+    const text = [
+      recommendation.items.top.name,
+      recommendation.items.bottom.name,
+      recommendation.items.shoes.name,
+      recommendation.items.accessory?.name ?? "",
+      recommendation.items.outerwear?.name ?? "",
+      recommendation.fitNote,
+      recommendation.whyItWorks,
+      ...recommendation.matchReasons,
+      ...recommendation.fitTags,
+    ]
+      .join(" ")
+      .toLowerCase();
+
+    return ["party", "club", "gym", "runner", "cargo short", "mesh"].some((signal) =>
+      text.includes(signal),
+    );
+  });
+}
+
+function hasTravelSignal(recommendations: OutfitRecommendation[]) {
+  return recommendations.some((recommendation) => {
+    const text = [
+      recommendation.fitNote,
+      recommendation.whyItWorks,
+      recommendation.creatorUseCase,
+      ...recommendation.matchReasons,
+      ...recommendation.fitTags,
+      recommendation.items.shoes.name,
+      recommendation.items.outerwear?.name ?? "",
+    ]
+      .join(" ")
+      .toLowerCase();
+
+    return ["travel", "comfortable", "comfort", "lightweight", "sneaker", "layer", "low-maintenance"].some(
+      (signal) => text.includes(signal),
+    );
+  });
+}
+
+function hasCreatorSignal(recommendations: OutfitRecommendation[]) {
+  return recommendations.some((recommendation) => {
+    const text = [
+      recommendation.creatorUseCase,
+      recommendation.whyItWorks,
+      ...recommendation.matchReasons,
+    ]
+      .join(" ")
+      .toLowerCase();
+
+    return ["creator", "photoshoot", "reels", "brand content", "on-camera", "on camera"].some(
+      (signal) => text.includes(signal),
+    );
+  });
+}
+
+function hasPetiteBagIssue(recommendations: OutfitRecommendation[]) {
+  return recommendations.some((recommendation) => {
+    const text = [
+      recommendation.items.accessory?.name ?? "",
+      recommendation.items.outerwear?.name ?? "",
+      recommendation.fitNote,
+      recommendation.whyItWorks,
+    ]
+      .join(" ")
+      .toLowerCase();
+
+    return ["oversized tote", "huge tote", "oversized bag", "giant bag"].some((signal) =>
+      text.includes(signal),
+    );
+  });
+}
+
 function analyzeScenario(scenario: Scenario): ScenarioResult {
   const brief = createScenarioBrief(scenario.brief);
   const recommendations = buildOutfitRecommendations(brief, 10);
+  const styleDnaSummary = buildStyleDnaSummary(brief);
   const budgetCap = budgetCapFromRange(brief.budgetRange);
   const budgetCounts = getBudgetCounts(recommendations, budgetCap);
   const averageConfidence =
@@ -575,7 +896,16 @@ function analyzeScenario(scenario: Scenario): ScenarioResult {
       recommendation.whyItWorks,
       recommendation.budgetMatchLabel,
       recommendation.budgetNote,
+      recommendation.occasionMatch,
+      recommendation.styleMatch,
+      recommendation.colorHarmony,
+      recommendation.fitConfidence,
+      recommendation.sizeCompatibility,
+      recommendation.storeMatch,
+      recommendation.stylingSummary,
       ...recommendation.matchReasons,
+      ...recommendation.fitTags,
+      ...recommendation.smartSwaps.flatMap((swap) => [swap.label, swap.suggestion, swap.reason]),
       recommendation.items.top.name,
       recommendation.items.bottom.name,
       recommendation.items.shoes.name,
@@ -590,7 +920,7 @@ function analyzeScenario(scenario: Scenario): ScenarioResult {
   }
 
   if (budgetCounts.overBudget === recommendations.length && recommendations.length > 0) {
-    if (budgetCap && budgetCap <= 100 && !scenario.key) {
+    if (budgetCap && budgetCap <= 100) {
       warnings.push(
         "Every recommendation is over budget for this under-$100 scenario. Review whether the catalog needs more true entry-budget outfit combinations.",
       );
@@ -612,12 +942,28 @@ function analyzeScenario(scenario: Scenario): ScenarioResult {
     warnings.push("Too many stretch-upgrade results are showing for this scenario.");
   }
 
+  if (
+    recommendations.length > 0 &&
+    budgetCap &&
+    budgetCap <= 200 &&
+    budgetCounts.withinBudget === 0 &&
+    budgetCounts.nearBudget === 0
+  ) {
+    if (budgetCap <= 100) {
+      warnings.push(
+        "No within-budget or near-budget options were returned here. The under-$100 catalog still needs stronger core outfit coverage.",
+      );
+    } else {
+      criticalIssues.push("No within-budget or near-budget options were returned for a common lower-budget scenario.");
+    }
+  }
+
   if (budgetCounts.budgetLabelMismatchCount > 0) {
     criticalIssues.push("One or more recommendation budget labels do not match the computed budget classification.");
   }
 
-  if (brief.stylePreference === "masculine" && visibleText.includes("clean girl")) {
-    criticalIssues.push("Masculine results still expose the Clean Girl label.");
+  if (brief.stylePreference !== "feminine" && visibleText.includes("clean girl")) {
+    criticalIssues.push("A non-feminine scenario still exposes the Clean Girl label.");
   }
 
   if (brief.stylePreference === "feminine" && /(gentleman|menswear)/.test(visibleText)) {
@@ -628,6 +974,10 @@ function analyzeScenario(scenario: Scenario): ScenarioResult {
     criticalIssues.push(`Occasion descriptor regressed to creator-ready for ${brief.occasion}.`);
   }
 
+  if (["reels", "photoshoot", "brand content"].includes(brief.occasion) && descriptor !== "creator-ready") {
+    criticalIssues.push("Creator-focused occasion did not use creator-ready wording.");
+  }
+
   if (!["reels", "photoshoot", "brand content"].includes(brief.occasion) && hasCreatorCopy(recommendations)) {
     criticalIssues.push("Creator-only copy appeared in a non-creator scenario.");
   }
@@ -636,7 +986,7 @@ function analyzeScenario(scenario: Scenario): ScenarioResult {
     fallbackWarning &&
     ["date", "office", "daily wear", "travel", "party"].includes(brief.occasion)
   ) {
-    if (budgetCap && budgetCap <= 100 && !scenario.key) {
+    if (budgetCap && budgetCap <= 100) {
       warnings.push(
         "Fallback messaging would appear here because the current under-$100 catalog is still thin for this scenario.",
       );
@@ -647,6 +997,34 @@ function analyzeScenario(scenario: Scenario): ScenarioResult {
 
   if (hasSavedSnapshotShapeIssue(recommendations[0])) {
     criticalIssues.push("Recommendation shape would break saved-look snapshots.");
+  }
+
+  if (!styleDnaSummary || !styleDnaSummary.startsWith("Your Style DNA:")) {
+    criticalIssues.push("Style DNA could not be generated from the brief.");
+  }
+
+  if (recommendations.some((recommendation) => recommendation.confidenceScore <= 0 || Number.isNaN(recommendation.confidenceScore))) {
+    criticalIssues.push("One or more recommendations are missing a valid confidence score.");
+  }
+
+  if (recommendations.some((recommendation) => recommendation.matchReasons.length === 0)) {
+    criticalIssues.push("One or more recommendations are missing match reasons.");
+  }
+
+  if (
+    recommendations.some(
+      (recommendation) =>
+        !recommendation.items.top ||
+        !recommendation.items.bottom ||
+        !recommendation.items.shoes ||
+        recommendation.totalPrice <= 0,
+    )
+  ) {
+    criticalIssues.push("One or more recommendations are missing core items or valid prices.");
+  }
+
+  if (new Set(recommendations.map((recommendation) => recommendation.id)).size !== recommendations.length) {
+    criticalIssues.push("Duplicate outfits were returned for the same scenario.");
   }
 
   if (
@@ -696,12 +1074,37 @@ function analyzeScenario(scenario: Scenario): ScenarioResult {
     criticalIssues.push("Petite vertical-line logic did not surface clearly in the result copy or item mix.");
   }
 
+  if (scenario.expectations?.requireSmartSwaps && !recommendations.some((recommendation) => recommendation.smartSwaps.length > 0)) {
+    criticalIssues.push("Smart swaps did not appear where they were expected.");
+  }
+
+  if (scenario.expectations?.requireOfficeSignals && hasOfficeMismatch(recommendations)) {
+    criticalIssues.push("Office results include items or language that feel too party, gym, or club coded.");
+  }
+
+  if (scenario.expectations?.requireTravelSignals && !hasTravelSignal(recommendations)) {
+    criticalIssues.push("Travel results did not surface comfort, layering, or low-maintenance logic clearly enough.");
+  }
+
+  if (scenario.expectations?.requireCreatorSignals && !hasCreatorSignal(recommendations)) {
+    criticalIssues.push("Creator/photoshoot scenario did not surface creator-oriented reasoning.");
+  }
+
+  if (scenario.expectations?.requireOldMoneySignals && hasOldMoneyMismatch(recommendations)) {
+    criticalIssues.push("Old-money results surfaced loud or off-brief style signals too often.");
+  }
+
+  if (scenario.expectations?.avoidPetiteBagIssue && hasPetiteBagIssue(recommendations)) {
+    criticalIssues.push("Petite scenario surfaced oversized bag logic that could overwhelm the frame.");
+  }
+
   return {
     scenario,
     recommendations,
     ...budgetCounts,
     averageConfidence,
     fallbackWarning,
+    styleDnaSummary,
     warnings,
     criticalIssues,
   };
@@ -727,6 +1130,7 @@ for (const result of results) {
       result.scenario.brief.stylePreference,
     )}`,
   );
+  console.log(`Style DNA: ${result.styleDnaSummary}`);
 
   if (result.recommendations[0]) {
     console.log(
@@ -734,6 +1138,9 @@ for (const result of results) {
     );
     console.log(
       `Top match reasons: ${result.recommendations[0].matchReasons.slice(0, 3).join(" | ")}`,
+    );
+    console.log(
+      `Smart swaps: ${result.recommendations[0].smartSwaps.length} | Price breakdown rows: ${result.recommendations[0].priceBreakdown.length}`,
     );
   }
 

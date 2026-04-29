@@ -15,6 +15,7 @@ import {
   useEffect,
   useRef,
   useState,
+  useSyncExternalStore,
   useTransition,
   type ChangeEvent,
   type FormEvent,
@@ -104,13 +105,22 @@ function getStepError(stepIndex: number, values: QuizAnswers) {
 export function QuizForm() {
   const router = useRouter();
   const formSurfaceRef = useRef<HTMLDivElement | null>(null);
-  const [storedBrief] = useState<QuizAnswers | null>(() => readStoredQuizAnswers());
   const [isPending, startTransition] = useTransition();
-  const [hasStoredBrief, setHasStoredBrief] = useState(Boolean(storedBrief));
-  const [showSavedBriefPrompt, setShowSavedBriefPrompt] = useState(Boolean(storedBrief));
+  const savedBrief = useSyncExternalStore(
+    () => () => {},
+    readStoredQuizAnswers,
+    () => null,
+  );
+  const [savedBriefChoice, setSavedBriefChoice] = useState<"pending" | "continue" | "fresh">(
+    "pending",
+  );
   const [currentStep, setCurrentStep] = useState(0);
   const [stepError, setStepError] = useState<string | null>(null);
-  const [formValues, setFormValues] = useState<QuizAnswers>(storedBrief ?? emptyQuizAnswers());
+  const [formValues, setFormValues] = useState<QuizAnswers>(emptyQuizAnswers());
+  const hasStoredBrief = Boolean(savedBrief);
+  const showSavedBriefPrompt = hasStoredBrief && savedBriefChoice === "pending";
+  const isUsingSavedBrief = hasStoredBrief && savedBriefChoice === "continue";
+  const savedBriefPreview = savedBrief ?? emptyQuizAnswers();
 
   useEffect(() => {
     if (typeof window === "undefined" || showSavedBriefPrompt) {
@@ -175,13 +185,16 @@ export function QuizForm() {
     clearStoredQuizAnswers();
     setCurrentStep(0);
     setStepError(null);
-    setHasStoredBrief(false);
+    setSavedBriefChoice("fresh");
     setFormValues(emptyQuizAnswers());
-    setShowSavedBriefPrompt(false);
   }
 
   function continueSavedBrief() {
-    setShowSavedBriefPrompt(false);
+    if (savedBrief) {
+      setFormValues(savedBrief);
+    }
+
+    setSavedBriefChoice("continue");
   }
 
   function handleNext() {
@@ -230,7 +243,12 @@ export function QuizForm() {
           <div className="rounded-[1.7rem] border border-white/12 bg-white/10 p-5">
             <p className="mini-label !text-white/64">Saved summary</p>
             <div className="mt-4 flex flex-wrap gap-2">
-              {[formValues.aesthetic, formValues.occasion, formValues.budgetRange, formValues.fitPreference]
+              {[
+                savedBriefPreview.aesthetic,
+                savedBriefPreview.occasion,
+                savedBriefPreview.budgetRange,
+                savedBriefPreview.fitPreference,
+              ]
                 .filter(Boolean)
                 .map((item) => (
                   <span key={item} className="rounded-full bg-white/12 px-3 py-2 text-sm text-white/92">
@@ -239,7 +257,9 @@ export function QuizForm() {
                 ))}
             </div>
             <p className="mt-4 text-sm leading-6 text-white/74">
-              {formValues.name ? `${formValues.name}'s saved FitMuse brief is ready to continue.` : "Your saved FitMuse brief is ready to continue."}
+              {savedBriefPreview.name
+                ? `${savedBriefPreview.name}'s saved FitMuse brief is ready to continue.`
+                : "Your saved FitMuse brief is ready to continue."}
             </p>
           </div>
         </aside>
@@ -363,9 +383,9 @@ export function QuizForm() {
           </p>
           <div className="mt-4 flex flex-wrap gap-3">
             <span className="rounded-full border border-line/70 bg-white/82 px-4 py-2 text-sm text-foreground">
-              {hasStoredBrief ? "Saved brief loaded" : "Fresh brief"}
+              {isUsingSavedBrief ? "Saved brief loaded" : "Fresh brief"}
             </span>
-            {hasStoredBrief ? (
+            {isUsingSavedBrief ? (
               <button type="button" onClick={startNewBrief} className="cta-secondary">
                 Start new brief
               </button>
