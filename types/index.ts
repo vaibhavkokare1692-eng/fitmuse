@@ -96,7 +96,8 @@ export type ProductVisualType =
 export type BudgetMatchLabel =
   | "Within budget"
   | "Near budget"
-  | "Over budget but strong style match";
+  | "Stretch upgrade"
+  | "Over budget";
 
 export type MatchQualityLabel =
   | "Best match"

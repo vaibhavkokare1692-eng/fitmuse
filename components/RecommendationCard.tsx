@@ -73,8 +73,12 @@ function getBudgetBadgeClasses(label: OutfitRecommendation["budgetMatchLabel"]) 
     return "border-emerald-200/80 bg-emerald-50 text-emerald-900";
   }
 
-  if (label === "Over budget but strong style match") {
+  if (label === "Stretch upgrade") {
     return "border-amber-200/90 bg-amber-50 text-amber-900";
+  }
+
+  if (label === "Over budget") {
+    return "border-rose-200/90 bg-rose-50 text-rose-900";
   }
 
   return "border-line/70 bg-white/82 text-foreground";

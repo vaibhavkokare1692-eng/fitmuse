@@ -1,10 +1,10 @@
-import { getStyleRulesForBrief, type StyleRule } from "@/data/styleRules";
-import { products } from "@/data/products";
+import { getStyleRulesForBrief, type StyleRule } from "../data/styleRules.ts";
+import { products } from "../data/products.ts";
 import {
   formatAestheticLabel,
   isCreatorOccasion,
   splitCommaSeparated,
-} from "@/lib/utils";
+} from "../lib/utils.ts";
 import type {
   Aesthetic,
   BudgetMatchLabel,
@@ -810,6 +810,121 @@ function budgetTargetForCategory(category: ProductCategory, budgetCap: number | 
   return budgetCap <= 200 ? budgetCap * 0.28 : budgetCap * 0.22;
 }
 
+type BudgetThresholds = {
+  withinMax: number;
+  nearMax: number;
+  stretchMax: number;
+  hardMax: number;
+};
+
+function getBudgetThresholds(budgetCap: number | null): BudgetThresholds | null {
+  if (!budgetCap) {
+    return null;
+  }
+
+  if (budgetCap <= 100) {
+    return {
+      withinMax: budgetCap,
+      nearMax: Math.round(budgetCap * 1.12),
+      stretchMax: Math.round(budgetCap * 1.3),
+      hardMax: Math.round(budgetCap * 1.42),
+    };
+  }
+
+  if (budgetCap <= 200) {
+    return {
+      withinMax: budgetCap,
+      nearMax: Math.round(budgetCap * 1.15),
+      stretchMax: Math.round(budgetCap * 1.4),
+      hardMax: Math.round(budgetCap * 1.55),
+    };
+  }
+
+  if (budgetCap <= 350) {
+    return {
+      withinMax: budgetCap,
+      nearMax: Math.round(budgetCap * 1.12),
+      stretchMax: Math.round(budgetCap * 1.3),
+      hardMax: Math.round(budgetCap * 1.42),
+    };
+  }
+
+  return {
+    withinMax: budgetCap,
+    nearMax: Math.round(budgetCap * 1.1),
+    stretchMax: Math.round(budgetCap * 1.24),
+    hardMax: Math.round(budgetCap * 1.34),
+  };
+}
+
+export function classifyBudgetMatch(totalPrice: number, budgetCap: number | null): BudgetMatchLabel {
+  const thresholds = getBudgetThresholds(budgetCap);
+
+  if (!thresholds) {
+    return "Near budget";
+  }
+
+  if (totalPrice <= thresholds.withinMax) {
+    return "Within budget";
+  }
+
+  if (totalPrice <= thresholds.nearMax) {
+    return "Near budget";
+  }
+
+  if (totalPrice <= thresholds.stretchMax) {
+    return "Stretch upgrade";
+  }
+
+  return "Over budget";
+}
+
+function getBudgetAnchorItem(items: Product[]) {
+  const outerwear = items.find((item) => item.category === "outerwear");
+  if (outerwear && keywordMatches(normalize(outerwear.name), ["blazer", "coat", "cardigan", "trench"])) {
+    return outerwear;
+  }
+
+  const shoes = items.find((item) => item.category === "shoes");
+  if (shoes) {
+    return shoes;
+  }
+
+  return [...items].sort((left, right) => right.price - left.price)[0];
+}
+
+function getBudgetUpgradeReason(items: Product[]) {
+  const anchorItem = getBudgetAnchorItem(items);
+  const itemText = normalize(`${anchorItem.name} ${anchorItem.styleNotes}`);
+
+  if (anchorItem.category === "shoes") {
+    return "higher-quality shoes complete the look while staying close to your brief.";
+  }
+
+  if (
+    anchorItem.category === "outerwear" &&
+    keywordMatches(itemText, ["blazer", "coat", "cardigan", "trench"])
+  ) {
+    return "the blazer improves the silhouette and quiet-luxury feel.";
+  }
+
+  if (
+    anchorItem.category === "bottom" &&
+    keywordMatches(itemText, ["trouser", "trousers", "chino", "skirt"])
+  ) {
+    return "the tailored bottom sharpens the silhouette and keeps the look more refined.";
+  }
+
+  if (
+    anchorItem.category === "top" &&
+    keywordMatches(itemText, ["silk", "merino", "cashmere", "knit", "button", "blazer"])
+  ) {
+    return "the elevated top adds polish and a more premium finish.";
+  }
+
+  return "the stronger finishing piece keeps the outfit aligned to your brief.";
+}
+
 function getRequiredSize(product: Product, answers: QuizAnswers) {
   if (product.category === "top" || product.category === "outerwear") {
     return normalize(answers.topSize);
@@ -1159,31 +1274,46 @@ function buildName(
   return index === 0 ? baseName : `${baseName} ${index + 1}`;
 }
 
-function buildBudgetMatch(totalPrice: number, budgetCap: number | null) {
+function buildBudgetMatch(items: Product[], budgetCap: number | null) {
   if (!budgetCap) {
     return {
       label: "Near budget" as BudgetMatchLabel,
-      note: "You left the budget flexible, so FitMuse prioritized overall match quality.",
+      note: "You left the budget flexible, so FitMuse prioritized overall match quality instead of a strict spend cap.",
     };
   }
 
-  if (totalPrice <= budgetCap) {
+  const totalPrice = items.reduce((sum, item) => sum + item.price, 0);
+  const budgetLabel = classifyBudgetMatch(totalPrice, budgetCap);
+  const budgetTargetLabel = formatLabel(budgetLabelFromCap(budgetCap));
+  const stretchReason = getBudgetUpgradeReason(items);
+  const compactBundle = items.length <= 4;
+
+  if (budgetLabel === "Within budget") {
     return {
-      label: "Within budget" as BudgetMatchLabel,
-      note: `This look stays inside your ${formatLabel(budgetLabelFromCap(budgetCap))} budget target.`,
+      label: budgetLabel,
+      note: compactBundle
+        ? `This look stays inside your ${budgetTargetLabel} target by focusing on the core pieces first.`
+        : `This look stays inside your ${budgetTargetLabel} target while still feeling complete.`,
     };
   }
 
-  if (totalPrice <= budgetCap * 1.08) {
+  if (budgetLabel === "Near budget") {
     return {
-      label: "Near budget" as BudgetMatchLabel,
-      note: `This look lands close to your ${formatLabel(budgetLabelFromCap(budgetCap))} budget target.`,
+      label: budgetLabel,
+      note: `Near budget: ${stretchReason.charAt(0).toUpperCase()}${stretchReason.slice(1)}`,
+    };
+  }
+
+  if (budgetLabel === "Stretch upgrade") {
+    return {
+      label: budgetLabel,
+      note: `Stretch upgrade: ${stretchReason.charAt(0).toUpperCase()}${stretchReason.slice(1)}`,
     };
   }
 
   return {
-    label: "Over budget but strong style match" as BudgetMatchLabel,
-    note: `This look runs over your ${formatLabel(budgetLabelFromCap(budgetCap))} target, but the styling match scored strongly enough to keep it in the mix.`,
+    label: budgetLabel,
+    note: `Over budget: ${stretchReason.charAt(0).toUpperCase()}${stretchReason.slice(1)} FitMuse kept it only because the style match stayed unusually strong.`,
   };
 }
 
@@ -1363,8 +1493,10 @@ function buildMatchReasons(
     reasons.add(`Keeps the look within ${formatLabel(answers.budgetRange || "your target budget")}`);
   } else if (budgetLabel === "Near budget") {
     reasons.add("Keeps the full outfit close to your budget range");
+  } else if (budgetLabel === "Stretch upgrade") {
+    reasons.add("Adds one stronger upgrade piece while staying close to your budget brief");
   } else {
-    reasons.add(`Pushes past ${formatLabel(answers.budgetRange || "budget")} only because the overall match is stronger`);
+    reasons.add(`Pushes past ${formatLabel(answers.budgetRange || "budget")} only because the overall match is unusually strong`);
   }
 
   if (productEntries.every((entry) => entry.sizeExact)) {
@@ -1419,8 +1551,7 @@ function buildConfidenceScore(
   );
   const allSizeMatched = sizeExactCount === productEntries.length;
   const paletteTight = new Set(items.map((item) => item.colorFamily)).size <= 3;
-  const withinBudget = budgetCap ? totalPrice <= budgetCap : false;
-  const nearBudget = budgetCap ? totalPrice <= budgetCap * 1.08 : false;
+  const budgetLabel = classifyBudgetMatch(totalPrice, budgetCap);
 
   let confidence = 28;
 
@@ -1450,14 +1581,14 @@ function buildConfidenceScore(
 
   if (!budgetCap) {
     confidence += 10;
-  } else if (withinBudget) {
+  } else if (budgetLabel === "Within budget") {
     confidence += 18;
-  } else if (nearBudget) {
-    confidence += 10;
-  } else if (totalPrice <= budgetCap * 1.16) {
-    confidence += 3;
+  } else if (budgetLabel === "Near budget") {
+    confidence += 11;
+  } else if (budgetLabel === "Stretch upgrade") {
+    confidence += 5;
   } else {
-    confidence -= 8;
+    confidence -= 9;
   }
 
   if (allSizeMatched) {
@@ -1529,7 +1660,7 @@ function buildOutfitRecommendation(
   );
   const matchMode: OutfitRecommendation["matchMode"] =
     confidenceScore >= 55 ? "exact" : "closest";
-  const budgetMatch = buildBudgetMatch(totalPrice, budgetCap);
+  const budgetMatch = buildBudgetMatch(items, budgetCap);
   const matchReasons = buildMatchReasons(productEntries, answers, totalPrice, budgetMatch.label);
   const matchedColors = Array.from(
     new Set(productEntries.flatMap((entry) => entry.matchedPreferredColors)),
@@ -1570,6 +1701,95 @@ function buildOutfitRecommendation(
   };
 }
 
+function budgetPriority(label: BudgetMatchLabel) {
+  if (label === "Within budget") {
+    return 0;
+  }
+
+  if (label === "Near budget") {
+    return 1;
+  }
+
+  if (label === "Stretch upgrade") {
+    return 2;
+  }
+
+  return 3;
+}
+
+function selectBudgetBalancedRecommendations(
+  recommendations: OutfitRecommendation[],
+  budgetCap: number | null,
+  limit: number,
+) {
+  if (!budgetCap || recommendations.length <= limit) {
+    return recommendations.slice(0, limit);
+  }
+
+  const within = recommendations.filter(
+    (recommendation) => recommendation.budgetMatchLabel === "Within budget",
+  );
+  const near = recommendations.filter(
+    (recommendation) => recommendation.budgetMatchLabel === "Near budget",
+  );
+  const stretch = recommendations.filter(
+    (recommendation) => recommendation.budgetMatchLabel === "Stretch upgrade",
+  );
+  const over = recommendations.filter(
+    (recommendation) => recommendation.budgetMatchLabel === "Over budget",
+  );
+
+  const selected: OutfitRecommendation[] = [];
+  const seen = new Set<string>();
+
+  const takeFromBucket = (bucket: OutfitRecommendation[], targetCount: number) => {
+    for (const recommendation of bucket) {
+      if (selected.length >= limit || targetCount <= 0) {
+        break;
+      }
+
+      if (seen.has(recommendation.id)) {
+        continue;
+      }
+
+      selected.push(recommendation);
+      seen.add(recommendation.id);
+      targetCount -= 1;
+    }
+  };
+
+  const targetWithin = Math.min(
+    within.length,
+    Math.max(3, Math.ceil(limit * 0.6)),
+  );
+  const targetNear = Math.min(
+    near.length,
+    near.length > 0 ? Math.max(1, Math.floor(limit * 0.2)) : 0,
+  );
+  const targetStretch = Math.min(
+    stretch.length,
+    stretch.length > 0
+      ? budgetCap <= 100
+        ? 1
+        : Math.min(2, Math.max(1, Math.floor(limit * 0.15)))
+      : 0,
+  );
+
+  takeFromBucket(within, targetWithin);
+  takeFromBucket(near, targetNear);
+  takeFromBucket(stretch, targetStretch);
+
+  for (const bucket of [within, near, stretch, over]) {
+    if (selected.length >= limit) {
+      break;
+    }
+
+    takeFromBucket(bucket, limit - selected.length);
+  }
+
+  return selected.slice(0, limit);
+}
+
 export function buildOutfitRecommendations(answers: QuizAnswers, limit = 8) {
   const matchedStyleRules = getStyleRulesForBrief({
     aesthetic: answers.aesthetic,
@@ -1586,6 +1806,7 @@ export function buildOutfitRecommendations(answers: QuizAnswers, limit = 8) {
   const accessoryPool = pickPool("accessory", answers, matchedStyleRules);
   const outerwearPool = pickPool("outerwear", answers, matchedStyleRules);
   const budgetCap = budgetCapFromRange(answers.budgetRange);
+  const budgetThresholds = getBudgetThresholds(budgetCap);
   const recommendations: OutfitRecommendation[] = [];
   const accessoryChoices = [undefined, ...accessoryPool];
   const outerwearChoices = [undefined, ...outerwearPool];
@@ -1603,15 +1824,39 @@ export function buildOutfitRecommendations(answers: QuizAnswers, limit = 8) {
               0,
             );
 
-            if (budgetCap && coreTotal > budgetCap * 1.08) {
+            if (budgetThresholds && coreTotal > budgetThresholds.stretchMax) {
               continue;
             }
 
-            if (budgetCap && budgetCap <= 200 && totalPrice > budgetCap * 1.1) {
+            if (budgetThresholds && totalPrice > budgetThresholds.hardMax) {
               continue;
             }
 
-            if (budgetCap && budgetCap > 200 && totalPrice > budgetCap * 1.16) {
+            if (
+              budgetCap &&
+              budgetCap <= 100 &&
+              outerwear &&
+              totalPrice > budgetThresholds!.withinMax
+            ) {
+              continue;
+            }
+
+            if (
+              budgetCap &&
+              budgetCap <= 200 &&
+              accessory &&
+              outerwear &&
+              totalPrice > budgetThresholds!.nearMax
+            ) {
+              continue;
+            }
+
+            if (
+              budgetCap &&
+              budgetCap <= 200 &&
+              outerwear &&
+              coreTotal > budgetThresholds!.nearMax
+            ) {
               continue;
             }
 
@@ -1632,18 +1877,6 @@ export function buildOutfitRecommendations(answers: QuizAnswers, limit = 8) {
     new Map(recommendations.map((recommendation) => [recommendation.id, recommendation])).values(),
   );
 
-  const budgetPriority = (label: BudgetMatchLabel) => {
-    if (label === "Within budget") {
-      return 0;
-    }
-
-    if (label === "Near budget") {
-      return 1;
-    }
-
-    return 2;
-  };
-
   const sorted = uniqueRecommendations.sort(
     (left, right) =>
       budgetPriority(left.budgetMatchLabel) - budgetPriority(right.budgetMatchLabel) ||
@@ -1653,7 +1886,7 @@ export function buildOutfitRecommendations(answers: QuizAnswers, limit = 8) {
   );
 
   if (sorted.length > 0) {
-    return sorted.slice(0, limit).map((recommendation, index) => ({
+    return selectBudgetBalancedRecommendations(sorted, budgetCap, limit).map((recommendation, index) => ({
       ...recommendation,
       name: buildName(
         (answers.aesthetic || "smart casual") as Aesthetic,
@@ -1676,6 +1909,7 @@ export function buildOutfitRecommendations(answers: QuizAnswers, limit = 8) {
     return [];
   }
 
+  const fallbackBudgetMatch = buildBudgetMatch(fallbackItems, budgetCap);
   const fallbackRecommendation: OutfitRecommendation = {
       id: fallbackItems.map((item) => item.id).join("__"),
       name: "Closest FitMuse Look",
@@ -1696,8 +1930,8 @@ export function buildOutfitRecommendations(answers: QuizAnswers, limit = 8) {
       creatorUseCase: buildCreatorUseCase((answers.occasion || "daily wear") as Occasion),
       confidenceScore: 49,
       matchQualityLabel: "Closest match",
-      budgetMatchLabel: "Near budget",
-      budgetNote: "This fallback prioritizes showing a complete outfit over a blank page.",
+      budgetMatchLabel: fallbackBudgetMatch.label,
+      budgetNote: "This fallback prioritizes showing a complete outfit over a blank page while staying as close to your budget as the current catalog allows.",
       matchReasons: [
         "No perfect match yet, but this is the closest full outfit in the current mock catalog",
         answers.aesthetic
