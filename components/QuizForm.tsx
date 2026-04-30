@@ -238,21 +238,35 @@ export function QuizForm() {
   const router = useRouter();
   const formSurfaceRef = useRef<HTMLDivElement | null>(null);
   const [isPending, startTransition] = useTransition();
-  const savedBrief = useSyncExternalStore(
+  const rawSavedBrief = useSyncExternalStore(
     subscribeStoredQuizAnswers,
     readStoredQuizAnswers,
     () => null,
   );
+  const [hasHydrated, setHasHydrated] = useState(false);
   const [savedBriefChoice, setSavedBriefChoice] = useState<"pending" | "continue" | "fresh">(
     "pending",
   );
   const [currentStep, setCurrentStep] = useState(0);
   const [stepError, setStepError] = useState<string | null>(null);
   const [formValues, setFormValues] = useState<QuizAnswers>(() => emptyQuizAnswers());
+  const savedBrief = hasHydrated ? rawSavedBrief : null;
   const hasStoredBrief = Boolean(savedBrief);
   const showSavedBriefPrompt = hasStoredBrief && savedBriefChoice === "pending";
   const isUsingSavedBrief = hasStoredBrief && savedBriefChoice === "continue";
   const savedBriefPreview = savedBrief ?? emptyQuizAnswers();
+
+  useEffect(() => {
+    if (typeof window === "undefined") {
+      return;
+    }
+
+    const frameId = window.requestAnimationFrame(() => {
+      setHasHydrated(true);
+    });
+
+    return () => window.cancelAnimationFrame(frameId);
+  }, []);
 
   useEffect(() => {
     if (typeof window === "undefined" || showSavedBriefPrompt) {

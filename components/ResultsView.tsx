@@ -101,6 +101,8 @@ const sortOptions: Array<{ value: ResultsSort; label: string }> = [
   { value: "creator-ready", label: "Occasion focus" },
 ];
 
+const emptySavedLooks: SavedLookSnapshot[] = [];
+
 const savedColorMap: Record<string, string> = {
   cream: "#efe3d1",
   camel: "#be9774",
@@ -340,13 +342,15 @@ export function ResultsView({ searchParamsObject = {} }: ResultsViewProps) {
     return hasQuizAnswers(normalized) ? normalized : null;
   }, [searchSignature]);
 
-  const storedQuizAnswers = useSyncExternalStore(
+  const rawStoredQuizAnswers = useSyncExternalStore(
     subscribeStoredQuizAnswers,
     readStoredQuizAnswers,
     () => null,
   );
-  const quizAnswers = searchAnswers ?? storedQuizAnswers;
-  const savedLooks = useSyncExternalStore(subscribeSavedLooks, readSavedLooks, () => []);
+  const rawSavedLooks = useSyncExternalStore(subscribeSavedLooks, readSavedLooks, () => []);
+  const [hasHydrated, setHasHydrated] = useState(false);
+  const quizAnswers = searchAnswers ?? (hasHydrated ? rawStoredQuizAnswers : null);
+  const savedLooks = hasHydrated ? rawSavedLooks : emptySavedLooks;
   const [filters, setFilters] = useState<ResultsFilters>(buildBaseFilters(searchAnswers));
   const [sort, setSort] = useState<ResultsSort>("best-match");
   const [viewMode, setViewMode] = useState<ResultsViewMode>("all");
@@ -359,6 +363,18 @@ export function ResultsView({ searchParamsObject = {} }: ResultsViewProps) {
   const filtersSeedRef = useRef("");
   const highlightTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const savedMessageTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => {
+    if (typeof window === "undefined") {
+      return;
+    }
+
+    const frameId = window.requestAnimationFrame(() => {
+      setHasHydrated(true);
+    });
+
+    return () => window.cancelAnimationFrame(frameId);
+  }, []);
 
   useEffect(() => {
     if (searchAnswers && hasQuizAnswers(searchAnswers)) {
