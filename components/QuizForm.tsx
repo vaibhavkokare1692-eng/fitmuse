@@ -35,6 +35,7 @@ import {
 import {
   buildResultsSearch,
   clearStoredQuizAnswers,
+  readServerStoredQuizAnswers,
   readStoredQuizAnswers,
   subscribeStoredQuizAnswers,
   writeStoredQuizAnswers,
@@ -241,7 +242,7 @@ export function QuizForm() {
   const rawSavedBrief = useSyncExternalStore(
     subscribeStoredQuizAnswers,
     readStoredQuizAnswers,
-    () => null,
+    readServerStoredQuizAnswers,
   );
   const [hasHydrated, setHasHydrated] = useState(false);
   const [savedBriefChoice, setSavedBriefChoice] = useState<"pending" | "continue" | "fresh">(

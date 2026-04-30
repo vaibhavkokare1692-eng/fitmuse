@@ -21,6 +21,8 @@ import { products } from "@/data/products";
 import {
   clearStoredQuizAnswers,
   normalizeQuizAnswers,
+  readServerSavedLooks,
+  readServerStoredQuizAnswers,
   readSavedLooks,
   readStoredQuizAnswers,
   subscribeSavedLooks,
@@ -345,9 +347,13 @@ export function ResultsView({ searchParamsObject = {} }: ResultsViewProps) {
   const rawStoredQuizAnswers = useSyncExternalStore(
     subscribeStoredQuizAnswers,
     readStoredQuizAnswers,
-    () => null,
+    readServerStoredQuizAnswers,
   );
-  const rawSavedLooks = useSyncExternalStore(subscribeSavedLooks, readSavedLooks, () => []);
+  const rawSavedLooks = useSyncExternalStore(
+    subscribeSavedLooks,
+    readSavedLooks,
+    readServerSavedLooks,
+  );
   const [hasHydrated, setHasHydrated] = useState(false);
   const quizAnswers = searchAnswers ?? (hasHydrated ? rawStoredQuizAnswers : null);
   const savedLooks = hasHydrated ? rawSavedLooks : emptySavedLooks;

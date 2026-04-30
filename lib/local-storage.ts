@@ -14,6 +14,7 @@ export const QUIZ_STORAGE_KEY = "fitmuse-quiz-answers";
 export const SAVED_LOOKS_STORAGE_KEY = "fitmuse-saved-looks";
 export const SAVED_LOOK_DETAILS_STORAGE_KEY = "fitmuse-saved-look-details";
 const STORAGE_EVENT_NAME = "fitmuse-storage-change";
+const EMPTY_SAVED_LOOKS: SavedLookSnapshot[] = [];
 
 let cachedQuizAnswersRaw: null | string | undefined;
 let cachedQuizAnswersValue: null | QuizAnswers = null;
@@ -241,6 +242,10 @@ export function subscribeStoredQuizAnswers(onStoreChange: () => void) {
   return subscribeToStorageKey(QUIZ_STORAGE_KEY, onStoreChange);
 }
 
+export function readServerStoredQuizAnswers() {
+  return null;
+}
+
 export function readSavedLookIds() {
   if (typeof window === "undefined") {
     return [];
@@ -356,7 +361,7 @@ function normalizeSavedLookSnapshot(entry: unknown): SavedLookSnapshot | null {
 
 export function readSavedLooks() {
   if (typeof window === "undefined") {
-    return [];
+    return EMPTY_SAVED_LOOKS;
   }
 
   try {
@@ -368,15 +373,15 @@ export function readSavedLooks() {
 
     if (!raw) {
       cachedSavedLooksRaw = null;
-      cachedSavedLooksValue = [];
-      return [];
+      cachedSavedLooksValue = EMPTY_SAVED_LOOKS;
+      return EMPTY_SAVED_LOOKS;
     }
 
     const parsed = JSON.parse(raw) as unknown;
 
     if (!Array.isArray(parsed)) {
       window.localStorage.removeItem(SAVED_LOOK_DETAILS_STORAGE_KEY);
-      return [];
+      return EMPTY_SAVED_LOOKS;
     }
 
     const normalized = parsed
@@ -397,8 +402,8 @@ export function readSavedLooks() {
   } catch {
     window.localStorage.removeItem(SAVED_LOOK_DETAILS_STORAGE_KEY);
     cachedSavedLooksRaw = null;
-    cachedSavedLooksValue = [];
-    return [];
+    cachedSavedLooksValue = EMPTY_SAVED_LOOKS;
+    return EMPTY_SAVED_LOOKS;
   }
 }
 
@@ -417,4 +422,8 @@ export function writeSavedLooks(looks: SavedLookSnapshot[]) {
 
 export function subscribeSavedLooks(onStoreChange: () => void) {
   return subscribeToStorageKey(SAVED_LOOK_DETAILS_STORAGE_KEY, onStoreChange);
+}
+
+export function readServerSavedLooks() {
+  return EMPTY_SAVED_LOOKS;
 }
