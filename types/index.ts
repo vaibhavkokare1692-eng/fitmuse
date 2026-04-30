@@ -224,36 +224,66 @@ export type SavedLookSnapshot = OutfitRecommendation & {
   briefSummary?: SavedLookBriefSummary;
 };
 
+export type RealProductCategory =
+  | "top"
+  | "bottom"
+  | "dress/one-piece"
+  | "outer layer"
+  | "shoes"
+  | "bag"
+  | "accessory";
+
+export type RealProductSourceType =
+  | "manual-placeholder"
+  | "manual-curated"
+  | "affiliate-placeholder";
+
+export type RealOutfitPackSmartSwap = {
+  label: string;
+  note: string;
+};
+
 export type RealProduct = {
   id: string;
   name: string;
   store: string;
-  category: ProductCategory;
-  price: number;
+  brand: string;
+  currentPrice: number;
+  originalPrice?: number;
   currency: string;
-  colors: string[];
-  sizes: string[];
-  aestheticTags: Aesthetic[];
-  occasionTags: Occasion[];
-  fitTags: FitPreference[];
-  stylePreferenceTags: StylePreference[];
+  category: RealProductCategory;
+  subcategory: string;
   productUrl: string;
   imageUrl?: string;
+  colors: string[];
+  sizes: string[];
+  fitTags: string[];
+  occasionTags: string[];
+  aestheticTags: string[];
+  stylePreferenceTags: StylePreference[];
+  region: string;
+  lastCheckedDate: string;
+  inStock: boolean;
   affiliateReady: boolean;
+  affiliateUrl?: string;
+  sourceType: RealProductSourceType;
   notes?: string;
 };
 
 export type RealOutfitPack = {
   id: string;
   name: string;
-  stylePreference: StylePreference;
-  aesthetic: Aesthetic;
-  occasion: Occasion;
+  targetStylePreference: StylePreference;
+  aesthetic: string;
+  occasion: string;
   budgetRange: BudgetRange;
-  totalPrice: number;
   productIds: string[];
+  totalPrice: number;
+  budgetLabel: BudgetMatchLabel;
   fitNote: string;
   whyItWorks: string;
+  smartSwaps: RealOutfitPackSmartSwap[];
+  lastUpdated: string;
   shopReady: boolean;
 };
 

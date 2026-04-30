@@ -1300,7 +1300,7 @@ export function ResultsView({ searchParamsObject = {} }: ResultsViewProps) {
                       >
                         <div className="flex flex-wrap gap-2">
                           <span className="chip">
-                            {formatAestheticLabel(pack.aesthetic, pack.stylePreference)}
+                            {formatAestheticLabel(pack.aesthetic, pack.targetStylePreference)}
                           </span>
                           <span className="chip">{formatOptionLabel(pack.occasion)}</span>
                           <span className="chip">{pack.budgetSummary}</span>
@@ -1335,7 +1335,7 @@ export function ResultsView({ searchParamsObject = {} }: ResultsViewProps) {
                                 <p className="mt-1 text-sm text-foreground">{product.name}</p>
                               </div>
                               <p className="text-sm font-medium text-foreground">
-                                {formatCurrency(product.price)}
+                                {formatCurrency(product.currentPrice)}
                               </p>
                             </div>
                           ))}
@@ -1678,7 +1678,10 @@ export function ResultsView({ searchParamsObject = {} }: ResultsViewProps) {
 
             <div className="mt-5 flex flex-wrap gap-2">
               <span className="chip">
-                {formatAestheticLabel(selectedRealPack.aesthetic, selectedRealPack.stylePreference)}
+                {formatAestheticLabel(
+                  selectedRealPack.aesthetic,
+                  selectedRealPack.targetStylePreference,
+                )}
               </span>
               <span className="chip">{formatOptionLabel(selectedRealPack.occasion)}</span>
               <span className="chip">{formatOptionLabel(selectedRealPack.budgetRange)}</span>
@@ -1715,7 +1718,7 @@ export function ResultsView({ searchParamsObject = {} }: ResultsViewProps) {
                       <p className="mini-label">{formatOptionLabel(product.category)}</p>
                       <h3 className="mt-2 text-xl text-foreground">{product.name}</h3>
                       <p className="mt-2 text-sm text-muted">
-                        {product.store} • {product.currency} {product.price}
+                        {product.store} • {product.currency} {product.currentPrice}
                       </p>
                     </div>
                     <a
