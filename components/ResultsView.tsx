@@ -4,7 +4,7 @@ import Link from "next/link";
 import { motion } from "framer-motion";
 import { SlidersHorizontal, Sparkles, X } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
 import { RecommendationCard } from "@/components/RecommendationCard";
 import {
   aestheticOptions,
@@ -23,6 +23,8 @@ import {
   normalizeQuizAnswers,
   readSavedLooks,
   readStoredQuizAnswers,
+  subscribeSavedLooks,
+  subscribeStoredQuizAnswers,
   writeSavedLookIds,
   writeSavedLooks,
   writeStoredQuizAnswers,
@@ -338,11 +340,13 @@ export function ResultsView({ searchParamsObject = {} }: ResultsViewProps) {
     return hasQuizAnswers(normalized) ? normalized : null;
   }, [searchSignature]);
 
-  const [localQuizAnswers, setLocalQuizAnswers] = useState<QuizAnswers | null>(() =>
-    searchAnswers ?? readStoredQuizAnswers(),
+  const storedQuizAnswers = useSyncExternalStore(
+    subscribeStoredQuizAnswers,
+    readStoredQuizAnswers,
+    () => null,
   );
-  const quizAnswers = searchAnswers ?? localQuizAnswers;
-  const [savedLooks, setSavedLooks] = useState<SavedLookSnapshot[]>(() => readSavedLooks());
+  const quizAnswers = searchAnswers ?? storedQuizAnswers;
+  const savedLooks = useSyncExternalStore(subscribeSavedLooks, readSavedLooks, () => []);
   const [filters, setFilters] = useState<ResultsFilters>(buildBaseFilters(searchAnswers));
   const [sort, setSort] = useState<ResultsSort>("best-match");
   const [viewMode, setViewMode] = useState<ResultsViewMode>("all");
@@ -579,34 +583,30 @@ export function ResultsView({ searchParamsObject = {} }: ResultsViewProps) {
   }
 
   function toggleSave(id: string) {
-    setSavedLooks((current) => {
-      const alreadySaved = current.some((savedLook) => savedLook.id === id);
+    const alreadySaved = savedLooks.some((savedLook) => savedLook.id === id);
 
-      const next = alreadySaved
-        ? current.filter((savedLook) => savedLook.id !== id)
-        : (() => {
-            const recommendation = recommendationLookup.get(id);
+    const next = alreadySaved
+      ? savedLooks.filter((savedLook) => savedLook.id !== id)
+      : (() => {
+          const recommendation = recommendationLookup.get(id);
 
-            if (!recommendation) {
-              return current;
-            }
+          if (!recommendation) {
+            return savedLooks;
+          }
 
-            const snapshot = buildSavedLookSnapshot(recommendation, quizAnswers);
-            return [snapshot, ...current.filter((savedLook) => savedLook.id !== id)];
-          })();
+          const snapshot = buildSavedLookSnapshot(recommendation, quizAnswers);
+          return [snapshot, ...savedLooks.filter((savedLook) => savedLook.id !== id)];
+        })();
 
-      if (alreadySaved && selectedSavedLookId === id) {
-        setSelectedSavedLookId(null);
-      }
+    if (alreadySaved && selectedSavedLookId === id) {
+      setSelectedSavedLookId(null);
+    }
 
-      persistSavedLooks(next);
-      return next;
-    });
+    persistSavedLooks(next);
   }
 
   function handleStartNewQuiz() {
     clearStoredQuizAnswers();
-    setLocalQuizAnswers(null);
     setFilters(buildBaseFilters(null));
     router.push("/quiz");
   }

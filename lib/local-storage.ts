@@ -13,9 +13,58 @@ import type {
 export const QUIZ_STORAGE_KEY = "fitmuse-quiz-answers";
 export const SAVED_LOOKS_STORAGE_KEY = "fitmuse-saved-looks";
 export const SAVED_LOOK_DETAILS_STORAGE_KEY = "fitmuse-saved-look-details";
+const STORAGE_EVENT_NAME = "fitmuse-storage-change";
+
+let cachedQuizAnswersRaw: null | string | undefined;
+let cachedQuizAnswersValue: null | QuizAnswers = null;
+let cachedSavedLooksRaw: null | string | undefined;
+let cachedSavedLooksValue: SavedLookSnapshot[] = [];
 
 function normalize(value?: string | null) {
   return value?.trim().toLowerCase() ?? "";
+}
+
+function dispatchStorageChange(storageKey: string) {
+  if (typeof window === "undefined") {
+    return;
+  }
+
+  window.dispatchEvent(new CustomEvent(STORAGE_EVENT_NAME, { detail: storageKey }));
+}
+
+function subscribeToStorageKey(storageKey: string, onStoreChange: () => void) {
+  if (typeof window === "undefined") {
+    return () => {};
+  }
+
+  const handleStorageChange = (event: Event) => {
+    if ("key" in event) {
+      const storageEvent = event as StorageEvent;
+
+      if (storageEvent.key && storageEvent.key !== storageKey) {
+        return;
+      }
+
+      onStoreChange();
+      return;
+    }
+
+    const customEvent = event as CustomEvent<string>;
+
+    if (customEvent.detail !== storageKey) {
+      return;
+    }
+
+    onStoreChange();
+  };
+
+  window.addEventListener("storage", handleStorageChange);
+  window.addEventListener(STORAGE_EVENT_NAME, handleStorageChange as EventListener);
+
+  return () => {
+    window.removeEventListener("storage", handleStorageChange);
+    window.removeEventListener(STORAGE_EVENT_NAME, handleStorageChange as EventListener);
+  };
 }
 
 const aestheticMap: Record<string, Aesthetic> = {
@@ -138,16 +187,27 @@ export function readStoredQuizAnswers() {
   try {
     const raw = window.localStorage.getItem(QUIZ_STORAGE_KEY);
 
+    if (raw === cachedQuizAnswersRaw) {
+      return cachedQuizAnswersValue;
+    }
+
     if (!raw) {
+      cachedQuizAnswersRaw = null;
+      cachedQuizAnswersValue = null;
       return null;
     }
 
     const parsed = JSON.parse(raw) as Partial<QuizAnswers>;
     const normalized = normalizeQuizAnswers(parsed);
+    const nextValue = hasQuizAnswers(normalized) ? normalized : null;
+    cachedQuizAnswersRaw = raw;
+    cachedQuizAnswersValue = nextValue;
 
-    return hasQuizAnswers(normalized) ? normalized : null;
+    return nextValue;
   } catch {
     window.localStorage.removeItem(QUIZ_STORAGE_KEY);
+    cachedQuizAnswersRaw = null;
+    cachedQuizAnswersValue = null;
     return null;
   }
 }
@@ -157,7 +217,13 @@ export function writeStoredQuizAnswers(answers: QuizAnswers) {
     return;
   }
 
-  window.localStorage.setItem(QUIZ_STORAGE_KEY, JSON.stringify(answers));
+  const raw = JSON.stringify(answers);
+  const normalized = normalizeQuizAnswers(answers);
+
+  window.localStorage.setItem(QUIZ_STORAGE_KEY, raw);
+  cachedQuizAnswersRaw = raw;
+  cachedQuizAnswersValue = hasQuizAnswers(normalized) ? normalized : null;
+  dispatchStorageChange(QUIZ_STORAGE_KEY);
 }
 
 export function clearStoredQuizAnswers() {
@@ -166,6 +232,13 @@ export function clearStoredQuizAnswers() {
   }
 
   window.localStorage.removeItem(QUIZ_STORAGE_KEY);
+  cachedQuizAnswersRaw = null;
+  cachedQuizAnswersValue = null;
+  dispatchStorageChange(QUIZ_STORAGE_KEY);
+}
+
+export function subscribeStoredQuizAnswers(onStoreChange: () => void) {
+  return subscribeToStorageKey(QUIZ_STORAGE_KEY, onStoreChange);
 }
 
 export function readSavedLookIds() {
@@ -200,6 +273,7 @@ export function writeSavedLookIds(ids: string[]) {
   }
 
   window.localStorage.setItem(SAVED_LOOKS_STORAGE_KEY, JSON.stringify(ids));
+  dispatchStorageChange(SAVED_LOOKS_STORAGE_KEY);
 }
 
 export function clearSavedLookIds() {
@@ -208,6 +282,7 @@ export function clearSavedLookIds() {
   }
 
   window.localStorage.removeItem(SAVED_LOOKS_STORAGE_KEY);
+  dispatchStorageChange(SAVED_LOOKS_STORAGE_KEY);
 }
 
 function normalizeSavedLookSnapshot(entry: unknown): SavedLookSnapshot | null {
@@ -287,7 +362,13 @@ export function readSavedLooks() {
   try {
     const raw = window.localStorage.getItem(SAVED_LOOK_DETAILS_STORAGE_KEY);
 
+    if (raw === cachedSavedLooksRaw) {
+      return cachedSavedLooksValue;
+    }
+
     if (!raw) {
+      cachedSavedLooksRaw = null;
+      cachedSavedLooksValue = [];
       return [];
     }
 
@@ -303,12 +384,20 @@ export function readSavedLooks() {
       .filter(Boolean) as SavedLookSnapshot[];
 
     if (normalized.length !== parsed.length) {
-      window.localStorage.setItem(SAVED_LOOK_DETAILS_STORAGE_KEY, JSON.stringify(normalized));
+      const normalizedRaw = JSON.stringify(normalized);
+      window.localStorage.setItem(SAVED_LOOK_DETAILS_STORAGE_KEY, normalizedRaw);
+      cachedSavedLooksRaw = normalizedRaw;
+      cachedSavedLooksValue = normalized;
+      return normalized;
     }
 
+    cachedSavedLooksRaw = raw;
+    cachedSavedLooksValue = normalized;
     return normalized;
   } catch {
     window.localStorage.removeItem(SAVED_LOOK_DETAILS_STORAGE_KEY);
+    cachedSavedLooksRaw = null;
+    cachedSavedLooksValue = [];
     return [];
   }
 }
@@ -318,5 +407,14 @@ export function writeSavedLooks(looks: SavedLookSnapshot[]) {
     return;
   }
 
-  window.localStorage.setItem(SAVED_LOOK_DETAILS_STORAGE_KEY, JSON.stringify(looks));
+  const raw = JSON.stringify(looks);
+
+  window.localStorage.setItem(SAVED_LOOK_DETAILS_STORAGE_KEY, raw);
+  cachedSavedLooksRaw = raw;
+  cachedSavedLooksValue = looks;
+  dispatchStorageChange(SAVED_LOOK_DETAILS_STORAGE_KEY);
+}
+
+export function subscribeSavedLooks(onStoreChange: () => void) {
+  return subscribeToStorageKey(SAVED_LOOK_DETAILS_STORAGE_KEY, onStoreChange);
 }

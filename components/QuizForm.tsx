@@ -13,6 +13,7 @@ import {
 import { useRouter } from "next/navigation";
 import {
   useEffect,
+  useMemo,
   useRef,
   useState,
   useSyncExternalStore,
@@ -35,10 +36,11 @@ import {
   buildResultsSearch,
   clearStoredQuizAnswers,
   readStoredQuizAnswers,
+  subscribeStoredQuizAnswers,
   writeStoredQuizAnswers,
 } from "@/lib/local-storage";
-import { formatAestheticLabel, formatCurrency, formatOptionLabel } from "@/lib/utils";
-import { buildOutfitRecommendations, emptyQuizAnswers } from "@/utils/outfitMatcher";
+import { formatAestheticLabel, formatOptionLabel } from "@/lib/utils";
+import { emptyQuizAnswers } from "@/utils/outfitMatcher";
 import type { QuizAnswers } from "@/types";
 
 const quizSteps = [
@@ -74,6 +76,136 @@ const quizSteps = [
   },
 ] as const;
 
+type QuizPreviewLook = {
+  id: string;
+  name: string;
+  summary: string;
+  pieces: string[];
+  aestheticLabel: string;
+  occasionLabel: string;
+  budgetLabel: string;
+};
+
+function normalizePreviewLabel(value: string) {
+  return formatOptionLabel(value).toLowerCase();
+}
+
+function buildPreviewPieces(values: QuizAnswers) {
+  const aesthetic = values.aesthetic;
+  const occasion = values.occasion;
+  const stylePreference = values.stylePreference;
+
+  const top =
+    occasion === "travel"
+      ? "Breathable top or light layer"
+      : occasion === "office"
+        ? "Polished shirt or refined knit"
+        : aesthetic === "old money"
+          ? "Oxford shirt or knit polo"
+          : aesthetic === "clean girl" || aesthetic === "minimalist"
+            ? "Clean fitted top or soft knit"
+            : aesthetic === "streetwear" || aesthetic === "creator/photoshoot"
+              ? "Statement top or sharp base layer"
+              : stylePreference === "feminine"
+                ? "Soft top with clean structure"
+                : "Signature top";
+
+  const bottom =
+    occasion === "travel"
+      ? "Easy trousers or clean denim"
+      : occasion === "office"
+        ? "Tailored trousers"
+        : aesthetic === "old money"
+          ? "Tailored trousers or chinos"
+          : aesthetic === "clean girl" || aesthetic === "minimalist"
+            ? "High-rise denim or straight trousers"
+            : occasion === "party"
+              ? "Dressier bottom with movement"
+              : "Balanced bottom piece";
+
+  const shoes =
+    occasion === "travel"
+      ? "Comfort-first clean sneakers"
+      : occasion === "office"
+        ? "Loafers, flats, or polished low heels"
+        : aesthetic === "old money"
+          ? "Loafers or refined boots"
+          : aesthetic === "clean girl" || aesthetic === "minimalist"
+            ? "Pointed flats, loafers, or sleek sneakers"
+            : aesthetic === "streetwear"
+              ? "Clean statement sneakers"
+              : "Finish with grounded shoes";
+
+  const fourthPiece =
+    occasion === "travel"
+      ? "Travel bag or light outer layer"
+      : occasion === "office"
+        ? "Structured bag or blazer"
+        : occasion === "party"
+          ? "Sharper layer or accessory finish"
+          : "Optional layer or accessory";
+
+  return [top, bottom, shoes, fourthPiece];
+}
+
+function buildQuizPreviewLooks(values: QuizAnswers): QuizPreviewLook[] {
+  const aestheticLabel = values.aesthetic
+    ? formatAestheticLabel(values.aesthetic, values.stylePreference)
+    : "Signature";
+  const occasionLabel = values.occasion ? formatOptionLabel(values.occasion) : "Everyday";
+  const budgetLabel = values.budgetRange ? formatOptionLabel(values.budgetRange) : "Flexible budget";
+  const fitLabel = values.fitPreference ? normalizePreviewLabel(values.fitPreference) : "balanced";
+  const pieces = buildPreviewPieces(values);
+
+  return [
+    {
+      id: "main-look",
+      name: `${aestheticLabel} ${occasionLabel} Look`,
+      summary: `Built around a ${fitLabel} silhouette with a realistic ${budgetLabel.toLowerCase()} spend target.`,
+      pieces,
+      aestheticLabel,
+      occasionLabel,
+      budgetLabel,
+    },
+    {
+      id: "easy-repeat",
+      name: `${aestheticLabel} Easy Repeat`,
+      summary:
+        "Keeps the same styling direction with simpler repeat-wear pieces before FitMuse picks exact products on the results page.",
+      pieces: [pieces[0], pieces[1], pieces[2], "Repeat-wear accessory or easy layer"],
+      aestheticLabel,
+      occasionLabel,
+      budgetLabel,
+    },
+    {
+      id: "dress-up",
+      name: `${aestheticLabel} Polished Swap`,
+      summary:
+        "Leaves room for one sharper layer or accessory upgrade once the full recommendation engine runs after submit.",
+      pieces: [pieces[0], pieces[1], "Dressier shoe option", pieces[3]],
+      aestheticLabel,
+      occasionLabel,
+      budgetLabel,
+    },
+  ];
+}
+
+function buildStyleDnaPreview(values: QuizAnswers) {
+  const summary = [
+    values.aesthetic
+      ? `${formatAestheticLabel(values.aesthetic, values.stylePreference).toLowerCase()} base`
+      : "",
+    values.fitPreference ? `${normalizePreviewLabel(values.fitPreference)} fit` : "",
+    values.preferredColors ? `${values.preferredColors.toLowerCase()} color mood` : "",
+    values.storesLike ? `${values.storesLike} store mix` : "",
+    values.occasion ? `${normalizePreviewLabel(values.occasion)} focus` : "",
+  ]
+    .filter(Boolean)
+    .join(", ");
+
+  return summary || "Your brief will get a fuller Style DNA summary on the results page.";
+}
+
 function getStepError(stepIndex: number, values: QuizAnswers) {
   if (stepIndex === 0) {
     if (!values.name.trim() || !values.stylePreference || !values.location.trim()) {
@@ -107,7 +239,7 @@ export function QuizForm() {
   const formSurfaceRef = useRef<HTMLDivElement | null>(null);
   const [isPending, startTransition] = useTransition();
   const savedBrief = useSyncExternalStore(
-    () => () => {},
+    subscribeStoredQuizAnswers,
     readStoredQuizAnswers,
     () => null,
   );
@@ -116,7 +248,7 @@ export function QuizForm() {
   );
   const [currentStep, setCurrentStep] = useState(0);
   const [stepError, setStepError] = useState<string | null>(null);
-  const [formValues, setFormValues] = useState<QuizAnswers>(emptyQuizAnswers());
+  const [formValues, setFormValues] = useState<QuizAnswers>(() => emptyQuizAnswers());
   const hasStoredBrief = Boolean(savedBrief);
   const showSavedBriefPrompt = hasStoredBrief && savedBriefChoice === "pending";
   const isUsingSavedBrief = hasStoredBrief && savedBriefChoice === "continue";
@@ -132,7 +264,8 @@ export function QuizForm() {
     }
   }, [currentStep, showSavedBriefPrompt]);
 
-  const previewLooks = buildOutfitRecommendations(formValues, 3);
+  const previewLooks = useMemo(() => buildQuizPreviewLooks(formValues), [formValues]);
+  const styleDnaPreview = useMemo(() => buildStyleDnaPreview(formValues), [formValues]);
   const progress = ((currentStep + 1) / quizSteps.length) * 100;
 
   function handleChange(
@@ -359,14 +492,14 @@ export function QuizForm() {
             <h3 className="mt-3 text-3xl text-white">{previewLooks[0].name}</h3>
             <div className="mt-4 flex flex-wrap gap-2">
               <span className="rounded-full bg-white/12 px-3 py-2 text-sm text-white/92">
-                {formatAestheticLabel(previewLooks[0].aesthetic, formValues.stylePreference)}
+                {previewLooks[0].aestheticLabel}
               </span>
               <span className="rounded-full bg-white/12 px-3 py-2 text-sm text-white/92">
-                {formatCurrency(previewLooks[0].totalPrice)}
+                {previewLooks[0].budgetLabel}
               </span>
             </div>
             <p className="mt-4 text-sm leading-6 text-white/74">
-              {previewLooks[0].creatorUseCase}
+              {previewLooks[0].summary}
             </p>
           </div>
         ) : null}
@@ -799,25 +932,7 @@ export function QuizForm() {
                     <div className="mt-5 rounded-[1.4rem] border border-line/70 bg-white/78 p-4">
                       <p className="mini-label">Style DNA preview</p>
                       <p className="mt-3 text-sm leading-6 text-foreground">
-                        {[
-                          formValues.aesthetic
-                            ? `${formatAestheticLabel(formValues.aesthetic, formValues.stylePreference).toLowerCase()} base`
-                            : "",
-                          formValues.fitPreference
-                            ? `${formatOptionLabel(formValues.fitPreference).toLowerCase()} fit`
-                            : "",
-                          formValues.preferredColors
-                            ? `${formValues.preferredColors.toLowerCase()} color mood`
-                            : "",
-                          formValues.storesLike
-                            ? `${formValues.storesLike} store mix`
-                            : "",
-                          formValues.occasion
-                            ? `${formatOptionLabel(formValues.occasion).toLowerCase()} focus`
-                            : "",
-                        ]
-                          .filter(Boolean)
-                          .join(", ") || "Your brief will get a fuller Style DNA summary on the results page."}
+                        {styleDnaPreview}
                       </p>
                     </div>
                   </div>
@@ -829,27 +944,20 @@ export function QuizForm() {
                           <p className="mini-label !text-white/70">Top preview look</p>
                           <h4 className="mt-3 text-3xl text-white">{previewLooks[0].name}</h4>
                           <p className="mt-3 text-sm leading-6 text-white/80">
-                            {previewLooks[0].fitNote}
+                            {previewLooks[0].summary}
                           </p>
                           <div className="mt-4 flex flex-wrap gap-2">
                             <span className="rounded-full bg-white/14 px-3 py-2 text-sm text-white">
-                              {formatOptionLabel(previewLooks[0].occasion)}
+                              {previewLooks[0].occasionLabel}
                             </span>
                             <span className="rounded-full bg-white/14 px-3 py-2 text-sm text-white">
-                              {formatCurrency(previewLooks[0].totalPrice)}
+                              {previewLooks[0].budgetLabel}
                             </span>
                           </div>
                         </div>
 
                         <div className="mt-4 grid gap-3">
-                          {[
-                            previewLooks[0].items.top.name,
-                            previewLooks[0].items.bottom.name,
-                            previewLooks[0].items.shoes.name,
-                            previewLooks[0].items.accessory?.name,
-                            previewLooks[0].items.outerwear?.name,
-                          ]
-                            .filter(Boolean)
+                          {previewLooks[0].pieces
                             .map((item) => (
                               <div
                                 key={item}
@@ -879,7 +987,7 @@ export function QuizForm() {
                     >
                       <p className="mini-label">Look {index + 1}</p>
                       <h4 className="mt-2 text-2xl text-foreground">{look.name}</h4>
-                      <p className="mt-2 text-sm">{look.creatorUseCase}</p>
+                      <p className="mt-2 text-sm">{look.summary}</p>
                     </div>
                   ))}
                 </div>
