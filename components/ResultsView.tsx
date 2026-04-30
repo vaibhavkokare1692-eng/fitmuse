@@ -5,6 +5,7 @@ import { motion } from "framer-motion";
 import { SlidersHorizontal, Sparkles, X } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
+import { OutfitVisual } from "@/components/OutfitVisual";
 import { RecommendationCard } from "@/components/RecommendationCard";
 import {
   aestheticOptions,
@@ -68,6 +69,11 @@ type ResultsFilters = {
   fit: FitPreference | "";
   store: string;
   colorFamily: ColorFamily | "";
+};
+
+type SavedLookVisualItem = {
+  category: "top" | "bottom" | "shoes" | "accessory" | "outerwear";
+  name: string;
 };
 
 type ResolvedRealOutfitPack = RealOutfitPack & {
@@ -331,6 +337,72 @@ function buildStyleDnaSummary(
       : "everyday flexibility";
 
   return `Your Style DNA: ${aesthetic}, ${fit}, ${colorMood}, ${stores}, and ${occasion}.`;
+}
+
+function getSavedLookPalette(savedLook: Partial<SavedLookSnapshot> | null | undefined) {
+  const palette = Array.isArray(savedLook?.colorPalette)
+    ? savedLook.colorPalette.filter((color): color is string => Boolean(color))
+    : [];
+
+  return palette.length > 0 ? palette : ["cream", "stone", "charcoal", "taupe"];
+}
+
+function getSavedLookVisualItems(
+  savedLook: Partial<SavedLookSnapshot> | null | undefined,
+): SavedLookVisualItem[] {
+  const items = savedLook?.items as
+    | Partial<Record<SavedLookVisualItem["category"], { name?: string } | null | undefined>>
+    | undefined;
+
+  const visualItems = [
+    items?.top?.name ? { category: "top", name: items.top.name } : null,
+    items?.bottom?.name ? { category: "bottom", name: items.bottom.name } : null,
+    items?.shoes?.name ? { category: "shoes", name: items.shoes.name } : null,
+    items?.accessory?.name ? { category: "accessory", name: items.accessory.name } : null,
+    items?.outerwear?.name ? { category: "outerwear", name: items.outerwear.name } : null,
+  ].filter(Boolean) as SavedLookVisualItem[];
+
+  if (visualItems.length > 0) {
+    return visualItems;
+  }
+
+  return [
+    { category: "top", name: "Saved top" },
+    { category: "bottom", name: "Saved bottom" },
+    { category: "shoes", name: "Saved shoes" },
+  ];
+}
+
+function getSavedLookStores(savedLook: Partial<SavedLookSnapshot> | null | undefined) {
+  return Array.isArray(savedLook?.stores)
+    ? savedLook.stores.filter((store): store is string => Boolean(store)).slice(0, 2)
+    : [];
+}
+
+function getSavedLookItemSummary(
+  savedLook: Partial<SavedLookSnapshot> | null | undefined,
+): Array<{ label: string; value: string }> {
+  const items = savedLook?.items as
+    | Partial<Record<SavedLookVisualItem["category"], { name?: string } | null | undefined>>
+    | undefined;
+
+  const summary = [
+    items?.top?.name ? { label: "Top", value: items.top.name } : null,
+    items?.bottom?.name ? { label: "Bottom", value: items.bottom.name } : null,
+    items?.shoes?.name ? { label: "Shoes", value: items.shoes.name } : null,
+    items?.accessory?.name ? { label: "Accessory", value: items.accessory.name } : null,
+    items?.outerwear?.name ? { label: "Outerwear", value: items.outerwear.name } : null,
+  ].filter(Boolean) as Array<{ label: string; value: string }>;
+
+  if (summary.length > 0) {
+    return summary;
+  }
+
+  return [
+    { label: "Top", value: "Saved look details unavailable" },
+    { label: "Bottom", value: "Snapshot uses an older FitMuse format" },
+    { label: "Shoes", value: "Visual fallback is shown safely" },
+  ];
 }
 
 export function ResultsView({ searchParamsObject = {} }: ResultsViewProps) {
@@ -1315,9 +1387,19 @@ export function ResultsView({ searchParamsObject = {} }: ResultsViewProps) {
             {savedRecommendations.map((savedLook) => (
               <div
                 key={`saved-${savedLook.id}-${savedLook.savedAt}`}
-                className="rounded-[1.6rem] border border-line/70 bg-white/82 p-5 shadow-[0_18px_40px_rgba(27,21,19,0.06)]"
+                className="rounded-[1.6rem] border border-line/70 bg-white/82 p-4 shadow-[0_18px_40px_rgba(27,21,19,0.06)] sm:p-5"
               >
-                <div className="flex flex-wrap gap-2">
+                <OutfitVisual
+                  title={savedLook.name}
+                  subtitle={`${savedLook.confidenceScore}% confidence`}
+                  palette={getSavedLookPalette(savedLook)}
+                  items={getSavedLookVisualItems(savedLook)}
+                  stores={getSavedLookStores(savedLook)}
+                  compact
+                  className="min-h-[22rem]"
+                />
+
+                <div className="mt-4 flex flex-wrap gap-2">
                   <span className="chip">
                     {formatAestheticLabel(savedLook.aesthetic, savedLook.stylePreference)}
                   </span>
@@ -1338,7 +1420,7 @@ export function ResultsView({ searchParamsObject = {} }: ResultsViewProps) {
                 </div>
 
                 <div className="mt-4 flex flex-wrap items-center gap-2">
-                  {savedLook.colorPalette.slice(0, 4).map((color) => (
+                  {getSavedLookPalette(savedLook).slice(0, 4).map((color) => (
                     <span
                       key={`${savedLook.id}-${savedLook.savedAt}-${color}`}
                       className="inline-flex items-center gap-2 rounded-full border border-line/70 bg-background/72 px-3 py-2 text-xs font-medium text-foreground"
@@ -1438,10 +1520,21 @@ export function ResultsView({ searchParamsObject = {} }: ResultsViewProps) {
               </div>
             </div>
 
+            <div className="mt-6">
+              <OutfitVisual
+                title={selectedSavedLook.name}
+                subtitle={`${selectedSavedLook.confidenceScore}% confidence`}
+                palette={getSavedLookPalette(selectedSavedLook)}
+                items={getSavedLookVisualItems(selectedSavedLook)}
+                stores={getSavedLookStores(selectedSavedLook)}
+                className="min-h-[24rem]"
+              />
+            </div>
+
             <div className="mt-6 rounded-[1.5rem] border border-line/70 bg-white/78 p-5">
               <p className="mini-label">Color palette</p>
               <div className="mt-4 flex flex-wrap gap-2">
-                {selectedSavedLook.colorPalette.map((color) => (
+                {getSavedLookPalette(selectedSavedLook).map((color) => (
                   <span
                     key={`modal-${selectedSavedLook.id}-${color}`}
                     className="inline-flex items-center gap-2 rounded-full border border-line/70 bg-background/72 px-3 py-2 text-xs font-medium text-foreground"
@@ -1457,19 +1550,7 @@ export function ResultsView({ searchParamsObject = {} }: ResultsViewProps) {
             </div>
 
             <div className="mt-6 grid gap-3">
-              {(
-                [
-                  { label: "Top", value: selectedSavedLook.items.top.name },
-                  { label: "Bottom", value: selectedSavedLook.items.bottom.name },
-                  { label: "Shoes", value: selectedSavedLook.items.shoes.name },
-                  selectedSavedLook.items.accessory
-                    ? { label: "Accessory", value: selectedSavedLook.items.accessory.name }
-                    : null,
-                  selectedSavedLook.items.outerwear
-                    ? { label: "Outerwear", value: selectedSavedLook.items.outerwear.name }
-                    : null,
-                ].filter(Boolean) as Array<{ label: string; value: string }>
-              ).map((item) => (
+              {getSavedLookItemSummary(selectedSavedLook).map((item) => (
                   <div
                     key={item.label}
                     className="flex items-center justify-between gap-3 rounded-[1.3rem] border border-line/70 bg-white/78 px-4 py-3"
