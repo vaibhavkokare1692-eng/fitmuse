@@ -8,6 +8,7 @@ type RuleCheck = {
     stylePreference?: string;
     budget?: string;
     fitPreference?: string;
+    bodyOrFit?: string;
     region?: string;
     climate?: string;
   };
@@ -47,8 +48,13 @@ const checks: RuleCheck[] = [
       aesthetic: "smart casual",
       occasion: "office",
       stylePreference: "masculine",
+      budget: "$200-$350",
     },
-    expectedRuleNames: ["Oxford Shirt Core"],
+    expectedRuleNames: [
+      "Masculine Office Smart Casual Core",
+      "Oxford Trouser Loafer Office Foundation",
+      "Masculine Premium Office Upgrade",
+    ],
   },
   {
     label: "Feminine Clean Minimal Date",
@@ -78,6 +84,36 @@ const checks: RuleCheck[] = [
       "Petite Vertical Line Rule",
       "Petite Skirt Length Rule",
       "White Tee and Straight Jean Formula",
+    ],
+  },
+  {
+    label: "Feminine Office Clean Minimal",
+    brief: {
+      aesthetic: "clean minimal",
+      occasion: "office",
+      stylePreference: "feminine",
+      budget: "$100-$200",
+    },
+    expectedRuleNames: [
+      "Feminine Office Clean Minimal Core",
+      "Silk Blouse Tailored Trouser Office",
+      "Fine Knit Wide-Leg Office",
+      "Office Low Visual Noise Discipline",
+    ],
+  },
+  {
+    label: "Mixed/Open Business Casual",
+    brief: {
+      aesthetic: "minimalist",
+      occasion: "office",
+      stylePreference: "mixed / open to all",
+      budget: "$100-$200",
+    },
+    expectedRuleNames: [
+      "Mixed Open Business Casual Core",
+      "Neutral Layer Office Flex",
+      "Casual Office Clean Sneaker Rule",
+      "Office Low Visual Noise Discipline",
     ],
   },
 ];

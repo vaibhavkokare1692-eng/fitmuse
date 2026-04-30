@@ -922,6 +922,821 @@ Later these rules can become:
 - budget fallback logic
 - regional and cultural styling rules
 
+---
+
+## Rule Set: Smart Casual / Office Style System
+
+### A. Core principles
+
+- Polished, but not overly formal
+- Clean structure over visual clutter
+- Workplace-appropriate silhouettes first
+- Comfort matters for long wear and commuting
+- Sharp shoes and clean layers do a lot of the styling work
+- Low visual noise reads more premium and more credible
+- Budget realism matters more than office fantasy styling
+- Office dress-code flexibility should be respected instead of assumed
+
+### B. Outfit formulas
+
+#### Masculine formulas
+
+##### 1. Oxford shirt + tailored trousers + loafers
+
+- Best occasion: office day, meeting, interview, business-casual commute
+- Recommended colors: white/off-white, soft blue, navy, charcoal
+- Fit notes: clean shoulder, straight or slim-straight trouser, no tight shirt pull
+- Why it works: this is the most dependable office-ready baseline
+- Budget-friendly version: wrinkle-resistant shirt + clean chinos + soft loafers
+
+##### 2. Knit polo + chinos + clean sneakers or loafers
+
+- Best occasion: casual office, startup office, warmer workday
+- Recommended colors: navy, beige, olive, camel, cream
+- Fit notes: polo should skim the torso, chinos should stay clean through the leg
+- Why it works: relaxed polish without looking underdressed
+- Budget-friendly version: cotton knit polo + tapered chinos + clean court sneaker
+
+##### 3. Quarter-zip + button-down + tailored trousers
+
+- Best occasion: cooler office, office travel day, meeting-heavy day
+- Recommended colors: charcoal, navy, cream, soft blue
+- Fit notes: neat layering only, no bulky athletic zip
+- Why it works: gives comfort and warmth while staying workplace-appropriate
+- Budget-friendly version: cotton quarter-zip + basic button-up + office trouser
+
+##### 4. Unstructured blazer + T-shirt or knit + chinos
+
+- Best occasion: business casual, founder office, presentation day
+- Recommended colors: navy, charcoal, camel, cream
+- Fit notes: one structured layer, one soft base, trousers should stay tidy
+- Why it works: smart without becoming stiff
+- Budget-friendly version: soft blazer + clean tee + chinos + loafers
+
+##### 5. Merino sweater + trousers + Chelsea boots
+
+- Best occasion: cooler office, city office, polished commute day
+- Recommended colors: charcoal, navy, camel, olive
+- Fit notes: smooth torso line, trousers should not stack heavily
+- Why it works: quiet and refined with long-wear comfort
+- Budget-friendly version: cotton-merino sweater + tailored chinos + sleek boots
+
+#### Feminine formulas
+
+##### 6. Silk or button-up blouse + tailored trousers + pointed flats
+
+- Best occasion: office day, client meeting, interview
+- Recommended colors: cream, soft blue, charcoal, muted burgundy
+- Fit notes: blouse should drape cleanly, trousers should hold shape
+- Why it works: soft polish plus work credibility
+- Budget-friendly version: matte draped blouse + ankle trouser + pointed flat
+
+##### 7. Fine knit top + wide-leg trousers + loafers
+
+- Best occasion: everyday office, business casual, cooler indoor office
+- Recommended colors: navy, cream, camel, olive
+- Fit notes: clear waist line or gentle tuck, trousers should fall cleanly
+- Why it works: comfortable and clean without looking too casual
+- Budget-friendly version: fitted knit tee + wide trouser + flat loafers
+
+##### 8. Blazer + simple tee + straight-leg trousers
+
+- Best occasion: office, coworking, meeting, hybrid-work day
+- Recommended colors: charcoal, cream, navy, camel
+- Fit notes: keep the tee refined and the blazer soft, not corporate-stiff
+- Why it works: structure plus simplicity
+- Budget-friendly version: ponte blazer + clean tee + straight trouser
+
+##### 9. Midi or slip skirt + structured knit + flats or boots
+
+- Best occasion: office, creative work setting, polished daily wear
+- Recommended colors: cream, camel, olive, charcoal
+- Fit notes: keep the skirt line calm and the knit clean at the waist
+- Why it works: feminine without becoming nightlife-coded
+- Budget-friendly version: knit top + matte midi skirt + pointed flat
+
+##### 10. Cardigan + high-rise trousers + structured bag
+
+- Best occasion: daily office wear, commute days, softer business casual
+- Recommended colors: cream, navy, camel, soft blue
+- Fit notes: high-rise helps the line feel cleaner, especially for petite users
+- Why it works: repeatable, practical, and polished
+- Budget-friendly version: cotton cardigan + high-rise trouser + small tote
+
+#### Mixed / open formulas
+
+##### 11. Relaxed blazer + clean tee + straight trousers
+
+- Best occasion: mixed/open office brief, business casual, meeting day
+- Recommended colors: navy, charcoal, cream, olive
+- Fit notes: relaxed is okay if one piece still feels structured
+- Why it works: neutral, current, and office-safe
+- Budget-friendly version: lightweight blazer + tee + straight-leg trouser
+
+##### 12. Neutral knit + chinos or trousers + minimalist sneakers
+
+- Best occasion: casual office, startup office, commute-heavy workday
+- Recommended colors: stone, charcoal, navy, cream
+- Fit notes: keep shoes clean and the trouser line tidy
+- Why it works: comfort without losing work-readiness
+- Budget-friendly version: cotton knit + chinos + clean sneaker
+
+##### 13. Overshirt or light jacket + tailored bottom + clean shoes
+
+- Best occasion: office travel day, creative office, mild-weather business casual
+- Recommended colors: olive, charcoal, navy, stone
+- Fit notes: the outer layer should add shape, not bulk
+- Why it works: layered and flexible without feeling messy
+- Budget-friendly version: cotton overshirt + tailored trouser + clean sneaker
+
+### C. Product selection rules
+
+#### Tops
+
+- Recommend:
+  - Oxford shirts
+  - button-ups
+  - knit polos
+  - fine knit tops
+  - silk or blend blouses
+  - simple premium tees
+  - merino or cotton sweaters
+  - quarter-zips
+- Avoid:
+  - graphic tees
+  - hoodies for standard office
+  - clubwear tops
+  - obvious gym layers
+- Price target:
+  - under $100: one strong top, not multiple weak layers
+  - $100-$200: top should still look polished, but not consume the whole budget
+  - $200+: better fabric and cleaner finishing become more important
+- Fit:
+  - structured but comfortable
+  - not too tight
+  - not sloppy
+- Materials:
+  - cotton
+  - oxford cotton
+  - merino
+  - silk
+  - matte satin only if it reads work-safe
+- Colors:
+  - navy
+  - cream
+  - white/off-white
+  - soft blue
+  - camel
+  - olive
+- Why:
+  - these tops build office polish quickly without requiring full suiting
+
+#### Bottoms
+
+- Recommend:
+  - tailored trousers
+  - chinos
+  - wide-leg trousers
+  - straight-leg trousers
+  - dark clean denim only when office is casual
+  - midi or slip skirts for feminine office looks
+- Avoid:
+  - distressed denim
+  - sloppy joggers
+  - cargo pants for standard office
+  - hyper-trendy low-rise cuts
+- Price target:
+  - under $100: one clean, repeatable trouser matters most
+  - $100-$200: better drape and fit make a clear difference
+  - $200+: wool, pleats, and refined tailoring can show up
+- Fit:
+  - clean trouser fall
+  - no heavy stacking
+  - wide-leg only if the rest of the look stays controlled
+- Materials:
+  - cotton twill
+  - wool blend
+  - merino-blend knit bottom only if it still reads office-safe
+- Colors:
+  - charcoal
+  - navy
+  - beige
+  - camel
+  - olive
+- Why:
+  - bottoms control how professional or sloppy the outfit feels
+
+#### Shoes
+
+- Recommend:
+  - loafers
+  - Chelsea boots
+  - pointed flats
+  - slingbacks
+  - minimalist sneakers if the office is casual
+  - low block heels if preferred
+- Avoid:
+  - gym sneakers
+  - chunky dad sneakers
+  - club heels for office
+  - patent or loud metallic footwear in normal office briefs
+- Price target:
+  - footwear is a strong upgrade zone at every budget level
+- Fit:
+  - clean silhouette
+  - comfortable enough for long wear
+- Materials:
+  - leather
+  - suede
+  - matte faux-leather only if it looks clean
+- Colors:
+  - black
+  - brown
+  - burgundy
+  - tan
+  - cream
+- Why:
+  - sharp shoes often make the whole outfit feel more intentional
+
+#### Accessories
+
+- Recommend:
+  - leather belt
+  - simple watch
+  - structured work bag
+  - minimal jewelry
+  - clean laptop bag
+  - subtle scarf when useful
+- Avoid:
+  - loud logo belts
+  - flashy club accessories
+  - overly sporty backpacks when the brief is polished office
+- Price target:
+  - budget accessories should support the look, not dominate the spend
+- Fit:
+  - scale matters, especially for petite users
+- Materials:
+  - leather
+  - coated canvas only if it stays understated
+  - subtle metal hardware
+- Colors:
+  - black
+  - brown
+  - tan
+  - neutral metals
+- Why:
+  - accessories should finish the board and reinforce work-readiness
+
+### D. Color rules
+
+- Use:
+  - navy
+  - charcoal
+  - beige
+  - cream
+  - white/off-white
+  - black
+  - camel
+  - olive
+  - brown
+  - soft blue
+  - muted burgundy
+- Avoid:
+  - neon
+  - loud graphics
+  - clubwear shine
+  - overly distressed pieces
+  - overly sporty/gym colors for office contexts
+- Keep color noise low:
+  - 2 to 3 main colors usually works best
+- Use texture instead of loud contrast:
+  - wool, knit, leather, and soft tailoring do more than bright statement colors
+
+### E. Fit and silhouette rules
+
+- Structured, but comfortable
+- Not too tight
+- Not too oversized unless balanced
+- Trousers should fall cleanly
+- Tops should tuck or half-tuck cleanly when appropriate
+- Petite users often benefit from high-rise bottoms and pointed shoes
+- Tall users can use longer layers and wide-leg trousers more easily
+- Relaxed-fit users should still keep one structured element
+
+### F. Budget rules
+
+#### Under $100
+
+- Prioritize top + bottom + shoes
+- Use minimal accessories only if budget allows
+- Avoid forcing blazer or outerwear
+
+#### $100-$200
+
+- Build a complete affordable smart-casual look
+- Top + bottom + shoes + small accessory is realistic
+
+#### $200-$350
+
+- Allow blazer, cardigan, structured bag, or better shoes
+
+#### $350+
+
+- Allow premium blazer, coat, structured bag, and stronger wool, silk, or merino pieces
+
+### G. Avoid list
+
+- hoodies for standard office unless the user selects casual or creative office
+- graphic tees
+- distressed denim
+- gym sneakers
+- clubwear tops
+- overly shiny synthetic fabrics
+- loud logos
+- clothes that are too tight or too revealing for office context
+- overly formal suits when the user selected smart casual
+
+### H. App-ready IF/THEN rules
+
+#### Rule 1: Masculine Office Smart Casual Core
+
+- IF user selects:
+  - aesthetic: smart casual, office, old money, quiet luxury
+  - occasion: office, work, meeting, business casual
+  - style preference: masculine
+  - budget: any
+  - body/proportion: general
+  - region/climate: any
+  - modesty preference: any
+- THEN prioritize:
+  - items: oxford shirt, tailored trousers, loafers
+  - colors: navy, charcoal, cream, camel
+  - fits: clean tailoring, polished silhouette
+  - materials: oxford cotton, wool blend, cotton
+  - shoes: loafers, Chelsea boots
+  - accessories: belt, watch, structured work bag
+- AVOID: hoodies, graphic tees, gym sneakers, loud logos
+- WHY: this is the safest and most credible office-smart-casual baseline
+- SCORING IMPACT: high
+- MATCH REASON: This look keeps office polish without feeling overly formal.
+- CONFIDENCE: high
+
+#### Rule 2: Oxford Trouser Loafer Office Foundation
+
+- IF user selects:
+  - aesthetic: smart casual, office, minimalist
+  - occasion: office, interview, meeting
+  - style preference: masculine
+  - budget: any
+  - body/proportion: general
+  - region/climate: any
+  - modesty preference: any
+- THEN prioritize:
+  - items: oxford shirt, tailored trousers
+  - colors: off-white, soft blue, navy, charcoal
+  - fits: clean line, pressed finish
+  - materials: oxford cotton, cotton, wool blend
+  - shoes: loafers
+  - accessories: belt, simple watch
+- AVOID: distressed denim, nightlife-coded shirts
+- WHY: shirt-trouser-loafer is the fastest office-ready formula
+- SCORING IMPACT: high
+- MATCH REASON: The tailored trousers and clean shoes make the outfit work-ready.
+- CONFIDENCE: high
+
+#### Rule 3: Knit Polo Chino Office Casual
+
+- IF user selects:
+  - aesthetic: smart casual, office
+  - occasion: office, business casual, work
+  - style preference: masculine
+  - budget: under $100 to $200-$350
+  - body/proportion: general
+  - region/climate: warm or mild
+  - modesty preference: any
+- THEN prioritize:
+  - items: knit polo, chinos
+  - colors: navy, beige, olive, camel
+  - fits: structured but comfortable
+  - materials: cotton knit, cotton, linen blend
+  - shoes: loafers or clean sneakers if office is casual
+  - accessories: clean laptop bag, leather belt
+- AVOID: sport polos, gym sneakers, performance shine
+- WHY: this keeps casual offices polished without overheating the look
+- SCORING IMPACT: high
+- MATCH REASON: The knit layer adds comfort while keeping the silhouette sharp.
+- CONFIDENCE: high
+
+#### Rule 4: Quarter-Zip Office Layer
+
+- IF user selects:
+  - aesthetic: smart casual, office, quiet luxury
+  - occasion: office, meeting, work
+  - style preference: masculine
+  - budget: any
+  - body/proportion: general
+  - region/climate: cool or mild
+  - modesty preference: any
+- THEN prioritize:
+  - items: quarter-zip, button-down, tailored trousers
+  - colors: charcoal, navy, cream, soft blue
+  - fits: neat layering, no bulk
+  - materials: merino, cotton, soft wool blend
+  - shoes: loafers, Chelsea boots
+  - accessories: simple watch, clean laptop bag
+- AVOID: technical athletic quarter-zips
+- WHY: a clean knit layer solves comfort and temperature without becoming sporty
+- SCORING IMPACT: medium-high
+- MATCH REASON: The layer keeps the outfit comfortable for long wear while still reading polished.
+- CONFIDENCE: medium
+
+#### Rule 5: Blazer Tee Chino Business Casual
+
+- IF user selects:
+  - aesthetic: smart casual, office, luxury neutral
+  - occasion: office, meeting, business casual
+  - style preference: masculine
+  - budget: $100-$200 and up
+  - body/proportion: general
+  - region/climate: mild or cool
+  - modesty preference: any
+- THEN prioritize:
+  - items: soft blazer, premium tee, chinos
+  - colors: navy, charcoal, cream, camel
+  - fits: one structured layer, one relaxed base
+  - materials: soft tailoring, cotton, wool blend
+  - shoes: loafers or clean sneakers if office is casual
+  - accessories: structured bag, watch
+- AVOID: graphic tees, stiff corporate suiting
+- WHY: a blazer and tee keeps the look modern and approachable
+- SCORING IMPACT: high
+- MATCH REASON: The clean layer stack makes the outfit work-ready without feeling corporate.
+- CONFIDENCE: high
+
+#### Rule 6: Merino Sweater Chelsea Office
+
+- IF user selects:
+  - aesthetic: office, old money, quiet luxury
+  - occasion: office, interview, meeting
+  - style preference: masculine
+  - budget: $100-$200 and up
+  - body/proportion: general
+  - region/climate: cool weather
+  - modesty preference: any
+- THEN prioritize:
+  - items: merino sweater, tailored trousers
+  - colors: charcoal, navy, camel, olive
+  - fits: clean line, not clingy
+  - materials: merino, wool blend, cotton
+  - shoes: Chelsea boots, loafers
+  - accessories: belt, work bag
+- AVOID: graphic sweatshirts, runner sneakers
+- WHY: a quiet knit plus a sharper shoe keeps cooler-weather office looks believable
+- SCORING IMPACT: medium-high
+- MATCH REASON: The knit layer adds comfort while the sharper shoes keep the outfit credible for work.
+- CONFIDENCE: medium
+
+#### Rule 7: Masculine Office Budget Core
+
+- IF user selects:
+  - aesthetic: office, smart casual, minimalist
+  - occasion: office, work, business casual
+  - style preference: masculine
+  - budget: under $100 or $100-$200
+  - body/proportion: general
+  - region/climate: any
+  - modesty preference: any
+- THEN prioritize:
+  - items: oxford shirt, chinos, clean shoes
+  - colors: off-white, navy, beige, charcoal
+  - fits: clean tailoring, structured but comfortable
+  - materials: cotton, oxford cotton
+  - shoes: loafers or clean sneakers if casual office
+  - accessories: belt only if budget allows
+- AVOID: forced blazer/coat layering
+- WHY: low-budget office boards should favor credible essentials over weak extras
+- SCORING IMPACT: high
+- MATCH REASON: This outfit stays within budget by focusing on office-ready core pieces.
+- CONFIDENCE: high
+
+#### Rule 8: Masculine Premium Office Upgrade
+
+- IF user selects:
+  - aesthetic: office, smart casual, quiet luxury
+  - occasion: office, work, meeting, interview
+  - style preference: masculine
+  - budget: $200-$350 or $350+
+  - body/proportion: general
+  - region/climate: any
+  - modesty preference: any
+- THEN prioritize:
+  - items: blazer, merino knit, structured work bag
+  - colors: navy, charcoal, camel, muted burgundy
+  - fits: soft structure, polished silhouette
+  - materials: wool blend, merino, leather
+  - shoes: loafers, Chelsea boots
+  - accessories: refined watch, structured tote
+- AVOID: showy luxury cues
+- WHY: higher office budgets should pay off through material, layer quality, and better accessories
+- SCORING IMPACT: high
+- MATCH REASON: The stronger layer and sharper shoes make the outfit feel more premium without losing office ease.
+- CONFIDENCE: high
+
+#### Rule 9: Feminine Office Clean Minimal Core
+
+- IF user selects:
+  - aesthetic: clean minimal, minimalist, office, quiet luxury
+  - occasion: office, work, meeting, business casual
+  - style preference: feminine
+  - budget: any
+  - body/proportion: general
+  - region/climate: any
+  - modesty preference: any
+- THEN prioritize:
+  - items: blouse, tailored trousers, structured bag
+  - colors: cream, navy, charcoal, camel
+  - fits: clean drape, waist-aware structure
+  - materials: silk, cotton, wool blend
+  - shoes: pointed flats, loafers, slingbacks
+  - accessories: minimal jewelry, structured work bag
+- AVOID: clubwear tops, gym sneakers, distressed denim
+- WHY: feminine office minimalism needs calm polish more than statement styling
+- SCORING IMPACT: high
+- MATCH REASON: The tailored pieces keep the outfit polished and office-ready without looking severe.
+- CONFIDENCE: high
+
+#### Rule 10: Silk Blouse Tailored Trouser Office
+
+- IF user selects:
+  - aesthetic: clean minimal, quiet luxury, office
+  - occasion: office, meeting, interview
+  - style preference: feminine
+  - budget: $100-$200 and up
+  - body/proportion: general
+  - region/climate: warm or mild
+  - modesty preference: any
+- THEN prioritize:
+  - items: silk/blend blouse, tailored trousers
+  - colors: cream, soft blue, charcoal, muted burgundy
+  - fits: clean drape, polished silhouette
+  - materials: silk, matte satin, wool blend
+  - shoes: pointed flats, loafers, low block heels
+  - accessories: structured bag, simple jewelry
+- AVOID: cheap shiny satin, party camis
+- WHY: fluid texture plus controlled tailoring works well for client-facing office looks
+- SCORING IMPACT: high
+- MATCH REASON: The fluid blouse and clean trouser line make the outfit feel polished but still easy to wear all day.
+- CONFIDENCE: high
+
+#### Rule 11: Fine Knit Wide-Leg Office
+
+- IF user selects:
+  - aesthetic: clean minimal, minimalist, office
+  - occasion: office, business casual, work
+  - style preference: feminine
+  - budget: any
+  - body/proportion: general
+  - region/climate: mild or cool
+  - modesty preference: any
+- THEN prioritize:
+  - items: fine knit top, wide-leg trousers
+  - colors: navy, cream, camel, olive
+  - fits: balanced proportions, clean drape
+  - materials: soft knit, cotton, wool blend
+  - shoes: loafers, pointed flats, low block heels
+  - accessories: structured work bag
+- AVOID: shapeless volume, gym runners
+- WHY: this formula gives office comfort without losing control of the silhouette
+- SCORING IMPACT: high
+- MATCH REASON: The knit layer adds comfort while the tailored line keeps the outfit office-ready.
+- CONFIDENCE: high
+
+#### Rule 12: Blazer Tee Straight Trouser Office
+
+- IF user selects:
+  - aesthetic: smart casual, office, clean minimal
+  - occasion: office, meeting, business casual
+  - style preference: feminine
+  - budget: $100-$200 and up
+  - body/proportion: general
+  - region/climate: mild or cool
+  - modesty preference: any
+- THEN prioritize:
+  - items: blazer, clean tee, straight trousers
+  - colors: charcoal, cream, navy, camel
+  - fits: soft structure, clean line
+  - materials: cotton, soft tailoring, wool blend
+  - shoes: pointed flats, loafers, clean casual-office sneakers
+  - accessories: structured work bag, watch
+- AVOID: graphic tees, party heels
+- WHY: a clean tee plus a better layer keeps the board modern and easy to repeat
+- SCORING IMPACT: high
+- MATCH REASON: The structured blazer and simple base keep the outfit intentional without making it feel heavy.
+- CONFIDENCE: high
+
+#### Rule 13: Midi Skirt Structured Knit Office
+
+- IF user selects:
+  - aesthetic: clean minimal, office, quiet luxury
+  - occasion: office, work, meeting
+  - style preference: feminine
+  - budget: $100-$200 and up
+  - body/proportion: general or modest
+  - region/climate: mild or cool
+  - modesty preference: balanced or modest
+- THEN prioritize:
+  - items: midi or slip skirt, structured knit
+  - colors: cream, camel, olive, charcoal
+  - fits: waist-aware structure, clean drape
+  - materials: silk texture, soft knit, wool blend
+  - shoes: pointed flats, slingbacks, boots
+  - accessories: minimal jewelry, subtle scarf
+- AVOID: clubwear shine, bodycon shapes
+- WHY: this keeps office femininity polished instead of nightlife-coded
+- SCORING IMPACT: medium-high
+- MATCH REASON: The structured knit and cleaner skirt line keep the outfit work-ready without losing softness.
+- CONFIDENCE: medium
+
+#### Rule 14: Cardigan High-Rise Trouser Office
+
+- IF user selects:
+  - aesthetic: clean minimal, office, smart casual
+  - occasion: office, work, business casual
+  - style preference: feminine
+  - budget: any
+  - body/proportion: general or petite
+  - region/climate: any
+  - modesty preference: any
+- THEN prioritize:
+  - items: cardigan, high-rise trouser, structured bag
+  - colors: cream, navy, camel, soft blue
+  - fits: high-rise, long vertical line, clean drape
+  - materials: cotton knit, merino, wool blend
+  - shoes: pointed flats, loafers, clean casual-office sneakers
+  - accessories: structured bag, minimal jewelry
+- AVOID: hoodies, slouchy shapes with no structure
+- WHY: cardigan plus high-rise tailoring is comfortable, believable, and easy to rewear
+- SCORING IMPACT: high
+- MATCH REASON: The cardigan keeps the outfit easy for long wear while the high-rise line keeps it polished.
+- CONFIDENCE: high
+
+#### Rule 15: Feminine Petite Office Line
+
+- IF user selects:
+  - aesthetic: clean minimal, office, minimalist
+  - occasion: office, meeting, business casual
+  - style preference: feminine
+  - budget: any
+  - body/proportion: petite
+  - region/climate: any
+  - modesty preference: any
+- THEN prioritize:
+  - items: high-rise bottoms, fine knit top, small structured bag
+  - colors: cream, navy, camel, soft blue
+  - fits: long vertical line, waist-aware structure
+  - materials: cotton, knit, wool blend
+  - shoes: pointed flats, low block heels, slingbacks
+  - accessories: scaled-down structured bag
+- AVOID: oversized totes, awkward knee-length cuts
+- WHY: petite office outfits work better when the line stays long and the accessories stay proportional
+- SCORING IMPACT: high
+- MATCH REASON: The high-rise line and refined shoes help the office outfit feel longer and cleaner.
+- CONFIDENCE: high
+
+#### Rule 16: Feminine Office Budget Anchor
+
+- IF user selects:
+  - aesthetic: office, clean minimal, smart casual
+  - occasion: office, work, business casual
+  - style preference: feminine
+  - budget: under $100 or $100-$200
+  - body/proportion: general
+  - region/climate: any
+  - modesty preference: any
+- THEN prioritize:
+  - items: knit top, tailored trousers, pointed flats
+  - colors: cream, navy, charcoal, camel
+  - fits: clean drape, polished silhouette
+  - materials: cotton, soft knit
+  - shoes: pointed flats, loafers
+  - accessories: minimal jewelry only if budget allows
+- AVOID: forced blazers, extra layers, cheap shine
+- WHY: a cleaner core looks more credible than a weak office costume at low spend
+- SCORING IMPACT: high
+- MATCH REASON: This outfit stays within budget by focusing on office-ready essentials instead of extra layers.
+- CONFIDENCE: high
+
+#### Rule 17: Mixed/Open Business Casual Core
+
+- IF user selects:
+  - aesthetic: smart casual, minimalist, office, quiet luxury
+  - occasion: office, work, business casual, meeting
+  - style preference: mixed/open
+  - budget: any
+  - body/proportion: general
+  - region/climate: any
+  - modesty preference: any
+- THEN prioritize:
+  - items: blazer, clean tee, straight trousers
+  - colors: navy, charcoal, cream, olive
+  - fits: structured but comfortable, balanced proportions
+  - materials: cotton, wool blend, soft tailoring
+  - shoes: loafers, clean sneakers, Chelsea boots
+  - accessories: structured bag, simple watch
+- AVOID: overly gendered office styling, graphic casualwear
+- WHY: mixed/open office styling should feel neutral, sharp, and easy to personalize
+- SCORING IMPACT: high
+- MATCH REASON: The neutral layers and clean shoes keep the outfit structured, comfortable, and office-ready.
+- CONFIDENCE: high
+
+#### Rule 18: Neutral Layer Office Flex
+
+- IF user selects:
+  - aesthetic: minimalist, office, luxury neutral
+  - occasion: office, work, business casual
+  - style preference: mixed/open
+  - budget: $100-$200 and up
+  - body/proportion: relaxed, oversized, or tall-friendly
+  - region/climate: mild or cool
+  - modesty preference: any
+- THEN prioritize:
+  - items: overshirt or light jacket, neutral knit, tailored bottom
+  - colors: charcoal, navy, stone, olive
+  - fits: layered without bulk, longer layers, one structured element
+  - materials: cotton, soft wool blend, linen blend
+  - shoes: clean sneakers, loafers, Chelsea boots
+  - accessories: clean laptop bag, minimal jewelry
+- AVOID: double-oversized proportions, sporty nylon shine
+- WHY: a neutral layered office look can stay comfortable without becoming sloppy
+- SCORING IMPACT: medium-high
+- MATCH REASON: The layered neutral pieces keep the outfit flexible for work while still looking intentional.
+- CONFIDENCE: medium
+
+#### Rule 19: Casual Office Clean Sneaker Rule
+
+- IF user selects:
+  - aesthetic: smart casual, office, minimal
+  - occasion: office, work, business casual
+  - style preference: any
+  - budget: any
+  - body/proportion: general
+  - region/climate: any
+  - modesty preference: any
+- THEN prioritize:
+  - items: tailored bottom, clean shirt or tee, office-safe layer
+  - colors: off-white, navy, charcoal, camel
+  - fits: structured but comfortable, clean line
+  - materials: cotton, wool blend, leather
+  - shoes: minimalist sneakers if office is casual
+  - accessories: clean laptop bag, simple watch
+- AVOID: gym sneakers, athletic mesh, sloppy sport styling
+- WHY: sneakers only work in office when everything around them stays clean and intentional
+- SCORING IMPACT: medium
+- MATCH REASON: The clean sneakers work because the rest of the outfit keeps the office silhouette structured.
+- CONFIDENCE: medium
+
+#### Rule 20: Office Low Visual Noise Discipline
+
+- IF user selects:
+  - aesthetic: office, smart casual, minimal, quiet luxury
+  - occasion: office, work, interview, meeting
+  - style preference: any
+  - budget: any
+  - body/proportion: general
+  - region/climate: any
+  - modesty preference: any
+- THEN prioritize:
+  - items: clean clothing, structured work bag, coordinated accessories
+  - colors: navy, charcoal, beige, cream, olive, soft blue
+  - fits: polished silhouette, clean line, not clingy
+  - materials: cotton, wool blend, merino, leather
+  - shoes: refined shoes
+  - accessories: minimal jewelry, simple watch, structured bag
+- AVOID: graphic clutter, loud logos, office-inappropriate reveal, shiny synthetic fabric
+- WHY: lower visual noise makes office outfits feel more premium and more believable
+- SCORING IMPACT: high
+- MATCH REASON: The structured bag and minimal accessories make the look feel intentional.
+- CONFIDENCE: high
+
+### I. User-facing match reasons
+
+- This look keeps office polish without feeling overly formal.
+- The tailored trousers and clean shoes make the outfit work-ready.
+- The knit layer adds comfort while keeping the silhouette sharp.
+- The structured bag and minimal accessories make the look feel intentional.
+- This outfit stays within budget by focusing on office-ready core pieces.
+- The clean sneakers work because the rest of the outfit keeps the office silhouette structured.
+- The layer keeps the outfit comfortable for long wear while still reading polished.
+- The fluid blouse and clean trouser line make the outfit feel polished but still easy to wear all day.
+
+### J. Limitations
+
+- Office dress codes vary by company, country, and industry.
+- Creative offices can allow sneakers and denim.
+- Corporate offices may require stricter tailoring.
+- FitMuse should ask user preference rather than assume.
+- Modesty and climate should be handled by user preference.
+
 This module can also support:
 
 - better recommendation ranking
