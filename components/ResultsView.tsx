@@ -18,6 +18,7 @@ import {
   getRealPackBudgetSummary,
   getRealProductsForOutfitPack,
 } from "@/data/realOutfitPacks";
+import { REAL_PRODUCT_PLACEHOLDER_URL } from "@/data/realProducts";
 import { products } from "@/data/products";
 import {
   clearStoredQuizAnswers,
@@ -403,6 +404,24 @@ function getSavedLookItemSummary(
     { label: "Bottom", value: "Snapshot uses an older FitMuse format" },
     { label: "Shoes", value: "Visual fallback is shown safely" },
   ];
+}
+
+function formatManualCheckDate(value?: string) {
+  const date = value ? new Date(value) : null;
+
+  if (!date || Number.isNaN(date.getTime())) {
+    return "Manual date unavailable";
+  }
+
+  return date.toLocaleDateString("en-US", {
+    month: "long",
+    day: "numeric",
+    year: "numeric",
+  });
+}
+
+function isPlaceholderRealProductLink(productUrl: string) {
+  return productUrl === REAL_PRODUCT_PLACEHOLDER_URL;
 }
 
 export function ResultsView({ searchParamsObject = {} }: ResultsViewProps) {
@@ -1304,11 +1323,18 @@ export function ResultsView({ searchParamsObject = {} }: ResultsViewProps) {
                           </span>
                           <span className="chip">{formatOptionLabel(pack.occasion)}</span>
                           <span className="chip">{pack.budgetSummary}</span>
+                          {pack.verificationStatus === "needs_manual_verification" ? (
+                            <span className="chip">Needs manual verification</span>
+                          ) : null}
                         </div>
 
                         <div className="mt-4 flex items-start justify-between gap-4">
                           <div>
-                            <p className="mini-label">Curated pack</p>
+                            <p className="mini-label">
+                              {pack.verificationStatus === "needs_manual_verification"
+                                ? "Candidate board"
+                                : "Curated pack"}
+                            </p>
                             <h4 className="mt-2 text-2xl text-foreground">{pack.name}</h4>
                           </div>
                           <div className="rounded-full border border-line/70 bg-background/80 px-4 py-2 text-sm font-semibold text-foreground">
@@ -1342,7 +1368,15 @@ export function ResultsView({ searchParamsObject = {} }: ResultsViewProps) {
                         </div>
 
                         <div className="mt-5 flex flex-wrap items-center justify-between gap-3">
-                          <p className="text-sm leading-6 text-muted">{pack.whyItWorks}</p>
+                          <div className="max-w-2xl">
+                            <p className="text-sm leading-6 text-muted">{pack.whyItWorks}</p>
+                            {pack.verificationStatus === "needs_manual_verification" ? (
+                              <p className="mt-3 text-xs leading-5 text-muted">
+                                Price last checked: {formatManualCheckDate(pack.lastUpdated)}.
+                                Verify current price and availability on retailer site.
+                              </p>
+                            ) : null}
+                          </div>
                           <button
                             type="button"
                             onClick={() => setSelectedRealPackId(pack.id)}
@@ -1663,7 +1697,9 @@ export function ResultsView({ searchParamsObject = {} }: ResultsViewProps) {
                   {selectedRealPack.name}
                 </h2>
                 <p className="mt-3 max-w-2xl text-sm leading-6 text-muted">
-                  Real product links are manually curated for MVP testing.
+                  {selectedRealPack.verificationStatus === "needs_manual_verification"
+                    ? "Candidate board. Needs manual verification. Verify current price and availability on retailer site. FitMuse may earn a commission from some links in a future version."
+                    : "Real product links are manually curated for MVP testing."}
                 </p>
               </div>
               <button
@@ -1686,6 +1722,9 @@ export function ResultsView({ searchParamsObject = {} }: ResultsViewProps) {
               <span className="chip">{formatOptionLabel(selectedRealPack.occasion)}</span>
               <span className="chip">{formatOptionLabel(selectedRealPack.budgetRange)}</span>
               <span className="chip">{selectedRealPack.budgetSummary}</span>
+              {selectedRealPack.verificationStatus === "needs_manual_verification" ? (
+                <span className="chip">Needs manual verification</span>
+              ) : null}
             </div>
 
             <div className="mt-6 grid gap-4 sm:grid-cols-3">
@@ -1702,10 +1741,29 @@ export function ResultsView({ searchParamsObject = {} }: ResultsViewProps) {
               <div className="rounded-[1.4rem] border border-line/70 bg-white/82 p-4">
                 <p className="mini-label">Shop status</p>
                 <p className="mt-2 text-sm text-foreground">
-                  {selectedRealPack.shopReady ? "Manually curated for MVP review" : "Draft only"}
+                  {selectedRealPack.verificationStatus === "needs_manual_verification"
+                    ? "Candidate board"
+                    : selectedRealPack.shopReady
+                      ? "Manually curated for MVP review"
+                      : "Draft only"}
                 </p>
+                {selectedRealPack.verificationStatus === "needs_manual_verification" ? (
+                  <p className="mt-2 text-xs leading-5 text-muted">
+                    Price last checked: {formatManualCheckDate(selectedRealPack.lastUpdated)}
+                  </p>
+                ) : null}
               </div>
             </div>
+
+            {selectedRealPack.verificationStatus === "needs_manual_verification" ? (
+              <div className="mt-4 rounded-[1.4rem] border border-line/70 bg-white/82 p-4">
+                <p className="mini-label">Verification note</p>
+                <p className="mt-2 text-sm leading-6 text-foreground">
+                  Verify current price and availability on retailer site before launch. FitMuse may
+                  earn a commission from some links in a future version.
+                </p>
+              </div>
+            ) : null}
 
             <div className="mt-6 grid gap-4">
               {selectedRealPack.products.map((product) => (
@@ -1718,7 +1776,7 @@ export function ResultsView({ searchParamsObject = {} }: ResultsViewProps) {
                       <p className="mini-label">{formatOptionLabel(product.category)}</p>
                       <h3 className="mt-2 text-xl text-foreground">{product.name}</h3>
                       <p className="mt-2 text-sm text-muted">
-                        {product.store} • {product.currency} {product.currentPrice}
+                        {product.store} • {formatCurrency(product.currentPrice)}
                       </p>
                     </div>
                     <a
@@ -1727,7 +1785,9 @@ export function ResultsView({ searchParamsObject = {} }: ResultsViewProps) {
                       rel="noreferrer"
                       className="cta-secondary"
                     >
-                      Replace with real link
+                      {isPlaceholderRealProductLink(product.productUrl)
+                        ? "Replace with real link"
+                        : "Open retailer candidate"}
                     </a>
                   </div>
 

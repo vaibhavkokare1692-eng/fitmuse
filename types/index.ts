@@ -236,7 +236,10 @@ export type RealProductCategory =
 export type RealProductSourceType =
   | "manual-placeholder"
   | "manual-curated"
+  | "manual_curated_candidate"
   | "affiliate-placeholder";
+
+export type RealVerificationStatus = "needs_manual_verification" | "manually_verified";
 
 export type RealOutfitPackSmartSwap = {
   label: string;
@@ -267,6 +270,7 @@ export type RealProduct = {
   affiliateReady: boolean;
   affiliateUrl?: string;
   sourceType: RealProductSourceType;
+  verificationStatus?: RealVerificationStatus;
   notes?: string;
 };
 
@@ -285,6 +289,7 @@ export type RealOutfitPack = {
   smartSwaps: RealOutfitPackSmartSwap[];
   lastUpdated: string;
   shopReady: boolean;
+  verificationStatus?: RealVerificationStatus;
 };
 
 export type Outfit = {

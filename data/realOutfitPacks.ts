@@ -21,10 +21,12 @@ type RealShoppingBrief = Partial<
 };
 
 function sumPackPrice(productIds: string[]) {
-  return productIds.reduce((total, productId) => {
+  const total = productIds.reduce((runningTotal, productId) => {
     const product = getRealProductById(productId);
-    return total + (product?.currentPrice ?? 0);
+    return runningTotal + (product?.currentPrice ?? 0);
   }, 0);
+
+  return Math.round(total * 100) / 100;
 }
 
 function normalize(value?: string | null) {
@@ -80,34 +82,45 @@ function canonicalizeOccasion(value?: string | null) {
 export const realOutfitPacks: RealOutfitPack[] = [
   {
     id: "real-pack-feminine-clean-minimal-date",
-    name: "Feminine Clean Minimal Date",
+    name: "Classic Clean Minimal Date Look",
     targetStylePreference: "feminine",
     aesthetic: "clean minimal",
     occasion: "date",
     budgetRange: "$100-$200",
     productIds: [
-      "real-hm-clean-blouse-cream",
-      "real-hm-slip-skirt-champagne",
-      "real-target-pointed-flats-black",
-      "real-target-structured-mini-tote-tan",
+      "real-target-clean-minimal-slip-dress-cream-floral",
+      "real-hm-fine-knit-cardigan-light-beige",
+      "real-hm-crossover-strap-sandals-beige",
+      "real-asos-leather-90s-shoulder-bag-beige",
+      "real-hm-delicate-gold-necklace-candidate",
     ],
-    totalPrice: 106,
+    totalPrice: 118.28,
     budgetLabel: "Within budget",
-    fitNote: "Keeps the upper half soft and neat, then uses a clean skirt line and refined flats for balance.",
+    fitNote:
+      "Soft neutral pieces with a simple slip silhouette, lightweight cardigan, walkable sandals, and compact shoulder bag.",
     whyItWorks:
-      "This board stays polished and feminine through clean neutrals, a fluid skirt, and a structured bag without feeling overdressed.",
+      "Cream and beige tones create a clean, feminine date look. The cardigan adds softness and temperature flexibility, while the sandals and shoulder bag keep the outfit polished without feeling formal.",
     smartSwaps: [
       {
-        label: "Dressier swap",
-        note: "Swap the flats for a slingback once a real premium shoe link is added.",
+        label: "Cheaper swap",
+        note: "Remove the bag or use a lower-cost Target crossbody alternative to reduce the total.",
       },
       {
-        label: "More casual swap",
-        note: "Swap the blouse for the Uniqlo crew tee to make the look feel easier for daytime plans.",
+        label: "Premium swap",
+        note: "Upgrade to Nordstrom Rack leather sandals or a more structured bag for a sharper finish.",
+      },
+      {
+        label: "Casual swap",
+        note: "Replace the sandals with clean white sneakers to make the outfit feel easier for daytime plans.",
+      },
+      {
+        label: "Dressy swap",
+        note: "Replace the cardigan with a lightweight linen blazer for a slightly sharper date-night layer.",
       },
     ],
     lastUpdated: DEFAULT_LAST_UPDATED,
     shopReady: true,
+    verificationStatus: "needs_manual_verification",
   },
   {
     id: "real-pack-feminine-everyday-clean",
