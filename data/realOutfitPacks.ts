@@ -10,6 +10,7 @@ import type { BudgetRange, QuizAnswers, RealOutfitPack, RealProduct } from "@/ty
 // Pricing should be treated as manually checked, not live.
 
 const DEFAULT_LAST_UPDATED = "2026-04-30";
+const MAY_1_LAST_UPDATED = "2026-05-01";
 
 type RealShoppingBrief = Partial<
   Pick<QuizAnswers, "stylePreference" | "aesthetic" | "occasion" | "budgetRange">
@@ -175,35 +176,48 @@ export const realOutfitPacks: RealOutfitPack[] = [
   },
   {
     id: "real-pack-feminine-smart-casual-office",
-    name: "Feminine Smart Casual Office",
+    name: "Polished Office Professional",
     targetStylePreference: "feminine",
     aesthetic: "smart casual",
+    aestheticAliases: ["clean minimal"],
     occasion: "office",
     budgetRange: "$100-$200",
     productIds: [
-      "real-hm-clean-blouse-cream",
-      "real-hm-straight-trouser-charcoal",
-      "real-target-pointed-flats-black",
-      "real-target-structured-mini-tote-tan",
-      "real-asos-chain-necklace-silver",
+      "real-hm-fitted-blazer-light-beige",
+      "real-hm-wide-leg-dress-pants-light-beige",
+      "real-uniqlo-rayon-blouse-neutral",
+      "real-target-julie-ballet-flats-neutral",
+      "real-hm-delicate-gold-necklace-candidate",
     ],
-    totalPrice: 116,
+    totalPrice: 149.87,
     budgetLabel: "Within budget",
-    fitNote: "Tailored trousers and pointed shoes keep the work silhouette sharp while the blouse softens the finish.",
+    fitNote:
+      "Structured beige blazer, wide-leg trousers, and pointed flats create a polished office look that stays comfortable and approachable.",
     whyItWorks:
-      "This board feels office-ready without going stiff: clean blouse, straight trousers, refined flats, and a structured tote do the heavy lifting.",
+      "This outfit keeps office polish without feeling overly formal. The blazer gives structure, the wide-leg trousers keep the silhouette comfortable, the Uniqlo blouse elevates the base, and the pointed flats make the look work-ready while staying walkable.",
     smartSwaps: [
       {
-        label: "Warmer layer swap",
-        note: "Add the Uniqlo cardigan when the office runs cold or the commute needs a third piece.",
+        label: "Cheaper swap",
+        note: "Replace the Uniqlo blouse with the H&M Cotton T-Shirt when you want a more casual office version at a lower total.",
       },
       {
-        label: "Dressier swap",
-        note: "Use the slip skirt and blouse together for a more editorial office-to-dinner variation.",
+        label: "Premium swap",
+        note: "Upgrade the flats to Nordstrom Rack leather flats when you want a slightly sharper office finish.",
+      },
+      {
+        label: "Casual swap",
+        note: "Replace the blazer with the H&M Fine-Knit Cardigan when you want a softer office layer.",
+      },
+      {
+        label: "Bag add-on",
+        note: "Add the H&M Shoulder Bag with Long Handles or the Target Elevated Camera Crossbody when you want extra room for work essentials.",
       },
     ],
-    lastUpdated: DEFAULT_LAST_UPDATED,
+    notes:
+      "All main product pages were verified on 2026-05-01, but the pack must stay in needs-manual-verification mode until launch-time price, stock, size, and final color checks are completed on the retailer sites.",
+    lastUpdated: MAY_1_LAST_UPDATED,
     shopReady: true,
+    verificationStatus: "needs_manual_verification",
   },
   {
     id: "real-pack-masculine-old-money-date",
@@ -286,6 +300,9 @@ export function getRealOutfitPacksForBrief(brief?: RealShoppingBrief | null) {
 
   return realOutfitPacks.filter((pack) => {
     const packStylePreference = normalize(pack.targetStylePreference);
+    const packAesthetics = [pack.aesthetic, ...(pack.aestheticAliases ?? [])].map(
+      canonicalizeAesthetic,
+    );
 
     if (
       targetStylePreference &&
@@ -295,7 +312,7 @@ export function getRealOutfitPacksForBrief(brief?: RealShoppingBrief | null) {
       return false;
     }
 
-    if (targetAesthetic && canonicalizeAesthetic(pack.aesthetic) !== targetAesthetic) {
+    if (targetAesthetic && !packAesthetics.includes(targetAesthetic)) {
       return false;
     }
 

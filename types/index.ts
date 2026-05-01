@@ -279,6 +279,7 @@ export type RealOutfitPack = {
   name: string;
   targetStylePreference: StylePreference;
   aesthetic: string;
+  aestheticAliases?: string[];
   occasion: string;
   budgetRange: BudgetRange;
   productIds: string[];
