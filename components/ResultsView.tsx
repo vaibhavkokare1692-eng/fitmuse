@@ -1779,16 +1779,23 @@ export function ResultsView({ searchParamsObject = {} }: ResultsViewProps) {
                         {product.store} • {formatCurrency(product.currentPrice)}
                       </p>
                     </div>
-                    <a
-                      href={product.productUrl}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="cta-secondary"
-                    >
-                      {isPlaceholderRealProductLink(product.productUrl)
-                        ? "Replace with real link"
-                        : "Open retailer candidate"}
-                    </a>
+                    {isPlaceholderRealProductLink(product.productUrl) ? (
+                      <span
+                        aria-disabled="true"
+                        className="cta-secondary cursor-not-allowed opacity-70"
+                      >
+                        Replace with real link
+                      </span>
+                    ) : (
+                      <a
+                        href={product.productUrl}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="cta-secondary"
+                      >
+                        Open retailer candidate
+                      </a>
+                    )}
                   </div>
 
                   <div className="mt-4 flex flex-wrap gap-2">
