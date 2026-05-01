@@ -62,6 +62,10 @@ function canonicalizeAesthetic(value?: string | null) {
 function canonicalizeOccasion(value?: string | null) {
   const normalized = normalize(value);
 
+  if (normalized === "everyday") {
+    return "daily wear";
+  }
+
   if (
     normalized === "office" ||
     normalized === "work" ||
@@ -126,34 +130,48 @@ export const realOutfitPacks: RealOutfitPack[] = [
   },
   {
     id: "real-pack-feminine-everyday-clean",
-    name: "Feminine Everyday Clean",
+    name: "Everyday Clean Target + H&M Mix",
     targetStylePreference: "feminine",
     aesthetic: "clean minimal",
     occasion: "daily wear",
     budgetRange: "$100-$200",
     productIds: [
-      "real-uniqlo-crew-tee-white",
-      "real-target-wide-leg-trouser-stone",
-      "real-hm-simple-loafer-espresso",
-      "real-target-structured-mini-tote-tan",
+      "real-hm-cotton-tshirt-white",
+      "real-hm-wide-leg-dress-pants-light-beige",
+      "real-target-julie-ballet-flats-neutral",
+      "real-target-elevated-camera-crossbody-tan",
+      "real-hm-delicate-gold-necklace-candidate",
+      "real-hm-fine-knit-cardigan-light-beige",
     ],
-    totalPrice: 102,
+    totalPrice: 101.46,
     budgetLabel: "Within budget",
-    fitNote: "A simple tee and clean trouser line keep the silhouette easy while loafers and a structured bag stop it from feeling plain.",
+    fitNote:
+      "Clean white and beige pieces create a polished everyday base with comfortable wide-leg trousers, walkable flats, and a hands-free crossbody.",
     whyItWorks:
-      "This pack gives everyday clean energy with low visual noise, neutral colors, and pieces that still feel intentional on a realistic budget.",
+      "This outfit uses affordable neutral basics that still look intentional. The wide-leg trousers make the look more polished than jeans, the ballet flats keep it walkable, and the cardigan adds softness for coffee, errands, casual lunch, or a casual workday.",
     smartSwaps: [
       {
         label: "Cheaper swap",
-        note: "Swap the loafers for the pointed flats when you want a slightly lower total spend.",
+        note: "Remove the cardigan or swap the flats for the H&M crossover-strap sandals when you want a lighter total or a warmer-weather finish.",
       },
       {
-        label: "Layered swap",
-        note: "Add the Uniqlo cardigan once a cooler-weather version of the board is needed.",
+        label: "Premium swap",
+        note: "Upgrade the tee to the Uniqlo AIRism Cotton T-Shirt when you want a stronger premium-basics feel.",
+      },
+      {
+        label: "Casual swap",
+        note: "Replace the flats with clean white sneakers to make the outfit feel even easier for errands or campus days.",
+      },
+      {
+        label: "Dressy swap",
+        note: "Replace the tee with a silk or silk-blend blouse for a more polished office-adjacent version.",
       },
     ],
+    notes:
+      "All listed product pages were verified on 2026-04-30, but the pack must stay in needs-manual-verification mode until launch-time price, stock, and size checks are completed on the retailer sites.",
     lastUpdated: DEFAULT_LAST_UPDATED,
     shopReady: true,
+    verificationStatus: "needs_manual_verification",
   },
   {
     id: "real-pack-feminine-smart-casual-office",
