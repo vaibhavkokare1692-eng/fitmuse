@@ -91,23 +91,23 @@ export const realOutfitPacks: RealOutfitPack[] = [
       "real-target-clean-minimal-slip-dress-cream-floral",
       "real-hm-fine-knit-cardigan-light-beige",
       "real-hm-crossover-strap-sandals-beige",
-      "real-asos-leather-90s-shoulder-bag-beige",
+      "real-hm-shoulder-bag-long-handles-beige-olive",
       "real-hm-delicate-gold-necklace-candidate",
     ],
-    totalPrice: 118.28,
+    totalPrice: 126.46,
     budgetLabel: "Within budget",
     fitNote:
       "Soft neutral pieces with a simple slip silhouette, lightweight cardigan, walkable sandals, and compact shoulder bag.",
     whyItWorks:
-      "Cream and beige tones create a clean, feminine date look. The cardigan adds softness and temperature flexibility, while the sandals and shoulder bag keep the outfit polished without feeling formal.",
+      "Cream floral, beige, and gold tones create a soft clean-minimal date look. The cardigan adds comfort and temperature flexibility, sandals keep the outfit walkable, and the shoulder bag plus necklace make it feel styled without looking overdone.",
     smartSwaps: [
       {
         label: "Cheaper swap",
-        note: "Remove the bag or use a lower-cost Target crossbody alternative to reduce the total.",
+        note: "Swap in the H&M Ring Pendant Necklace at $6.99 if you want a lower-cost jewelry finish while keeping the overall look intact.",
       },
       {
         label: "Premium swap",
-        note: "Upgrade to Nordstrom Rack leather sandals or a more structured bag for a sharper finish.",
+        note: "Replace the cardigan with a lightweight linen blazer when you want a sharper premium layer.",
       },
       {
         label: "Casual swap",
@@ -115,9 +115,11 @@ export const realOutfitPacks: RealOutfitPack[] = [
       },
       {
         label: "Dressy swap",
-        note: "Replace the cardigan with a lightweight linen blazer for a slightly sharper date-night layer.",
+        note: "Replace the sandals with a low heel or slingback for a slightly dressier finish.",
       },
     ],
+    notes:
+      "Four of five item prices were verified from active product pages on 2026-04-30. Keep the board in needs-manual-verification mode until the Target dress price is checked one more time on the retailer site before launch.",
     lastUpdated: DEFAULT_LAST_UPDATED,
     shopReady: true,
     verificationStatus: "needs_manual_verification",

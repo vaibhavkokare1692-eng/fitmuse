@@ -287,6 +287,7 @@ export type RealOutfitPack = {
   fitNote: string;
   whyItWorks: string;
   smartSwaps: RealOutfitPackSmartSwap[];
+  notes?: string;
   lastUpdated: string;
   shopReady: boolean;
   verificationStatus?: RealVerificationStatus;
