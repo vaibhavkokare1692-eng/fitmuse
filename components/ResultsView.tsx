@@ -407,7 +407,20 @@ function getSavedLookItemSummary(
 }
 
 function formatManualCheckDate(value?: string) {
-  const date = value ? new Date(value) : null;
+  const date = (() => {
+    if (!value) {
+      return null;
+    }
+
+    const dateOnlyMatch = value.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+
+    if (dateOnlyMatch) {
+      const [, year, month, day] = dateOnlyMatch;
+      return new Date(Number(year), Number(month) - 1, Number(day));
+    }
+
+    return new Date(value);
+  })();
 
   if (!date || Number.isNaN(date.getTime())) {
     return "Manual date unavailable";
