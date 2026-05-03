@@ -1,6 +1,7 @@
 import {
   getRealProductById,
   getShopReadyRealProducts,
+  hasRealRetailerCandidateProductLink,
   realProductLookup,
 } from "@/data/realProducts";
 import type { BudgetRange, QuizAnswers, RealOutfitPack, RealProduct } from "@/types";
@@ -82,6 +83,13 @@ function canonicalizeOccasion(value?: string | null) {
   }
 
   return normalized;
+}
+
+function hasPackVerificationStatus(pack: RealOutfitPack) {
+  return (
+    pack.verificationStatus === "needs_manual_verification" ||
+    pack.verificationStatus === "manually_verified"
+  );
 }
 
 export const realOutfitPacks: RealOutfitPack[] = [
@@ -247,8 +255,10 @@ export const realOutfitPacks: RealOutfitPack[] = [
         note: "Swap in the Uniqlo merino quarter-zip for cooler weather or a more relaxed dinner setting.",
       },
     ],
+    notes:
+      "This is still a placeholder-only future candidate pack. Keep it hidden from the live curated real-shopping section until real retailer candidate products and manual verification status are added.",
     lastUpdated: DEFAULT_LAST_UPDATED,
-    shopReady: true,
+    shopReady: false,
   },
   {
     id: "real-pack-streetwear-photoshoot",
@@ -279,8 +289,10 @@ export const realOutfitPacks: RealOutfitPack[] = [
         note: "Swap the cargo for the Uniqlo smart ankle trouser when you want the same layering energy with less utility weight.",
       },
     ],
+    notes:
+      "This is still a placeholder-only future candidate pack. Keep it hidden from the live curated real-shopping section until real retailer candidate products and manual verification status are added.",
     lastUpdated: DEFAULT_LAST_UPDATED,
-    shopReady: true,
+    shopReady: false,
   },
 ];
 
@@ -298,7 +310,7 @@ export function getRealOutfitPacksForBrief(brief?: RealShoppingBrief | null) {
   const targetOccasion = canonicalizeOccasion(brief.occasion);
   const targetBudget = normalize(brief.budgetRange);
 
-  return realOutfitPacks.filter((pack) => {
+  return getShopReadyRealOutfitPacks().filter((pack) => {
     const packStylePreference = normalize(pack.targetStylePreference);
     const packAesthetics = [pack.aesthetic, ...(pack.aestheticAliases ?? [])].map(
       canonicalizeAesthetic,
@@ -333,7 +345,12 @@ export function getShopReadyRealOutfitPacks() {
 
   return realOutfitPacks.filter(
     (pack) =>
-      pack.shopReady && pack.productIds.every((productId) => shopReadyProductIds.has(productId)),
+      pack.shopReady &&
+      hasPackVerificationStatus(pack) &&
+      pack.productIds.some((productId) => shopReadyProductIds.has(productId)) &&
+      pack.productIds
+        .map((productId) => getRealProductById(productId))
+        .some((product) => hasRealRetailerCandidateProductLink(product)),
   );
 }
 

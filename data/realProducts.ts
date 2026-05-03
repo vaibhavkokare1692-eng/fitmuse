@@ -1047,6 +1047,20 @@ export function getRealProductById(productId: string) {
   return realProductLookup.get(productId);
 }
 
+export function isPlaceholderRealProductLink(productUrl?: string | null) {
+  return !productUrl || productUrl === REAL_PRODUCT_PLACEHOLDER_URL;
+}
+
+export function hasRealRetailerCandidateProductLink(
+  product?: Pick<RealProduct, "productUrl"> | null,
+) {
+  if (!product?.productUrl) {
+    return false;
+  }
+
+  return !isPlaceholderRealProductLink(product.productUrl);
+}
+
 export function getRealProductsByStore(store: string) {
   const normalizedStore = store.trim().toLowerCase();
 
@@ -1055,6 +1069,10 @@ export function getRealProductsByStore(store: string) {
 
 export function getShopReadyRealProducts() {
   return realProducts.filter(
-    (product) => product.inStock && Boolean(product.productUrl) && Boolean(product.lastCheckedDate),
+    (product) =>
+      product.inStock &&
+      Boolean(product.lastCheckedDate) &&
+      Boolean(product.verificationStatus) &&
+      hasRealRetailerCandidateProductLink(product),
   );
 }
