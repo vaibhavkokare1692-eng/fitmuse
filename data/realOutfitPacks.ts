@@ -12,6 +12,7 @@ import type { BudgetRange, QuizAnswers, RealOutfitPack, RealProduct } from "@/ty
 
 const DEFAULT_LAST_UPDATED = "2026-04-30";
 const MAY_1_LAST_UPDATED = "2026-05-01";
+const MAY_2_LAST_UPDATED = "2026-05-02";
 
 type RealShoppingBrief = Partial<
   Pick<QuizAnswers, "stylePreference" | "aesthetic" | "occasion" | "budgetRange">
@@ -66,6 +67,10 @@ function canonicalizeOccasion(value?: string | null) {
 
   if (normalized === "everyday") {
     return "daily wear";
+  }
+
+  if (normalized === "airport") {
+    return "travel";
   }
 
   if (
@@ -224,6 +229,56 @@ export const realOutfitPacks: RealOutfitPack[] = [
     notes:
       "All main product pages were verified on 2026-05-01, but the pack must stay in needs-manual-verification mode until launch-time price, stock, size, and final color checks are completed on the retailer sites.",
     lastUpdated: MAY_1_LAST_UPDATED,
+    shopReady: true,
+    verificationStatus: "needs_manual_verification",
+  },
+  {
+    id: "real-pack-feminine-travel-airport",
+    name: "Polished Travel Ready",
+    targetStylePreference: "feminine",
+    aesthetic: "clean minimal",
+    aestheticAliases: ["travel"],
+    occasion: "travel",
+    budgetRange: "$100-$200",
+    productIds: [
+      "real-uniqlo-ultra-stretch-active-jogger-pants-neutral",
+      "real-uniqlo-airism-cotton-tshirt-white",
+      "real-target-spencer-fashion-sneakers-white",
+      "real-hm-crossbody-bag-beige",
+      "real-hm-fine-knit-cardigan-light-beige",
+      "real-hm-delicate-gold-necklace-candidate",
+    ],
+    totalPrice: 150.27,
+    budgetLabel: "Within budget",
+    fitNote:
+      "Breathable tee, stretch joggers, walkable sneakers, and a compact crossbody create a polished airport outfit that stays comfortable through long travel days.",
+    whyItWorks:
+      "This look keeps travel comfort without looking sloppy. The AIRism tee and stretch joggers handle long wear, the cardigan gives an easy airplane layer, the sneakers support walking, and the crossbody keeps essentials secure and hands-free.",
+    smartSwaps: [
+      {
+        label: "Cheaper swap",
+        note: "Replace the AIRism tee with the H&M Cotton T-Shirt when you want to trim the total without changing the overall silhouette.",
+      },
+      {
+        label: "Premium swap",
+        note: "Upgrade the sneakers to Nordstrom Rack leather sneakers when you want a sharper premium-travel finish.",
+      },
+      {
+        label: "Functional swap",
+        note: "Replace the joggers with the H&M Four-Way Stretch Wide-Cut Pants when you want a more structured functional-travel trouser.",
+      },
+      {
+        label: "Slip-on swap",
+        note: "Replace the sneakers with the Target Julie Ballet Flats when you want an easier TSA or quick-security shoe option.",
+      },
+      {
+        label: "Bag swap",
+        note: "Replace the H&M Crossbody Bag with the H&M Shoulder Bag with Long Handles when you want more carrying capacity.",
+      },
+    ],
+    notes:
+      "All main product pages were verified on 2026-05-02, but the pack must stay in needs-manual-verification mode until launch-time price, stock, size, and final color checks are completed on the retailer sites. Per research, use the itemized total of $150.27 rather than the inconsistent $159.27 header value.",
+    lastUpdated: MAY_2_LAST_UPDATED,
     shopReady: true,
     verificationStatus: "needs_manual_verification",
   },
