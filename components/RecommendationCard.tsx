@@ -133,37 +133,56 @@ export function RecommendationCard({
           : ""
       }`}
     >
-      <div className="flex items-start justify-between gap-3 px-2 pb-4">
-        <div className="flex flex-wrap gap-2">
-          <span className="rounded-full border border-line/70 bg-white px-3 py-2 text-[11px] font-semibold uppercase tracking-[0.22em] text-foreground">
-            {formatAestheticLabel(recommendation.aesthetic, stylePreference)}
-          </span>
-          <span className="rounded-full border border-line/70 bg-background/86 px-3 py-2 text-[11px] font-semibold uppercase tracking-[0.22em] text-foreground">
-            {formatOptionLabel(recommendation.occasion)}
-          </span>
-          <span
-            className={`rounded-full px-3 py-2 text-[11px] font-semibold uppercase tracking-[0.22em] ${getMatchBadgeClasses(recommendation.matchQualityLabel)}`}
-          >
-            {recommendation.matchQualityLabel}
-          </span>
-        </div>
+      <div className="px-2 pb-4">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+          <div className="space-y-3">
+            <div className="flex flex-wrap gap-2">
+              <span className="rounded-full border border-line/70 bg-white px-3 py-2 text-[11px] font-semibold uppercase tracking-[0.22em] text-foreground">
+                {formatAestheticLabel(recommendation.aesthetic, stylePreference)}
+              </span>
+              <span className="rounded-full border border-line/70 bg-background/86 px-3 py-2 text-[11px] font-semibold uppercase tracking-[0.22em] text-foreground">
+                {formatOptionLabel(recommendation.occasion)}
+              </span>
+              <span
+                className={`rounded-full px-3 py-2 text-[11px] font-semibold uppercase tracking-[0.22em] ${getMatchBadgeClasses(recommendation.matchQualityLabel)}`}
+              >
+                {recommendation.matchQualityLabel}
+              </span>
+            </div>
+            <div>
+              <p className="mini-label">FitMuse recommendation</p>
+              <p className="mt-2 text-sm leading-6 text-muted">
+                {recommendation.creatorUseCase}
+              </p>
+            </div>
+          </div>
 
-        <button
-          type="button"
-          onClick={() => onToggleSave(recommendation.id)}
-          aria-pressed={saved}
-          data-testid={`save-look-${recommendation.id}`}
-          className={`rounded-full border px-3 py-2 text-sm font-semibold ${
-            saved
-              ? "border-accent-2 bg-accent-2 text-white"
-              : "border-line/80 bg-white text-foreground"
-          }`}
-        >
-          <span className="flex items-center gap-2">
-            <Bookmark size={14} />
-            {saved ? "Saved" : "Save look"}
-          </span>
-        </button>
+          <div className="flex flex-col items-start gap-2 sm:items-end">
+            <button
+              type="button"
+              onClick={() => onToggleSave(recommendation.id)}
+              aria-pressed={saved}
+              data-testid={`save-look-${recommendation.id}`}
+              className={`rounded-full border px-4 py-2.5 text-sm font-semibold ${
+                saved
+                  ? "border-accent-2 bg-accent-2 text-white"
+                  : "border-line/80 bg-white text-foreground"
+              }`}
+            >
+              <span className="flex items-center gap-2">
+                <Bookmark size={14} />
+                {saved ? "Saved look" : "Save look"}
+              </span>
+            </button>
+            <div
+              aria-live="polite"
+              data-testid={`save-status-${recommendation.id}`}
+              className="min-h-5 text-sm font-medium text-accent-2"
+            >
+              {saved ? "Saved to your looks" : null}
+            </div>
+          </div>
+        </div>
       </div>
 
       <OutfitVisual
@@ -174,22 +193,26 @@ export function RecommendationCard({
         stores={recommendation.stores}
       />
 
-      <div className="mt-4 grid gap-3 px-2 sm:grid-cols-3">
-        <div className="rounded-[1.35rem] border border-line/70 bg-white/86 px-4 py-4">
+      <div className="mt-4 grid gap-2 px-2 sm:grid-cols-3">
+        <div className="metric-card p-4">
           <p className="mini-label">Total price</p>
           <p className="mt-2 text-xl text-foreground">{formatCurrency(recommendation.totalPrice)}</p>
         </div>
-        <div className="rounded-[1.35rem] border border-line/70 bg-background/84 px-4 py-4">
+        <div className="metric-card p-4">
           <p className="mini-label">Confidence</p>
           <p className="mt-2 text-xl text-foreground">{recommendation.confidenceScore}%</p>
         </div>
-        <div className="rounded-[1.35rem] border border-line/70 bg-background/84 px-4 py-4">
+        <div className="metric-card p-4">
           <p className="mini-label">Budget match</p>
-          <p className="mt-2 text-base text-foreground">{recommendation.budgetMatchLabel}</p>
+          <span
+            className={`mt-3 inline-flex items-center rounded-full border px-3 py-2 text-xs font-semibold ${getBudgetBadgeClasses(recommendation.budgetMatchLabel)}`}
+          >
+            {recommendation.budgetMatchLabel}
+          </span>
         </div>
       </div>
 
-      <div className="mt-3 grid gap-3 px-2 sm:grid-cols-2">
+      <div className="mt-3 grid gap-2 px-2 sm:grid-cols-2">
         {[
           { label: "Occasion match", value: recommendation.occasionMatch },
           { label: "Style match", value: recommendation.styleMatch },
@@ -206,7 +229,7 @@ export function RecommendationCard({
         ))}
       </div>
 
-      <div className="flex flex-1 flex-col p-2 pt-5">
+      <div className="flex flex-1 flex-col p-2 pt-4">
         <div className="flex flex-wrap gap-2">
           {recommendation.colorPalette.map((color) => (
             <span
@@ -222,12 +245,7 @@ export function RecommendationCard({
           ))}
         </div>
 
-        <div className="mt-5 flex flex-wrap gap-2">
-          <span
-            className={`inline-flex items-center rounded-full border px-3 py-2 text-xs font-semibold ${getBudgetBadgeClasses(recommendation.budgetMatchLabel)}`}
-          >
-            {recommendation.budgetMatchLabel}
-          </span>
+        <div className="mt-4 flex flex-wrap gap-2">
           <span className="inline-flex items-center rounded-full border border-line/70 bg-white/82 px-3 py-2 text-xs font-semibold text-foreground">
             {recommendation.colorHarmony}
           </span>
@@ -242,40 +260,47 @@ export function RecommendationCard({
         {recommendation.fitTags.length > 0 ? (
           <div className="mt-3 flex flex-wrap gap-2">
             {recommendation.fitTags.map((tag) => (
-              <span key={tag} className="chip">
+              <span key={tag} className="chip text-sm">
                 {tag}
               </span>
             ))}
           </div>
         ) : null}
 
-        <div className="mt-5 grid gap-3 sm:grid-cols-2">
-          {topReasons.map((reason) => (
-            <div key={reason} className="rounded-[1.35rem] border border-line/70 bg-white/80 p-4">
-              <p className="mini-label">Match reason</p>
-              <p className="mt-3 text-sm leading-6 text-foreground">{reason}</p>
+        <div className="mt-5 grid gap-4 lg:grid-cols-[1.1fr_0.9fr]">
+          <div className="trust-panel">
+            <p className="mini-label">Why this outfit works</p>
+            <p className="mt-3 text-sm leading-6 text-foreground">{recommendation.stylingSummary}</p>
+
+            {topReasons.length > 0 ? (
+              <div className="mt-4 grid gap-2">
+                {topReasons.map((reason) => (
+                  <div key={reason} className="rounded-[1.2rem] border border-white/65 bg-white/72 px-4 py-3">
+                    <p className="mini-label">Match reason</p>
+                    <p className="mt-2 text-sm leading-6 text-foreground">{reason}</p>
+                  </div>
+                ))}
+              </div>
+            ) : null}
+          </div>
+
+          <div className="rounded-[1.5rem] border border-line/70 bg-white/80 p-5">
+            <p className="mini-label">Core pieces</p>
+            <div className="mt-4 grid gap-2">
+              {itemRows.map((item) => (
+                <div
+                  key={item.label}
+                  className="flex items-center justify-between gap-3 rounded-[1.2rem] border border-line/70 bg-background/70 px-4 py-3"
+                >
+                  <p className="mini-label">{item.label}</p>
+                  <p className="text-right text-sm text-foreground">{item.value}</p>
+                </div>
+              ))}
             </div>
-          ))}
+          </div>
         </div>
 
-        <div className="mt-5 rounded-[1.5rem] border border-line/70 bg-white/80 p-5">
-          <p className="mini-label">Why this outfit works</p>
-          <p className="mt-3 text-sm leading-6 text-foreground">{recommendation.stylingSummary}</p>
-        </div>
-
-        <div className="mt-5 grid gap-3">
-          {itemRows.map((item) => (
-            <div
-              key={item.label}
-              className="flex items-center justify-between gap-3 rounded-[1.3rem] border border-line/70 bg-white/78 px-4 py-3"
-            >
-              <p className="mini-label">{item.label}</p>
-              <p className="text-right text-sm text-foreground">{item.value}</p>
-            </div>
-          ))}
-        </div>
-
-        <div className="mt-5 rounded-[1.5rem] bg-background/80 p-5">
+        <div className="mt-4 rounded-[1.5rem] bg-background/80 p-5">
           <p className="mini-label">Fit note</p>
           <p className="mt-3 text-sm leading-6 text-foreground">
             {shorten(recommendation.fitNote, 120)}
@@ -350,14 +375,20 @@ export function RecommendationCard({
           </div>
         ) : null}
 
-        <div className="mt-6 flex flex-wrap gap-3">
-          <ShoppingLinksButton className="cta-secondary" testId={`shop-look-${recommendation.id}`} />
-        </div>
-
-        <div aria-live="polite" data-testid={`save-status-${recommendation.id}`} className="mt-3 min-h-6">
-          {saved ? (
-            <p className="text-sm font-medium text-accent-2">Saved to your looks</p>
-          ) : null}
+        <div className="mt-5 rounded-[1.5rem] border border-line/70 bg-white/78 p-5">
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+            <div className="max-w-xl">
+              <p className="mini-label">Shopping links</p>
+              <p className="mt-2 text-sm leading-6 text-muted">
+                Use this to preview the MVP shopping flow. These links are still mock
+                data while FitMuse prepares real retailer connections.
+              </p>
+            </div>
+            <ShoppingLinksButton
+              className="cta-secondary w-full sm:w-auto"
+              testId={`shop-look-${recommendation.id}`}
+            />
+          </div>
         </div>
       </div>
     </motion.article>

@@ -15,7 +15,7 @@ export function ShoppingLinksButton({
   const [showMessage, setShowMessage] = useState(false);
 
   return (
-    <div className="relative flex flex-col items-start gap-2">
+    <div className="relative flex w-full flex-col items-start gap-2 sm:w-auto">
       <button
         type="button"
         className={className}
@@ -32,9 +32,12 @@ export function ShoppingLinksButton({
       {showMessage ? (
         <div
           data-testid={`${testId}-message`}
-          className="max-w-xs rounded-[1.2rem] border border-line/70 bg-white/96 px-4 py-3 text-xs leading-5 text-foreground shadow-[0_16px_32px_rgba(27,21,19,0.08)]"
+          className="w-full max-w-sm rounded-[1.3rem] border border-line/70 bg-white/96 px-4 py-3 shadow-[0_16px_32px_rgba(27,21,19,0.08)]"
         >
-          Shopping links are coming soon. This MVP uses mock products while we prepare real affiliate links.
+          <p className="mini-label">MVP note</p>
+          <p className="mt-2 text-xs leading-5 text-foreground">
+            Shopping links are coming soon. This MVP uses mock products while we prepare real affiliate links.
+          </p>
         </div>
       ) : null}
     </div>

@@ -1310,7 +1310,7 @@ export function ResultsView({ searchParamsObject = {} }: ResultsViewProps) {
 
               {curatedRealOutfitPacks.length > 0 ? (
                 <div className="hero-card p-5 sm:p-6">
-                  <div className="flex flex-wrap items-start justify-between gap-4">
+                  <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
                     <div>
                       <p className="eyebrow !mb-0">Curated real shopping looks</p>
                       <h3 className="mt-3 text-3xl text-foreground">
@@ -1328,7 +1328,7 @@ export function ResultsView({ searchParamsObject = {} }: ResultsViewProps) {
                     {curatedRealOutfitPacks.map((pack) => (
                       <div
                         key={pack.id}
-                        className="rounded-[1.7rem] border border-line/70 bg-white/82 p-5 shadow-[0_18px_40px_rgba(27,21,19,0.06)]"
+                        className="rounded-[1.7rem] border border-line/70 bg-white/82 p-4 shadow-[0_18px_40px_rgba(27,21,19,0.06)] sm:p-5"
                       >
                         <div className="flex flex-wrap gap-2">
                           <span className="chip">
@@ -1363,6 +1363,37 @@ export function ResultsView({ searchParamsObject = {} }: ResultsViewProps) {
                           ))}
                         </div>
 
+                        <div className="trust-panel mt-5">
+                          <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+                            <div className="max-w-2xl">
+                              <p className="mini-label">Shop status</p>
+                              <p className="mt-2 text-sm font-semibold text-foreground">
+                                {pack.verificationStatus === "needs_manual_verification"
+                                  ? "Candidate board - needs manual verification"
+                                  : pack.shopReady
+                                    ? "Manually curated for MVP review"
+                                    : "Draft only"}
+                              </p>
+                              {pack.verificationStatus === "needs_manual_verification" ? (
+                                <>
+                                  <p className="mt-2 micro-note">
+                                    Price last checked: {formatManualCheckDate(pack.lastUpdated)}.
+                                    Verify current price and availability on retailer site.
+                                  </p>
+                                  <p className="mt-2 micro-note">
+                                    FitMuse may earn a commission from some links in a future version.
+                                  </p>
+                                </>
+                              ) : null}
+                            </div>
+                            <div className="min-w-[12rem] rounded-[1.3rem] border border-white/70 bg-white/78 px-4 py-4">
+                              <p className="mini-label">Total estimated price</p>
+                              <p className="mt-2 text-2xl text-foreground">{formatCurrency(pack.totalPrice)}</p>
+                              <p className="mt-2 text-sm text-muted">{pack.budgetSummary}</p>
+                            </div>
+                          </div>
+                        </div>
+
                         <div className="mt-5 grid gap-3">
                           {pack.products.map((product) => (
                             <div
@@ -1380,23 +1411,25 @@ export function ResultsView({ searchParamsObject = {} }: ResultsViewProps) {
                           ))}
                         </div>
 
-                        <div className="mt-5 flex flex-wrap items-center justify-between gap-3">
-                          <div className="max-w-2xl">
-                            <p className="text-sm leading-6 text-muted">{pack.whyItWorks}</p>
-                            {pack.verificationStatus === "needs_manual_verification" ? (
-                              <p className="mt-3 text-xs leading-5 text-muted">
-                                Price last checked: {formatManualCheckDate(pack.lastUpdated)}.
-                                Verify current price and availability on retailer site.
-                              </p>
-                            ) : null}
+                        <div className="mt-5 grid gap-4 lg:grid-cols-[1fr_auto]">
+                          <div className="rounded-[1.4rem] border border-line/70 bg-background/68 p-4">
+                            <p className="mini-label">Why it works</p>
+                            <p className="mt-3 text-sm leading-6 text-muted">{pack.whyItWorks}</p>
                           </div>
-                          <button
-                            type="button"
-                            onClick={() => setSelectedRealPackId(pack.id)}
-                            className="cta-primary"
-                          >
-                            Shop Full Look
-                          </button>
+                          <div className="flex flex-col gap-2 lg:min-w-[15rem]">
+                            <p className="mini-label px-1">Retailer candidates</p>
+                            <button
+                              type="button"
+                              onClick={() => setSelectedRealPackId(pack.id)}
+                              className="cta-primary w-full"
+                            >
+                              Shop Full Look
+                            </button>
+                            <p className="micro-note px-1">
+                              Open the full pack to review retailer candidates and manual
+                              verification notes.
+                            </p>
+                          </div>
                         </div>
                       </div>
                     ))}
@@ -1443,10 +1476,10 @@ export function ResultsView({ searchParamsObject = {} }: ResultsViewProps) {
                   items={getSavedLookVisualItems(savedLook)}
                   stores={getSavedLookStores(savedLook)}
                   compact
-                  className="min-h-[22rem]"
+                  className="min-h-[18.5rem] sm:min-h-[20rem]"
                 />
 
-                <div className="mt-4 flex flex-wrap gap-2">
+                <div className="mt-3 flex flex-wrap gap-2">
                   <span className="chip">
                     {formatAestheticLabel(savedLook.aesthetic, savedLook.stylePreference)}
                   </span>
@@ -1456,17 +1489,17 @@ export function ResultsView({ searchParamsObject = {} }: ResultsViewProps) {
                   ) : null}
                 </div>
 
-                <div className="mt-4">
+                <div className="mt-3">
                   <p className="mini-label">{formatSavedAt(savedLook.savedAt)}</p>
                   <h3 className="mt-2 text-2xl text-foreground">{savedLook.name}</h3>
                 </div>
 
-                <div className="mt-4 flex flex-wrap gap-2">
+                <div className="mt-3 flex flex-wrap gap-2">
                   <span className="chip">{formatCurrency(savedLook.totalPrice)}</span>
                   <span className="chip">{savedLook.budgetMatchLabel}</span>
                 </div>
 
-                <div className="mt-4 flex flex-wrap items-center gap-2">
+                <div className="mt-3 flex flex-wrap items-center gap-2">
                   {getSavedLookPalette(savedLook).slice(0, 4).map((color) => (
                     <span
                       key={`${savedLook.id}-${savedLook.savedAt}-${color}`}
@@ -1481,20 +1514,20 @@ export function ResultsView({ searchParamsObject = {} }: ResultsViewProps) {
                   ))}
                 </div>
 
-                <div className="mt-5 flex flex-wrap gap-3">
+                <div className="mt-4 flex flex-col gap-3 sm:flex-row">
                   <button
                     type="button"
                     onClick={() => handleOpenSavedLook(savedLook.id)}
                     aria-label={`Open saved look: ${savedLook.name}`}
                     data-testid={`open-saved-look-${savedLook.id}`}
-                    className="cta-primary"
+                    className="cta-primary w-full sm:flex-1"
                   >
                     Open Look
                   </button>
                   <button
                     type="button"
                     onClick={() => toggleSave(savedLook.id)}
-                    className="cta-secondary"
+                    className="cta-secondary w-full sm:w-auto"
                   >
                     Unsave
                   </button>
@@ -1740,43 +1773,50 @@ export function ResultsView({ searchParamsObject = {} }: ResultsViewProps) {
               ) : null}
             </div>
 
-            <div className="mt-6 grid gap-4 sm:grid-cols-3">
-              <div className="rounded-[1.4rem] border border-line/70 bg-white/82 p-4">
-                <p className="mini-label">Total price</p>
-                <p className="mt-2 text-xl text-foreground">
-                  {formatCurrency(selectedRealPack.totalPrice)}
-                </p>
-              </div>
-              <div className="rounded-[1.4rem] border border-line/70 bg-white/82 p-4">
-                <p className="mini-label">Stores</p>
-                <p className="mt-2 text-sm text-foreground">{selectedRealPack.stores.join(", ")}</p>
-              </div>
-              <div className="rounded-[1.4rem] border border-line/70 bg-white/82 p-4">
-                <p className="mini-label">Shop status</p>
-                <p className="mt-2 text-sm text-foreground">
-                  {selectedRealPack.verificationStatus === "needs_manual_verification"
-                    ? "Candidate board"
-                    : selectedRealPack.shopReady
-                      ? "Manually curated for MVP review"
-                      : "Draft only"}
-                </p>
+            <div className="trust-panel mt-6">
+              <div className="grid gap-4 lg:grid-cols-[0.95fr_1.05fr]">
+                <div className="grid gap-3 sm:grid-cols-2">
+                  <div className="rounded-[1.35rem] border border-white/70 bg-white/80 p-4">
+                    <p className="mini-label">Total estimated price</p>
+                    <p className="mt-2 text-2xl text-foreground">
+                      {formatCurrency(selectedRealPack.totalPrice)}
+                    </p>
+                    <p className="mt-2 text-sm text-muted">{selectedRealPack.budgetSummary}</p>
+                  </div>
+                  <div className="rounded-[1.35rem] border border-white/70 bg-white/80 p-4">
+                    <p className="mini-label">Stores</p>
+                    <p className="mt-2 text-sm text-foreground">
+                      {selectedRealPack.stores.join(", ")}
+                    </p>
+                  </div>
+                  <div className="rounded-[1.35rem] border border-white/70 bg-white/80 p-4 sm:col-span-2">
+                    <p className="mini-label">Shop status</p>
+                    <p className="mt-2 text-sm font-semibold text-foreground">
+                      {selectedRealPack.verificationStatus === "needs_manual_verification"
+                        ? "Candidate board - needs manual verification"
+                        : selectedRealPack.shopReady
+                          ? "Manually curated for MVP review"
+                          : "Draft only"}
+                    </p>
+                    {selectedRealPack.verificationStatus === "needs_manual_verification" ? (
+                      <p className="mt-2 micro-note">
+                        Price last checked: {formatManualCheckDate(selectedRealPack.lastUpdated)}
+                      </p>
+                    ) : null}
+                  </div>
+                </div>
+
                 {selectedRealPack.verificationStatus === "needs_manual_verification" ? (
-                  <p className="mt-2 text-xs leading-5 text-muted">
-                    Price last checked: {formatManualCheckDate(selectedRealPack.lastUpdated)}
-                  </p>
+                  <div className="rounded-[1.35rem] border border-white/70 bg-white/80 p-4">
+                    <p className="mini-label">Verification note</p>
+                    <p className="mt-2 text-sm leading-6 text-foreground">
+                      Verify current price and availability on retailer site before launch. FitMuse may
+                      earn a commission from some links in a future version.
+                    </p>
+                  </div>
                 ) : null}
               </div>
             </div>
-
-            {selectedRealPack.verificationStatus === "needs_manual_verification" ? (
-              <div className="mt-4 rounded-[1.4rem] border border-line/70 bg-white/82 p-4">
-                <p className="mini-label">Verification note</p>
-                <p className="mt-2 text-sm leading-6 text-foreground">
-                  Verify current price and availability on retailer site before launch. FitMuse may
-                  earn a commission from some links in a future version.
-                </p>
-              </div>
-            ) : null}
 
             <div className="mt-6 grid gap-4">
               {selectedRealPack.products.map((product) => (
@@ -1784,7 +1824,7 @@ export function ResultsView({ searchParamsObject = {} }: ResultsViewProps) {
                   key={`real-pack-${selectedRealPack.id}-${product.id}`}
                   className="rounded-[1.5rem] border border-line/70 bg-white/78 p-5"
                 >
-                  <div className="flex flex-wrap items-start justify-between gap-4">
+                  <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
                     <div>
                       <p className="mini-label">{formatOptionLabel(product.category)}</p>
                       <h3 className="mt-2 text-xl text-foreground">{product.name}</h3>
@@ -1792,23 +1832,26 @@ export function ResultsView({ searchParamsObject = {} }: ResultsViewProps) {
                         {product.store} • {formatCurrency(product.currentPrice)}
                       </p>
                     </div>
-                    {isPlaceholderRealProductLink(product.productUrl) ? (
-                      <span
-                        aria-disabled="true"
-                        className="cta-secondary cursor-not-allowed opacity-70"
-                      >
-                        Replace with real link
-                      </span>
-                    ) : (
-                      <a
-                        href={product.productUrl}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="cta-secondary"
-                      >
-                        Open retailer candidate
-                      </a>
-                    )}
+                    <div className="flex flex-col gap-2 sm:min-w-[14rem]">
+                      <p className="mini-label px-1">Retailer candidate</p>
+                      {isPlaceholderRealProductLink(product.productUrl) ? (
+                        <span
+                          aria-disabled="true"
+                          className="cta-secondary cursor-not-allowed opacity-70"
+                        >
+                          Replace with real link
+                        </span>
+                      ) : (
+                        <a
+                          href={product.productUrl}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="cta-secondary"
+                        >
+                          Open retailer candidate
+                        </a>
+                      )}
+                    </div>
                   </div>
 
                   <div className="mt-4 flex flex-wrap gap-2">
