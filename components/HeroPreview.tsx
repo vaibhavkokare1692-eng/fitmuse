@@ -16,7 +16,7 @@ export function HeroPreview({ outfit }: HeroPreviewProps) {
       <div className="absolute -right-8 top-8 h-28 w-28 rounded-full bg-accent-2/12 blur-3xl" />
       <div className="absolute -bottom-10 right-4 h-32 w-32 rounded-full bg-accent-3/30 blur-3xl" />
 
-      <div className="relative rounded-[2.8rem] border border-white/70 bg-white/68 p-4 shadow-[0_28px_120px_rgba(27,21,19,0.12)] backdrop-blur-xl">
+      <div className="relative rounded-[2.8rem] border border-white/70 bg-white/68 p-3 shadow-[0_28px_120px_rgba(27,21,19,0.12)] backdrop-blur-xl sm:p-4">
         <div className="grid gap-4 sm:grid-cols-[0.72fr_0.28fr]">
           <div className="rounded-[2.1rem] border border-white/70 bg-white/88 p-3 shadow-[0_18px_40px_rgba(27,21,19,0.07)]">
             <div className="rounded-[1.7rem] bg-foreground px-4 py-3 text-white">
@@ -33,7 +33,7 @@ export function HeroPreview({ outfit }: HeroPreviewProps) {
               </div>
             </div>
 
-            <div className="gradient-visual mt-3 h-56 p-5 text-white">
+            <div className="gradient-visual mt-3 h-48 p-5 text-white sm:h-56">
               <div className="flex h-full items-end justify-between">
                 <div className="rounded-[1.5rem] bg-white/12 px-4 py-3 backdrop-blur-md">
                   <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-white/70">
@@ -62,7 +62,7 @@ export function HeroPreview({ outfit }: HeroPreviewProps) {
                 >
                   <span className="flex items-center gap-2">
                     <Bookmark size={14} />
-                    Save
+                    Save preview
                   </span>
                 </button>
               </div>
@@ -85,11 +85,16 @@ export function HeroPreview({ outfit }: HeroPreviewProps) {
                 </div>
               </div>
 
-              <div className="flex flex-wrap gap-3">
-                <button type="button" className="cta-secondary">
-                  Save
-                </button>
-                <ShoppingLinksButton />
+              <div className="rounded-[1.4rem] border border-line/70 bg-background/72 p-4">
+                <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                  <div>
+                    <p className="mini-label">Preview action</p>
+                    <p className="mt-2 text-sm leading-6 text-foreground">
+                      Explore the sample flow now, then save your real shortlist after the quiz.
+                    </p>
+                  </div>
+                  <ShoppingLinksButton />
+                </div>
               </div>
             </div>
           </div>

@@ -10,7 +10,7 @@ export function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
-    <header className="sticky top-0 z-50 bg-background/75 pt-4 backdrop-blur-xl">
+    <header className="sticky top-0 z-50 bg-background/75 pt-3 backdrop-blur-xl sm:pt-4">
       <div className="shell">
         <div className="hero-card flex items-center justify-between gap-4 px-4 py-3 sm:px-6">
           <Link href="/" className="flex items-center gap-3" onClick={() => setIsOpen(false)}>
@@ -48,12 +48,31 @@ export function Navbar() {
             </Link>
             <button
               type="button"
-              className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-line bg-white/86 text-sm font-semibold text-foreground xl:hidden"
+              className="inline-flex h-11 items-center gap-2 rounded-full border border-line bg-white/86 px-3 text-foreground shadow-[0_12px_24px_rgba(27,21,19,0.05)] xl:hidden"
               onClick={() => setIsOpen((current) => !current)}
               aria-expanded={isOpen}
               aria-label="Toggle navigation menu"
             >
-              {isOpen ? "Close" : "Menu"}
+              <span className="text-[11px] font-semibold uppercase tracking-[0.24em] text-muted">
+                {isOpen ? "Close" : "Menu"}
+              </span>
+              <span className="relative h-4 w-4" aria-hidden="true">
+                <span
+                  className={`absolute left-0 top-1/2 h-[1.5px] w-4 -translate-y-1/2 rounded-full bg-foreground transition ${
+                    isOpen ? "rotate-45" : "-translate-y-[6px]"
+                  }`}
+                />
+                <span
+                  className={`absolute left-0 top-1/2 h-[1.5px] w-4 -translate-y-1/2 rounded-full bg-foreground transition ${
+                    isOpen ? "opacity-0" : "opacity-100"
+                  }`}
+                />
+                <span
+                  className={`absolute left-0 top-1/2 h-[1.5px] w-4 -translate-y-1/2 rounded-full bg-foreground transition ${
+                    isOpen ? "-rotate-45" : "translate-y-[6px]"
+                  }`}
+                />
+              </span>
             </button>
           </div>
         </div>
@@ -61,7 +80,7 @@ export function Navbar() {
 
       {isOpen ? (
         <div className="shell pb-4 xl:hidden">
-          <div className="hero-card mt-4 flex flex-col gap-2 p-4">
+          <div className="hero-card mt-4 flex flex-col gap-2 p-3 sm:p-4">
             {navLinks.map((link) => {
               const active = pathname === link.href;
 

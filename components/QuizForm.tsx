@@ -282,6 +282,9 @@ export function QuizForm() {
   const previewLooks = useMemo(() => buildQuizPreviewLooks(formValues), [formValues]);
   const styleDnaPreview = useMemo(() => buildStyleDnaPreview(formValues), [formValues]);
   const progress = ((currentStep + 1) / quizSteps.length) * 100;
+  const currentStepMeta = quizSteps[currentStep];
+  const CurrentStepIcon = currentStepMeta.icon;
+  const briefStatusLabel = isUsingSavedBrief ? "Resuming saved brief" : "Starting a new brief";
 
   function handleChange(
     event: ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>,
@@ -520,24 +523,56 @@ export function QuizForm() {
         ) : null}
       </aside>
 
-      <div ref={formSurfaceRef} className="order-1 glass-panel p-5 pb-40 sm:p-8 sm:pb-8 xl:order-2">
+      <div ref={formSurfaceRef} className="order-1 glass-panel p-5 pb-32 sm:p-8 sm:pb-8 xl:order-2">
         <div className="max-w-3xl">
-          <p className="mini-label">Current step</p>
-          <h3 className="mt-2 text-3xl text-foreground sm:text-5xl">
-            {quizSteps[currentStep].title}
-          </h3>
-          <p className="mt-3 max-w-2xl text-sm leading-6 sm:mt-4 sm:text-base sm:leading-7">
-            {quizSteps[currentStep].description}
-          </p>
-          <div className="mt-4 flex flex-wrap gap-3">
-            <span className="rounded-full border border-line/70 bg-white/82 px-4 py-2 text-sm text-foreground">
-              {isUsingSavedBrief ? "Saved brief loaded" : "Fresh brief"}
+          <div className="flex flex-wrap items-center gap-3">
+            <span className="rounded-full border border-line/70 bg-white/82 px-4 py-2 text-sm font-medium text-foreground">
+              Step {currentStep + 1} of {quizSteps.length}
+            </span>
+            <span className="rounded-full border border-accent-3/80 bg-[#fbf6ef] px-4 py-2 text-sm font-medium text-foreground">
+              {briefStatusLabel}
             </span>
             {isUsingSavedBrief ? (
-              <button type="button" onClick={startNewBrief} className="cta-secondary">
+              <button
+                type="button"
+                onClick={startNewBrief}
+                className="text-sm font-semibold text-accent-2 underline-offset-4 hover:text-accent hover:underline"
+              >
                 Start new brief
               </button>
             ) : null}
+          </div>
+
+          <div className="mt-5">
+            <p className="mini-label">Your FitMuse brief</p>
+            <h3 className="mt-2 text-3xl text-foreground sm:text-5xl">
+              {currentStepMeta.title}
+            </h3>
+            <p className="mt-3 max-w-2xl text-sm leading-6 sm:mt-4 sm:text-base sm:leading-7">
+              {currentStepMeta.description}
+            </p>
+          </div>
+        </div>
+
+        <div className="mt-5 xl:hidden">
+          <div className="rounded-[1.5rem] border border-line/70 bg-background/72 p-4">
+            <div className="flex items-center justify-between gap-3">
+              <div className="flex items-center gap-3">
+                <span className="flex h-10 w-10 items-center justify-center rounded-full bg-accent-4 text-accent-2">
+                  <CurrentStepIcon size={18} />
+                </span>
+                <div>
+                  <p className="mini-label">Progress</p>
+                  <p className="mt-1 text-sm font-semibold text-foreground">
+                    {currentStepMeta.title}
+                  </p>
+                </div>
+              </div>
+              <p className="text-sm font-semibold text-foreground">{Math.round(progress)}%</p>
+            </div>
+            <div className="progress-track mt-4 bg-line/45">
+              <div className="progress-fill" style={{ width: `${progress}%` }} />
+            </div>
           </div>
         </div>
 
@@ -552,17 +587,25 @@ export function QuizForm() {
 
         <AnimatePresence mode="wait">
           <motion.div
-            key={quizSteps[currentStep].title}
+            key={currentStepMeta.title}
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -12 }}
             transition={{ duration: 0.32, ease: [0.22, 1, 0.36, 1] }}
-            className="mt-6 sm:mt-8"
+            className="mt-6 sm:mt-7"
           >
             {currentStep === 0 ? (
-              <div className="grid gap-5 md:grid-cols-2">
-                <div className="md:col-span-2 rounded-[1.6rem] border border-line/70 bg-background/74 p-5">
-                  <p className="mini-label">Quick-start templates</p>
+              <div className="grid gap-4 md:grid-cols-2">
+                <div className="md:col-span-2 rounded-[1.6rem] border border-line/70 bg-background/74 p-5 sm:p-6">
+                  <div className="flex flex-wrap items-center justify-between gap-3">
+                    <div>
+                      <p className="mini-label">Quick-start templates</p>
+                      <h4 className="mt-2 text-2xl text-foreground">Start from a polished brief</h4>
+                    </div>
+                    <span className="rounded-full border border-accent-3/80 bg-white/88 px-3 py-2 text-xs font-semibold uppercase tracking-[0.22em] text-accent-2">
+                      Fastest start
+                    </span>
+                  </div>
                   <p className="mt-2 max-w-2xl text-sm leading-6 text-foreground">
                     Start with a proven brief instead of building from zero. FitMuse will prefill the vibe, occasion, budget, and store direction for you.
                   </p>
@@ -572,8 +615,9 @@ export function QuizForm() {
                         key={template.id}
                         type="button"
                         onClick={() => applyQuickStartTemplate(template)}
-                        className="rounded-[1.35rem] border border-line/70 bg-white/82 p-4 text-left transition hover:-translate-y-0.5 hover:border-accent hover:text-accent"
+                        className="rounded-[1.35rem] border border-line/70 bg-white/86 p-4 text-left transition hover:-translate-y-0.5 hover:border-accent hover:shadow-[0_16px_30px_rgba(27,21,19,0.07)]"
                       >
+                        <p className="mini-label">Prefill this brief</p>
                         <p className="text-sm font-semibold text-foreground">{template.label}</p>
                         <p className="mt-2 text-xs leading-5 text-muted">{template.description}</p>
                       </button>
@@ -582,7 +626,7 @@ export function QuizForm() {
                 </div>
 
                 <div className="md:col-span-2">
-                  <p className="mini-label">Step 1</p>
+                  <p className="mini-label">Start with the profile basics</p>
                   <p className="mt-2 max-w-2xl text-sm">
                     This becomes the saved profile FitMuse uses on future visits. You do not need to upload a full wardrobe first.
                   </p>
@@ -604,7 +648,7 @@ export function QuizForm() {
 
                 <div>
                   <label htmlFor="stylePreference" className="field-label">
-                    Gender or style preference
+                    Style direction
                   </label>
                   <select
                     id="stylePreference"
@@ -639,7 +683,7 @@ export function QuizForm() {
             ) : null}
 
             {currentStep === 1 ? (
-              <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
+              <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
                 {[
                   ["height", "Height", "5'6\""],
                   ["weight", "Weight", "135 lb"],
@@ -726,9 +770,9 @@ export function QuizForm() {
             ) : null}
 
             {currentStep === 2 ? (
-              <div className="grid gap-6">
+              <div className="grid gap-5">
                 <div>
-                  <label className="field-label">Choose your aesthetic</label>
+                  <label className="field-label">Pick your main aesthetic</label>
                   <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
                     {aestheticOptions.map((option) => {
                       const selected = formValues.aesthetic === option;
@@ -754,9 +798,9 @@ export function QuizForm() {
             ) : null}
 
             {currentStep === 3 ? (
-              <div className="grid gap-6">
+              <div className="grid gap-5">
                 <div>
-                  <label className="field-label">Main occasion</label>
+                  <label className="field-label">Primary occasion</label>
                   <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-5">
                     {occasionOptions.map((option) => {
                       const selected = formValues.occasion === option;
@@ -806,9 +850,9 @@ export function QuizForm() {
             ) : null}
 
             {currentStep === 4 ? (
-              <div className="grid gap-6">
+              <div className="grid gap-5">
                 <div>
-                  <label className="field-label">Fit preference</label>
+                  <label className="field-label">Preferred fit</label>
                   <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
                     {fitPreferenceOptions.map((option) => {
                       const selected = formValues.fitPreference === option;
@@ -831,7 +875,7 @@ export function QuizForm() {
                   </div>
                 </div>
 
-                <div className="grid gap-5 md:grid-cols-2">
+                <div className="grid gap-4 md:grid-cols-2">
                   <div>
                     <label htmlFor="preferredColors" className="field-label">
                       Preferred colors
@@ -901,10 +945,10 @@ export function QuizForm() {
             ) : null}
 
             {currentStep === 5 ? (
-              <div className="grid gap-6">
-                <div className="grid gap-5 lg:grid-cols-[0.96fr_1.04fr]">
+              <div className="grid gap-5">
+                <div className="grid gap-4 lg:grid-cols-[0.96fr_1.04fr]">
                   <div className="soft-card">
-                    <p className="mini-label">Review your brief</p>
+                    <p className="mini-label">Review before results</p>
                     <h4 className="mt-3 text-3xl text-foreground">
                       {formValues.name ? `${formValues.name}'s FitMuse profile` : "Your FitMuse profile"}
                     </h4>
@@ -928,7 +972,7 @@ export function QuizForm() {
                         ))}
                     </div>
 
-                    <div className="mt-5 grid gap-3 sm:grid-cols-2">
+                    <div className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
                       {[
                         { label: "Height", value: formValues.height },
                         { label: "Top size", value: formValues.topSize },
@@ -952,7 +996,7 @@ export function QuizForm() {
                     </div>
                   </div>
 
-                  <div className="hero-card overflow-hidden p-4">
+                  <div className="hero-card overflow-hidden p-4 sm:p-5">
                     {previewLooks[0] ? (
                       <>
                         <div className="rounded-[1.8rem] bg-gradient-to-br from-[#274650] via-[#6f857b] to-[#ead8c1] p-5 text-white">
@@ -994,7 +1038,7 @@ export function QuizForm() {
                   </div>
                 </div>
 
-                <div className="grid gap-4 md:grid-cols-3">
+                <div className="grid gap-3 md:grid-cols-3">
                   {previewLooks.map((look, index) => (
                     <div
                       key={look.id}
@@ -1002,7 +1046,7 @@ export function QuizForm() {
                     >
                       <p className="mini-label">Look {index + 1}</p>
                       <h4 className="mt-2 text-2xl text-foreground">{look.name}</h4>
-                      <p className="mt-2 text-sm">{look.summary}</p>
+                      <p className="mt-2 text-sm leading-6">{look.summary}</p>
                     </div>
                   ))}
                 </div>
@@ -1011,11 +1055,11 @@ export function QuizForm() {
           </motion.div>
         </AnimatePresence>
 
-        <div className="fixed inset-x-4 bottom-12 z-40 flex flex-col gap-4 rounded-[1.5rem] border border-line/70 bg-[rgba(252,247,242,0.94)] p-4 shadow-[0_18px_36px_rgba(27,21,19,0.12)] backdrop-blur-sm sm:static sm:mt-8 sm:flex-row sm:items-center sm:justify-between sm:rounded-none sm:border-t sm:border-x-0 sm:border-b-0 sm:bg-transparent sm:p-0 sm:pt-6 sm:shadow-none sm:backdrop-blur-0">
+        <div className="fixed inset-x-4 bottom-4 z-40 flex flex-col gap-3 rounded-[1.35rem] border border-line/70 bg-[rgba(252,247,242,0.92)] p-3.5 shadow-[0_16px_30px_rgba(27,21,19,0.12)] backdrop-blur-md sm:static sm:mt-8 sm:flex-row sm:items-center sm:justify-between sm:rounded-none sm:border-t sm:border-x-0 sm:border-b-0 sm:bg-transparent sm:p-0 sm:pt-6 sm:shadow-none sm:backdrop-blur-0">
           <button
             type="button"
             onClick={() => goToStep(currentStep - 1)}
-            className="cta-secondary"
+            className="cta-secondary w-full sm:w-auto"
             data-testid="quiz-back-button"
             disabled={currentStep === 0}
           >
@@ -1026,7 +1070,7 @@ export function QuizForm() {
             <button
               type="button"
               onClick={handleNext}
-              className="cta-primary"
+              className="cta-primary w-full sm:w-auto"
               data-testid="quiz-next-button"
             >
               <span className="flex items-center gap-2">
@@ -1037,7 +1081,7 @@ export function QuizForm() {
           ) : (
             <button
               type="submit"
-              className="cta-primary min-w-56"
+              className="cta-primary min-w-56 w-full sm:w-auto"
               data-testid="quiz-submit-button"
               disabled={isPending}
             >

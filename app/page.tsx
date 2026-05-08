@@ -140,34 +140,37 @@ export default function HomePage() {
   return (
     <>
       <MotionReveal>
-        <section className="section-space pb-14 pt-8 sm:pb-16">
+        <section className="section-space pb-10 pt-6 sm:pb-14 sm:pt-8">
           <div className="shell">
-            <div className="relative overflow-hidden rounded-[3rem] border border-white/75 bg-white/66 px-5 py-6 shadow-[0_32px_140px_rgba(27,21,19,0.11)] backdrop-blur-xl sm:px-8 sm:py-8 lg:px-10 lg:py-10">
+            <div className="relative overflow-hidden rounded-[3rem] border border-white/75 bg-white/66 px-4 py-5 shadow-[0_32px_140px_rgba(27,21,19,0.11)] backdrop-blur-xl sm:px-8 sm:py-8 lg:px-10 lg:py-10">
               <div className="absolute -left-16 top-10 h-56 w-56 rounded-full bg-accent-3/30 blur-3xl" />
               <div className="absolute right-0 top-0 h-60 w-60 rounded-full bg-accent-2/10 blur-3xl" />
               <div className="absolute bottom-0 left-1/3 h-48 w-48 rounded-full bg-accent/10 blur-3xl" />
 
-              <div className="relative grid gap-12 xl:grid-cols-[0.96fr_1.04fr] xl:items-center">
-                <div className="space-y-7">
-                  <div className="space-y-5">
+              <div className="relative grid gap-8 lg:gap-10 xl:grid-cols-[0.96fr_1.04fr] xl:items-center xl:gap-12">
+                <div className="space-y-5 sm:space-y-6">
+                  <div className="space-y-4 sm:space-y-5">
                     <span className="pill">For shoppers who want full looks without the closet-upload chore</span>
-                    <div className="space-y-5">
+                    <div className="space-y-4 sm:space-y-5">
                       <p className="eyebrow">Premium digital styling</p>
-                      <h1 className="max-w-4xl text-5xl leading-[0.9] text-foreground sm:text-6xl lg:text-7xl">
+                      <h1 className="max-w-4xl text-[2.9rem] leading-[0.92] text-foreground sm:text-6xl lg:text-7xl">
                         Build complete outfits that actually fit your budget, style, and life.
                       </h1>
-                      <p className="max-w-2xl text-lg leading-8">
+                      <p className="max-w-2xl text-base leading-7 sm:text-lg sm:leading-8">
                         Describe your vibe, budget, occasion, preferred stores, colors, and fit.
                         FitMuse turns it into full outfit boards in minutes <span aria-hidden="true">&mdash;</span> no full closet upload required.
                       </p>
                     </div>
                   </div>
 
-                  <div className="flex flex-col gap-3 sm:flex-row">
+                  <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
                     <Link href="/quiz" className="cta-primary">
                       Take the Style Quiz
                     </Link>
-                    <Link href="#sample-looks" className="cta-secondary">
+                    <Link
+                      href="#sample-looks"
+                      className="inline-flex items-center justify-center px-1 py-2 text-sm font-semibold text-accent-2 underline-offset-4 hover:text-accent hover:underline"
+                    >
                       View Sample Looks
                     </Link>
                   </div>
