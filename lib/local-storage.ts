@@ -70,9 +70,11 @@ function subscribeToStorageKey(storageKey: string, onStoreChange: () => void) {
 
 const aestheticMap: Record<string, Aesthetic> = {
   "old money": "old money",
+  "quiet luxury": "old money",
   streetwear: "streetwear",
   minimalist: "minimalist",
   "clean girl": "clean girl",
+  "clean minimal": "clean girl",
   "smart casual": "smart casual",
   office: "office",
   party: "party",
@@ -93,8 +95,10 @@ const occasionMap: Record<string, Occasion> = {
   college: "college",
   office: "office",
   travel: "travel",
+  airport: "travel",
   "wedding guest": "wedding guest",
   "daily wear": "daily wear",
+  everyday: "daily wear",
   "brand content": "brand content",
 };
 
