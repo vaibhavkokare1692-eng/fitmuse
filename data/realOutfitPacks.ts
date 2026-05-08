@@ -13,6 +13,7 @@ import type { BudgetRange, QuizAnswers, RealOutfitPack, RealProduct } from "@/ty
 const DEFAULT_LAST_UPDATED = "2026-04-30";
 const MAY_1_LAST_UPDATED = "2026-05-01";
 const MAY_2_LAST_UPDATED = "2026-05-02";
+const MAY_6_LAST_UPDATED = "2026-05-06";
 
 type RealShoppingBrief = Partial<
   Pick<QuizAnswers, "stylePreference" | "aesthetic" | "occasion" | "budgetRange">
@@ -284,36 +285,47 @@ export const realOutfitPacks: RealOutfitPack[] = [
   },
   {
     id: "real-pack-masculine-old-money-date",
-    name: "Masculine Old Money Date",
+    name: "Classic Old Money Date",
     targetStylePreference: "masculine",
     aesthetic: "old money",
+    aestheticAliases: ["quiet luxury"],
     occasion: "date",
     budgetRange: "$100-$200",
     productIds: [
-      "real-nordstrom-rack-oxford-shirt-off-white",
-      "real-nordstrom-rack-pleated-trouser-camel",
-      "real-nordstrom-rack-penny-loafer-brown",
-      "real-nordstrom-rack-slim-belt-brown",
+      "real-uniqlo-oxford-slim-shirt-neutral",
+      "real-hm-relaxed-fit-cotton-chinos-beige",
+      "real-target-alfred-slip-on-loafers-neutral",
+      "real-hm-leather-belt-brown",
     ],
-    totalPrice: 160,
+    totalPrice: 149.88,
     budgetLabel: "Within budget",
-    fitNote: "The shirt and trouser pairing keeps the line clean, while loafers and a matching belt reinforce polish without feeling formal.",
+    fitNote:
+      "An oxford shirt, beige chinos, loafers, and leather belt create a clean masculine date look that feels polished without looking overdone.",
     whyItWorks:
-      "This pack captures the old-money brief through soft neutrals, clean tailoring, and low-noise accessories that still feel approachable for a date.",
+      "This is the classic old-money date formula: a crisp oxford shirt, relaxed beige chinos, minimal loafers, and a leather belt. The outfit stays neutral, logo-free, and approachable while still feeling intentional for dinner, coffee, brunch, or a casual classy date.",
     smartSwaps: [
       {
-        label: "Office crossover swap",
-        note: "Add the navy blazer later if you want this board to stretch into meetings or dinners with stricter dress codes.",
+        label: "Cheaper swap",
+        note: "Skip the leather belt or use an owned belt or loafers when you want to reduce the total without changing the overall formula.",
       },
       {
-        label: "Softer swap",
-        note: "Swap in the Uniqlo merino quarter-zip for cooler weather or a more relaxed dinner setting.",
+        label: "Premium swap",
+        note: "Add the Uniqlo Premium Lambswool Sweater as a stretch layer when you want a richer old-money finish for a cooler date night.",
+      },
+      {
+        label: "Casual swap",
+        note: "Replace the loafers with minimal leather sneakers when you want the same clean look in a more relaxed direction.",
+      },
+      {
+        label: "Cooler evening swap",
+        note: "Layer the Uniqlo Premium Lambswool Sweater over the oxford shirt when you want more warmth without losing the old-money feel.",
       },
     ],
     notes:
-      "This is still a placeholder-only future candidate pack. Keep it hidden from the live curated real-shopping section until real retailer candidate products and manual verification status are added.",
-    lastUpdated: DEFAULT_LAST_UPDATED,
-    shopReady: false,
+      "All main product pages were verified on 2026-05-06, but the pack must stay in needs-manual-verification mode until launch-time price, stock, size, final shirt color, and loafers color checks are completed on the retailer sites.",
+    lastUpdated: MAY_6_LAST_UPDATED,
+    shopReady: true,
+    verificationStatus: "needs_manual_verification",
   },
   {
     id: "real-pack-streetwear-photoshoot",
