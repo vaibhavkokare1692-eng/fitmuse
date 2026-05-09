@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import {
   Bookmark,
   CalendarDays,
@@ -9,6 +8,7 @@ import {
   Sparkles,
   Wallet,
 } from "lucide-react";
+import { TrackedLink } from "@/components/AnalyticsEvents";
 import { AppPreviewTile } from "@/components/AppPreviewTile";
 import { FeatureShowcaseCard } from "@/components/FeatureShowcaseCard";
 import { HeroPreview } from "@/components/HeroPreview";
@@ -167,15 +167,25 @@ export default function HomePage() {
                   </div>
 
                   <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
-                    <Link href="/quiz" className="cta-primary">
+                    <TrackedLink
+                      href="/quiz"
+                      className="cta-primary"
+                      analyticsEvent="homepage_cta_clicked"
+                      analyticsProperties={{ source: "hero_primary", destination: "/quiz" }}
+                    >
                       Take the Style Quiz
-                    </Link>
-                    <Link
+                    </TrackedLink>
+                    <TrackedLink
                       href="#sample-looks"
                       className="inline-flex items-center justify-center px-1 py-2 text-sm font-semibold text-accent-2 underline-offset-4 hover:text-accent hover:underline"
+                      analyticsEvent="homepage_cta_clicked"
+                      analyticsProperties={{
+                        source: "hero_sample_looks",
+                        destination: "#sample-looks",
+                      }}
                     >
                       View Sample Looks
-                    </Link>
+                    </TrackedLink>
                   </div>
 
                   <div className="flex flex-wrap gap-2">
@@ -306,9 +316,14 @@ export default function HomePage() {
                   Complete boards, not random product picks.
                 </h2>
               </div>
-              <Link href="/results" className="cta-secondary">
+              <TrackedLink
+                href="/results"
+                className="cta-secondary"
+                analyticsEvent="homepage_cta_clicked"
+                analyticsProperties={{ source: "sample_looks", destination: "/results" }}
+              >
                 View all looks
-              </Link>
+              </TrackedLink>
             </div>
 
             <div className="grid gap-6 lg:grid-cols-3">
@@ -350,9 +365,14 @@ export default function HomePage() {
                   Current access now, future packaging later.
                 </h2>
               </div>
-              <Link href="/pricing" className="cta-secondary">
+              <TrackedLink
+                href="/pricing"
+                className="cta-secondary"
+                analyticsEvent="homepage_cta_clicked"
+                analyticsProperties={{ source: "pricing_section", destination: "/pricing" }}
+              >
                 View access details
-              </Link>
+              </TrackedLink>
             </div>
 
             <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-4">
@@ -379,12 +399,14 @@ export default function HomePage() {
                     fit, budget, stores, and plans.
                   </p>
                 </div>
-                <Link
+                <TrackedLink
                   href="/quiz"
                   className="rounded-full bg-white px-6 py-3 text-sm font-semibold text-foreground hover:bg-accent-3"
+                  analyticsEvent="homepage_cta_clicked"
+                  analyticsProperties={{ source: "final_cta", destination: "/quiz" }}
                 >
                   Start Styling
-                </Link>
+                </TrackedLink>
               </div>
             </div>
           </div>

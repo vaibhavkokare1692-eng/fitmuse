@@ -20,6 +20,7 @@ import {
 } from "@/data/realOutfitPacks";
 import { REAL_PRODUCT_PLACEHOLDER_URL } from "@/data/realProducts";
 import { products } from "@/data/products";
+import { trackFitMuseEvent } from "@/lib/analytics";
 import {
   clearStoredQuizAnswers,
   normalizeQuizAnswers,
@@ -471,6 +472,7 @@ export function ResultsView({ searchParamsObject = {} }: ResultsViewProps) {
   const [savedLooksMessage, setSavedLooksMessage] = useState("");
   const [pendingOpenSavedLookId, setPendingOpenSavedLookId] = useState<string | null>(null);
   const filtersSeedRef = useRef("");
+  const resultsViewedSignatureRef = useRef("");
   const highlightTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const savedMessageTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -652,6 +654,47 @@ export function ResultsView({ searchParamsObject = {} }: ResultsViewProps) {
     selectedSavedLook && recommendationLookup.has(selectedSavedLook.id),
   );
 
+  useEffect(() => {
+    if (!quizAnswers) {
+      return;
+    }
+
+    const signature = [
+      quizAnswers.stylePreference,
+      quizAnswers.aesthetic,
+      quizAnswers.occasion,
+      quizAnswers.budgetRange,
+      quizAnswers.fitPreference,
+      viewMode,
+    ].join("|");
+
+    if (resultsViewedSignatureRef.current === signature) {
+      return;
+    }
+
+    resultsViewedSignatureRef.current = signature;
+    trackFitMuseEvent("results_viewed", {
+      stylePreference: quizAnswers.stylePreference,
+      aesthetic: quizAnswers.aesthetic,
+      occasion: quizAnswers.occasion,
+      budgetRange: quizAnswers.budgetRange,
+      fitPreference: quizAnswers.fitPreference,
+      resultCount: visibleRecommendations.length,
+      realCandidateBoardCount: curatedRealOutfitPacks.length,
+      mode: viewMode,
+    });
+  }, [
+    curatedRealOutfitPacks.length,
+    quizAnswers,
+    quizAnswers?.aesthetic,
+    quizAnswers?.budgetRange,
+    quizAnswers?.fitPreference,
+    quizAnswers?.occasion,
+    quizAnswers?.stylePreference,
+    viewMode,
+    visibleRecommendations.length,
+  ]);
+
   function persistSavedLooks(next: SavedLookSnapshot[]) {
     writeSavedLooks(next);
     writeSavedLookIds(next.map((savedLook) => savedLook.id));
@@ -710,12 +753,12 @@ export function ResultsView({ searchParamsObject = {} }: ResultsViewProps) {
 
   function toggleSave(id: string) {
     const alreadySaved = savedLooks.some((savedLook) => savedLook.id === id);
+    const savedLook = savedLooks.find((look) => look.id === id);
+    const recommendation = recommendationLookup.get(id);
 
     const next = alreadySaved
       ? savedLooks.filter((savedLook) => savedLook.id !== id)
       : (() => {
-          const recommendation = recommendationLookup.get(id);
-
           if (!recommendation) {
             return savedLooks;
           }
@@ -729,6 +772,16 @@ export function ResultsView({ searchParamsObject = {} }: ResultsViewProps) {
     }
 
     persistSavedLooks(next);
+    trackFitMuseEvent("saved_look_clicked", {
+      action: alreadySaved ? "unsave" : "save",
+      boardId: id,
+      boardName: recommendation?.name ?? savedLook?.name,
+      stylePreference: quizAnswers?.stylePreference,
+      aesthetic: quizAnswers?.aesthetic,
+      occasion: quizAnswers?.occasion,
+      budgetRange: quizAnswers?.budgetRange,
+      fitPreference: quizAnswers?.fitPreference,
+    });
   }
 
   function handleStartNewQuiz() {
@@ -738,6 +791,18 @@ export function ResultsView({ searchParamsObject = {} }: ResultsViewProps) {
   }
 
   function handleOpenSavedLook(savedLookId: string) {
+    const savedLook = savedRecommendations.find((look) => look.id === savedLookId);
+
+    trackFitMuseEvent("saved_look_clicked", {
+      action: "open",
+      boardId: savedLookId,
+      boardName: savedLook?.name,
+      stylePreference: savedLook?.stylePreference || quizAnswers?.stylePreference,
+      aesthetic: savedLook?.aesthetic || quizAnswers?.aesthetic,
+      occasion: savedLook?.occasion || quizAnswers?.occasion,
+      budgetRange: quizAnswers?.budgetRange,
+      fitPreference: quizAnswers?.fitPreference,
+    });
     setSelectedSavedLookId(savedLookId);
   }
 
@@ -751,10 +816,33 @@ export function ResultsView({ searchParamsObject = {} }: ResultsViewProps) {
     setViewMode("all");
     setBudgetViewMode("balanced");
     setPendingOpenSavedLookId(savedLookId);
+    trackFitMuseEvent("saved_look_clicked", {
+      action: "view_in_current_results",
+      boardId: savedLookId,
+      stylePreference: quizAnswers?.stylePreference,
+      aesthetic: quizAnswers?.aesthetic,
+      occasion: quizAnswers?.occasion,
+      budgetRange: quizAnswers?.budgetRange,
+      fitPreference: quizAnswers?.fitPreference,
+    });
     setFilters((current) => {
       const next = buildBaseFilters(quizAnswers);
       return sameFilters(current, next) ? current : next;
     });
+  }
+
+  function handleOpenRealPack(pack: ResolvedRealOutfitPack) {
+    trackFitMuseEvent("real_candidate_board_opened", {
+      boardId: pack.id,
+      boardName: pack.name,
+      verificationStatus: pack.verificationStatus,
+      stylePreference: pack.targetStylePreference,
+      aesthetic: pack.aesthetic,
+      occasion: pack.occasion,
+      budgetRange: pack.budgetRange,
+      resultCount: pack.products.length,
+    });
+    setSelectedRealPackId(pack.id);
   }
 
   useEffect(() => {
@@ -1421,7 +1509,7 @@ export function ResultsView({ searchParamsObject = {} }: ResultsViewProps) {
                             <p className="mini-label px-1">Retailer candidates</p>
                             <button
                               type="button"
-                              onClick={() => setSelectedRealPackId(pack.id)}
+                              onClick={() => handleOpenRealPack(pack)}
                               className="cta-primary w-full"
                             >
                               Shop Full Look
@@ -1848,6 +1936,16 @@ export function ResultsView({ searchParamsObject = {} }: ResultsViewProps) {
                           href={product.productUrl}
                           target="_blank"
                           rel="noreferrer"
+                          onClick={() =>
+                            trackFitMuseEvent("retailer_candidate_clicked", {
+                              boardId: selectedRealPack.id,
+                              boardName: selectedRealPack.name,
+                              verificationStatus: selectedRealPack.verificationStatus,
+                              productId: product.id,
+                              store: product.store,
+                              category: product.category,
+                            })
+                          }
                           className="cta-secondary"
                         >
                           Open retailer candidate

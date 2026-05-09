@@ -40,6 +40,7 @@ import {
   subscribeStoredQuizAnswers,
   writeStoredQuizAnswers,
 } from "@/lib/local-storage";
+import { trackFitMuseEvent } from "@/lib/analytics";
 import { formatAestheticLabel, formatOptionLabel } from "@/lib/utils";
 import { emptyQuizAnswers } from "@/utils/outfitMatcher";
 import type { QuizAnswers } from "@/types";
@@ -256,6 +257,7 @@ export function QuizForm() {
   const showSavedBriefPrompt = hasStoredBrief && savedBriefChoice === "pending";
   const isUsingSavedBrief = hasStoredBrief && savedBriefChoice === "continue";
   const savedBriefPreview = savedBrief ?? emptyQuizAnswers();
+  const hasTrackedQuizStartedRef = useRef(false);
 
   useEffect(() => {
     if (typeof window === "undefined") {
@@ -278,6 +280,18 @@ export function QuizForm() {
       formSurfaceRef.current?.scrollIntoView({ block: "start", behavior: "smooth" });
     }
   }, [currentStep, showSavedBriefPrompt]);
+
+  useEffect(() => {
+    if (!hasHydrated || showSavedBriefPrompt || hasTrackedQuizStartedRef.current) {
+      return;
+    }
+
+    hasTrackedQuizStartedRef.current = true;
+    trackFitMuseEvent("quiz_started", {
+      mode: isUsingSavedBrief ? "saved_brief" : "fresh_brief",
+      source: "quiz_form",
+    });
+  }, [hasHydrated, isUsingSavedBrief, showSavedBriefPrompt]);
 
   const previewLooks = useMemo(() => buildQuizPreviewLooks(formValues), [formValues]);
   const styleDnaPreview = useMemo(() => buildStyleDnaPreview(formValues), [formValues]);
@@ -356,6 +370,16 @@ export function QuizForm() {
       return;
     }
 
+    trackFitMuseEvent("quiz_step_completed", {
+      stepIndex: currentStep + 1,
+      stepTitle: currentStepMeta.title,
+      stylePreference: formValues.stylePreference,
+      aesthetic: formValues.aesthetic,
+      occasion: formValues.occasion,
+      budgetRange: formValues.budgetRange,
+      fitPreference: formValues.fitPreference,
+    });
+
     goToStep(currentStep + 1);
   }
 
@@ -368,6 +392,16 @@ export function QuizForm() {
       setStepError(error);
       return;
     }
+
+    trackFitMuseEvent("quiz_submitted", {
+      source: "quiz_form",
+      destination: "/results",
+      stylePreference: formValues.stylePreference,
+      aesthetic: formValues.aesthetic,
+      occasion: formValues.occasion,
+      budgetRange: formValues.budgetRange,
+      fitPreference: formValues.fitPreference,
+    });
 
     writeStoredQuizAnswers(formValues);
     const search = buildResultsSearch(formValues);

@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Analytics } from "@vercel/analytics/next";
 import "@/app/globals.css";
 import { brandName, headerTagline } from "@/data/mock-data";
 import { Footer } from "@/components/Footer";
@@ -24,6 +25,7 @@ export default function RootLayout({
         <Navbar />
         <main>{children}</main>
         <Footer />
+        <Analytics />
       </body>
     </html>
   );

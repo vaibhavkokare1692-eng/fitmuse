@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { TrackEventOnMount } from "@/components/AnalyticsEvents";
 import { PricingCard } from "@/components/PricingCard";
 import { pricingPlans } from "@/data/mock-data";
 
@@ -13,6 +14,10 @@ export default function PricingPage() {
 
   return (
     <div className="shell section-space">
+      <TrackEventOnMount
+        eventName="pricing_page_viewed"
+        properties={{ source: "pricing_page" }}
+      />
       <section className="grid gap-8 xl:grid-cols-[1.02fr_0.98fr] xl:items-end">
         <div>
           <p className="eyebrow">Access + packaging</p>
