@@ -52,8 +52,9 @@ export function Footer() {
               MVP note
             </p>
             <p>
-              FitMuse uses mock outfit data and placeholder shopping links right now, so it stays
-              easy to evolve into a real affiliate and recommendation product later.
+              FitMuse currently combines sample outfit boards with a smaller set of manually
+              reviewed retailer-candidate boards. Retailer candidates still require manual
+              verification before purchase.
             </p>
           </div>
         </div>

@@ -33,7 +33,7 @@ export function PricingCard({ plan }: PricingCardProps) {
               plan.highlighted ? "text-accent-3" : "text-muted"
             }`}
           >
-            {plan.highlighted ? "Best for creators" : "Plan"}
+            {plan.highlighted ? "Future direction" : "Product stage"}
           </p>
           <h3 className="mt-3 text-3xl">{plan.name}</h3>
         </div>

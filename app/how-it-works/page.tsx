@@ -13,17 +13,19 @@ export default function HowItWorksPage() {
         <div>
           <p className="eyebrow">How it works</p>
           <h1 className="max-w-4xl text-5xl leading-[0.96] text-foreground sm:text-6xl">
-            Four quick steps from brief to full look.
+            Four quick steps from style brief to outfit board.
           </h1>
           <p className="mt-5 max-w-2xl text-lg leading-8">
-            FitMuse starts with the person, not the product.
+            FitMuse starts with the brief behind the outfit, not a closet upload and not a generic style claim.
           </p>
         </div>
 
         <div className="soft-card">
           <p className="mini-label">The flow</p>
           <h2 className="mt-3 text-3xl text-foreground">Short inputs. Clear output.</h2>
-          <p className="mt-4">Measurements, aesthetic, occasion, and budget become one style brief.</p>
+          <p className="mt-4">
+            Measurements, aesthetic, occasion, budget, colors, and stores become one style brief.
+          </p>
         </div>
       </section>
 
@@ -41,15 +43,15 @@ export default function HowItWorksPage() {
         {[
           {
             title: "Input layer",
-            text: "Body data, sizes, colors, stores, budget, and aesthetic all become part of the recommendation brief.",
+            text: "Body data, sizes, colors, stores, budget, and occasion become one style brief that anchors the board.",
           },
           {
             title: "Recommendation layer",
-            text: "The MVP uses local mock data now, but it is already structured for live feeds, AI scoring, and size logic later.",
+            text: "FitMuse uses that brief to rank style-matching outfit boards from the current curated catalog and rules.",
           },
           {
             title: "Shopping layer",
-            text: "Each look is presented as a complete pack with notes, creator use cases, and placeholder shopping links.",
+            text: "Some boards include manually reviewed retailer candidates. Those candidates still require price and availability verification before purchase.",
           },
         ].map((item) => (
           <article key={item.title} className="soft-card">
@@ -66,8 +68,8 @@ export default function HowItWorksPage() {
             <p className="eyebrow !mb-0 text-accent-3">Try it live</p>
             <h2 className="mt-4 text-4xl text-white">See the flow with realistic sample data.</h2>
             <p className="mt-4 max-w-2xl text-white/76">
-              The quiz is the fastest way to show how FitMuse turns a short brief into a polished
-              outfit pack.
+              The quiz is the fastest way to show how FitMuse turns a short brief into outfit
+              boards with honest shopping context.
             </p>
           </div>
 

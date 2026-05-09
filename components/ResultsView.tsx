@@ -966,7 +966,7 @@ export function ResultsView({ searchParamsObject = {} }: ResultsViewProps) {
                 <p className="mt-4 text-sm leading-6 text-white/72">
                   {quizAnswers.storesLike
                     ? `Preferred stores: ${quizAnswers.storesLike}.`
-                    : "No store lock-in yet, so FitMuse is mixing the strongest mock products across the catalog."}
+                    : "No store lock-in yet, so FitMuse is mixing the strongest sample products across the current catalog."}
                 </p>
                 <div className="mt-4 flex flex-wrap gap-2">
                   {(preferredStores.length > 0 ? preferredStores.slice(0, 4) : ["Any store"]).map(
@@ -1254,7 +1254,8 @@ export function ResultsView({ searchParamsObject = {} }: ResultsViewProps) {
                 {visibleRecommendations.length === 1 ? "look" : "looks"} ranked for your brief.
               </h2>
               <p className="mt-3 max-w-2xl">
-                FitMuse is balancing fit, occasion, colors, stores, spend range, and style intelligence using the current curated mock catalog.
+                FitMuse is ranking style-matching sample boards using your fit, occasion, colors,
+                stores, and budget across the current curated catalog.
               </p>
             </div>
             <div className="flex flex-wrap gap-2">
@@ -1273,7 +1274,7 @@ export function ResultsView({ searchParamsObject = {} }: ResultsViewProps) {
               <p className="mt-4 max-w-2xl">
                 {budgetViewMode === "stay-under"
                   ? "The current brief has no fully within-budget looks under this filter mix. Switch back to Balanced mix to see the closest near-budget options too."
-                  : "The recommendation engine still has mock inventory, but the current combination of store, color family, fit, and budget is too narrow."}
+                  : "The current sample catalog does not have a close board match under this combination of store, color family, fit, and budget yet."}
               </p>
               <div className="mt-6">
                 <div className="flex flex-wrap gap-3">
@@ -1317,8 +1318,8 @@ export function ResultsView({ searchParamsObject = {} }: ResultsViewProps) {
                         Manually curated packs for this brief.
                       </h3>
                       <p className="mt-3 max-w-2xl text-sm leading-6 text-muted">
-                        These packs sit alongside the mock engine so FitMuse can start testing real
-                        shopping workflows one scenario at a time.
+                        These packs use manually curated retailer candidates for a small set of
+                        briefs so FitMuse can test real-shopping workflows carefully.
                       </p>
                     </div>
                     <span className="pill">{curatedRealOutfitPacks.length} curated packs</span>
@@ -1439,8 +1440,9 @@ export function ResultsView({ searchParamsObject = {} }: ResultsViewProps) {
 
               <div className="rounded-[1.4rem] border border-line/70 bg-white/74 px-5 py-4">
                 <p className="text-sm leading-6 text-muted">
-                  FitMuse currently uses curated mock data for MVP testing. Real shopping links and
-                  affiliate product feeds can be connected in a future version.
+                  FitMuse currently uses two layers: sample recommendation boards for style
+                  matching, and retailer-candidate boards that still require manual verification
+                  before purchase.
                 </p>
               </div>
             </>
@@ -1745,7 +1747,7 @@ export function ResultsView({ searchParamsObject = {} }: ResultsViewProps) {
                 <p className="mt-3 max-w-2xl text-sm leading-6 text-muted">
                   {selectedRealPack.verificationStatus === "needs_manual_verification"
                     ? "Candidate board. Needs manual verification. Verify current price and availability on retailer site. FitMuse may earn a commission from some links in a future version."
-                    : "Real product links are manually curated for MVP testing."}
+                    : "Retailer candidates are manually curated for MVP testing."}
                 </p>
               </div>
               <button

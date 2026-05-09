@@ -1,16 +1,16 @@
 import type { Metadata } from "next";
 import "@/app/globals.css";
-import { brandName } from "@/data/mock-data";
+import { brandName, headerTagline } from "@/data/mock-data";
 import { Footer } from "@/components/Footer";
 import { Navbar } from "@/components/Navbar";
 
 export const metadata: Metadata = {
   title: {
-    default: `${brandName} | Outfit-Board Stylist`,
+    default: `${brandName} | ${headerTagline}`,
     template: `%s | ${brandName}`,
   },
   description:
-    "Build complete outfits that fit your budget, style, stores, and life without uploading your full closet first.",
+    "Turn a style brief into ready-to-shop outfit boards without uploading your full closet first.",
 };
 
 export default function RootLayout({

@@ -12,15 +12,15 @@ export default function QuizPage() {
         <div>
           <p className="eyebrow">Style quiz</p>
           <h1 className="max-w-4xl text-[2.7rem] leading-[0.98] text-foreground sm:text-6xl">
-            Tell FitMuse your vibe, your fit, and your budget.
+            Tell FitMuse the brief behind the look you need.
           </h1>
           <p className="mt-3 max-w-2xl text-base leading-7 sm:mt-4 sm:text-lg sm:leading-8">
-            Build a personalized style brief so FitMuse can recommend complete looks for your body,
-            occasion, budget, and aesthetic.
+            Build a style brief that turns into outfit boards shaped by your fit, occasion,
+            budget, colors, and store preferences.
           </p>
 
           <div className="mt-4 flex flex-wrap gap-2 xl:hidden">
-            {["6 quick steps", "Save your brief", "Complete outfit boards"].map((item) => (
+            {["6 quick steps", "Save your brief", "No closet upload"].map((item) => (
               <span key={item} className="chip text-xs sm:text-sm">
                 {item}
               </span>
@@ -32,7 +32,7 @@ export default function QuizPage() {
           {[
             { label: "Fast to finish", value: "6 steps" },
             { label: "Inputs covered", value: "Budget + fit + stores" },
-            { label: "Output", value: "Complete outfit boards" },
+            { label: "Output", value: "Outfit boards" },
           ].map((item) => (
             <div key={item.label} className="metric-card">
               <p className="mini-label">{item.label}</p>

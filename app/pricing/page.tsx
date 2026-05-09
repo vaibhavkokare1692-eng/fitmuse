@@ -8,30 +8,31 @@ export const metadata: Metadata = {
 };
 
 export default function PricingPage() {
-  const influencerPlan = pricingPlans.find((plan) => plan.highlighted) ?? pricingPlans[0];
+  const highlightedFuturePlan = pricingPlans.find((plan) => plan.highlighted) ?? pricingPlans[0];
   const standardPlans = pricingPlans.filter((plan) => !plan.highlighted);
 
   return (
     <div className="shell section-space">
       <section className="grid gap-8 xl:grid-cols-[1.02fr_0.98fr] xl:items-end">
         <div>
-          <p className="eyebrow">Pricing</p>
+          <p className="eyebrow">Access + packaging</p>
           <h1 className="max-w-4xl text-5xl leading-[0.96] text-foreground sm:text-6xl">
-            Affordable styling plans built for repeat outfit needs.
+            Current access first. Paid packaging later.
           </h1>
           <p className="mt-5 max-w-2xl text-lg leading-8">
-            Start free, upgrade when you want more looks, and lean into the Influencer plan when
-            content days start needing weekly outfit packs.
+            FitMuse is currently an early product you can explore while the team validates repeat
+            use, board coverage, and trust. The cards below show product-stage direction, not
+            active subscriptions.
           </p>
         </div>
 
         <div className="soft-card">
-          <p className="mini-label">What makes the pricing clear</p>
+          <p className="mini-label">What is true today</p>
           <div className="mt-4 grid gap-3">
             {[
-              "Free for first-time users",
-              "Low-cost plans for everyday styling",
-              "Creator-focused tier for recurring content outfits",
+              "The current live product is free to explore",
+              "Paid plans are directional, not fully launched subscriptions",
+              "Retailer-candidate boards still use manual verification before purchase",
             ].map((item) => (
               <div key={item} className="note-card">
                 <p className="text-sm text-foreground">{item}</p>
@@ -48,22 +49,23 @@ export default function PricingPage() {
           ))}
         </div>
 
-        <PricingCard plan={influencerPlan} />
+        <PricingCard plan={highlightedFuturePlan} />
       </section>
 
       <section className="mt-12">
         <div className="dark-panel grid gap-6 p-8 lg:grid-cols-[1fr_auto] lg:items-center">
           <div>
-            <p className="eyebrow !mb-0 text-accent-3">Most popular for creators</p>
-            <h2 className="mt-4 text-4xl text-white">Weekly packs for reels, shoots, and brand days.</h2>
+            <p className="eyebrow !mb-0 text-accent-3">Before paid plans</p>
+            <h2 className="mt-4 text-4xl text-white">FitMuse is still proving the repeat-use loop before serious paid plans.</h2>
             <p className="mt-4 max-w-2xl text-white/78">
-              The Influencer plan makes the business case obvious: frequent outfit needs, faster
-              planning, and a more polished content workflow without hiring a human stylist.
+              The next job is sharpening the brief-to-board loop, expanding board coverage, and
+              keeping the mock-versus-retailer-candidate boundary clear. Pricing should follow real
+              product trust, not get ahead of it.
             </p>
           </div>
 
           <Link href="/quiz" className="rounded-full bg-white px-6 py-3 text-sm font-semibold text-foreground hover:bg-accent-3">
-            Take the style quiz
+            Try the style quiz
           </Link>
         </div>
       </section>

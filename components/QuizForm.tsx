@@ -72,7 +72,7 @@ const quizSteps = [
   },
   {
     title: "Review",
-    description: "Check the summary and generate your outfit pack.",
+    description: "Check the summary and generate your outfit boards.",
     icon: Sparkles,
   },
 ] as const;
@@ -452,10 +452,11 @@ export function QuizForm() {
         <div>
           <p className="eyebrow !mb-0 text-accent-3">Style quiz</p>
           <h2 className="mt-4 text-4xl leading-tight text-white sm:text-5xl">
-            Build your personal style brief.
+            Build the brief behind your next outfit board.
           </h2>
           <p className="mt-4 max-w-xl text-white/72">
-            Six quick steps. Save once. Reuse anytime you want complete outfit boards for new plans, budgets, and stores.
+            Six quick steps. Save once. Reuse anytime you want fresh outfit boards for a new
+            plan, budget, or store mix.
           </p>
         </div>
 
@@ -544,7 +545,7 @@ export function QuizForm() {
           </div>
 
           <div className="mt-5">
-            <p className="mini-label">Your FitMuse brief</p>
+            <p className="mini-label">Your style brief</p>
             <h3 className="mt-2 text-3xl text-foreground sm:text-5xl">
               {currentStepMeta.title}
             </h3>
@@ -953,7 +954,8 @@ export function QuizForm() {
                       {formValues.name ? `${formValues.name}'s FitMuse profile` : "Your FitMuse profile"}
                     </h4>
                     <p className="mt-3 max-w-2xl text-sm leading-6 text-foreground">
-                      FitMuse is about to turn your vibe, budget, occasion, colors, fit, and store preferences into complete outfit boards.
+                      FitMuse is about to turn this brief into ranked outfit boards shaped by your
+                      occasion, budget, colors, fit, and store preferences.
                     </p>
 
                     <div className="mt-5 flex flex-wrap gap-2">
@@ -1031,7 +1033,7 @@ export function QuizForm() {
                       <div className="soft-card">
                         <p className="mini-label">Preview</p>
                         <h4 className="mt-3 text-2xl text-foreground">
-                          Add a few more details to preview your looks.
+                          Add a few more details to preview your boards.
                         </h4>
                       </div>
                     )}

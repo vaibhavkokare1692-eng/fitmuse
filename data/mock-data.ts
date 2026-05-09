@@ -9,8 +9,9 @@ import type {
 } from "@/types";
 
 export const brandName = "FitMuse";
-export const headerTagline = "Outfit-Board Stylist";
-export const brandTagline = "Complete outfit boards for real budgets, real stores, and real life.";
+export const headerTagline = "Brief-to-Board Outfit Planner";
+export const brandTagline =
+  "Turn a style brief into ready-to-shop outfit boards, no closet upload required.";
 
 export const navLinks: NavLink[] = [
   { label: "Home", href: "/" },
@@ -49,10 +50,10 @@ export const homeFeatures: Feature[] = [
       "Clean girl, streetwear, old money, minimalist, office, and creator-shoot looks stay distinct and intentional.",
   },
   {
-    eyebrow: "Ready-to-buy outfit links",
-    title: "One look, multiple stores, one decision",
+    eyebrow: "Retailer candidates where available",
+    title: "One board, multiple stores, clearer next steps",
     description:
-      "Each outfit card bundles the top, bottom, shoes, and accessories into one easy decision.",
+      "FitMuse separates sample style boards from manually reviewed retailer candidates so shopping claims stay honest.",
   },
 ];
 
@@ -70,90 +71,91 @@ export const creatorUseCases = [
 export const howItWorksSteps: Step[] = [
   {
     title: "Measure",
-    description: "Add your sizes and body cues.",
+    description: "Add your sizes, fit cues, and the brief details that shape the board.",
   },
   {
     title: "Choose aesthetic",
-    description: "Pick the vibe you want to show up with.",
+    description: "Pick the vibe, colors, and stores you want the board to respect.",
   },
   {
     title: "Set occasion + budget",
-    description: "Keep the outfit pack realistic and relevant.",
+    description: "Keep the outfit board realistic for the plan and spend range in front of you.",
   },
   {
     title: "Get full looks",
-    description: "See complete outfits with notes and mock links.",
+    description: "See ranked outfit boards first, plus retailer candidates where FitMuse has manually reviewed them.",
   },
 ];
 
 export const comparisonRows: ComparisonRow[] = [
   {
-    legacy: "Existing wardrobe apps help users organize clothes they already own.",
-    modern: "Our platform helps users discover new complete outfits to buy.",
-  },
-  {
-    legacy: "Existing AI body-shape apps suggest general styles.",
+    legacy: "Closet apps usually start by asking you to catalog what you already own.",
     modern:
-      "Our platform combines body data, budget, occasion, aesthetic, and shopping links.",
+      "FitMuse starts with a style brief and builds the outfit board you need for the plan in front of you.",
   },
   {
-    legacy: "Existing virtual try-on apps focus on visual try-on.",
-    modern: "Our platform focuses on complete outfit discovery for creators.",
+    legacy: "Broad style-suggestion tools often stop at an aesthetic label.",
+    modern:
+      "FitMuse keeps the brief grounded in budget, fit, colors, stores, and occasion so the board feels more usable.",
   },
   {
-    legacy: "Existing personal stylists are expensive.",
-    modern: "Our platform gives affordable digital styling.",
+    legacy: "Single-brand recommendation tools only show what one retailer wants to sell.",
+    modern: "FitMuse can mix sample boards and manually reviewed retailer candidates across multiple stores.",
   },
   {
-    legacy: "Store-specific recommendation tools suggest only one brand's clothes.",
-    modern: "Our platform suggests multi-store outfit combinations.",
+    legacy: "Mood boards and inspiration feeds rarely finish the outfit for you.",
+    modern: "FitMuse turns the brief into a full board with reasoning, swaps, and price context.",
+  },
+  {
+    legacy: "High-touch personal styling can help, but most people do not need a human service every time.",
+    modern: "FitMuse aims to be a faster self-serve planning tool for repeat outfit decisions.",
   },
 ];
 
 export const pricingPlans: PricingPlan[] = [
   {
-    name: "Free",
-    price: "$0",
-    description: "Try 3 looks",
+    name: "Current access",
+    price: "Available now",
+    description: "Use the live product free while FitMuse refines paid packaging.",
     features: [
-      "3 outfit suggestions",
-      "Quick aesthetic matching",
-      "Mock shopping links",
-      "Save favorites locally",
+      "Style quiz and saved brief",
+      "Sample recommendation boards",
+      "Saved looks in this browser",
+      "Selected real-shopping candidate boards",
     ],
   },
   {
-    name: "Basic",
-    price: "$4.99/month",
-    description: "Everyday styling",
+    name: "Future everyday plan",
+    price: "Planned",
+    description: "Direction for repeat outfit planning once the core loop proves sticky.",
     features: [
-      "10 outfit suggestions per month",
-      "Measurement-based fit notes",
-      "Budget and occasion filters",
-      "Expanded style presets",
+      "More repeat-use board generation",
+      "Stronger shortlist and comparison tools",
+      "Expanded brief presets",
+      "Priority access to new board categories",
     ],
   },
   {
-    name: "Premium",
-    price: "$9.99/month",
-    description: "Unlimited outfit ideas",
+    name: "Future plus plan",
+    price: "Planned",
+    description: "Direction for heavier use and deeper planning tools.",
     features: [
-      "Unlimited outfit suggestions",
-      "Saved style profile",
-      "Favorite and compare looks",
-      "Priority feature access",
+      "Broader board coverage",
+      "Deeper comparison and refinement tools",
+      "Expanded saved-board workflow",
+      "Earlier access to new shopping features",
     ],
   },
   {
-    name: "Influencer",
-    price: "$19.99/month",
-    description: "Weekly creator outfit packs",
+    name: "Future creator plan",
+    price: "Planned",
+    description: "Direction for recurring shoots, brand days, and heavier board use.",
     highlighted: true,
     features: [
-      "Weekly outfit packs",
-      "Creator-focused looks",
-      "Content calendar outfit ideas",
-      "Brand-ready direction notes",
+      "Repeat brief-to-board planning",
+      "Creator-friendly occasion presets",
+      "Faster board reuse for content days",
+      "Deeper planning tools once validated",
     ],
   },
 ];
@@ -429,7 +431,7 @@ export const defaultQuizValues: QuizFormValues = {
   storesLike: "Zara, Mango, H&M, ASOS",
 };
 
-// Mock outfits keep the MVP demo realistic while staying easy to swap with live feeds later.
+// Mock outfits keep the MVP sample catalog realistic while staying easy to evolve later.
 export const outfits: Outfit[] = [
   {
     id: "old-money-dinner-look",

@@ -14,11 +14,14 @@ export default function DifferencePage() {
           <SectionHeading
             eyebrow="Competitor difference"
             title="Why FitMuse feels different from typical fashion tools"
-            description="This page holds the fuller comparison so the homepage can stay cleaner and more visual."
+            description="FitMuse is built around brief-to-board outfit planning, not closet management or broad styling claims without clear shopping context."
           />
           <div className="soft-card">
-            <h2 className="text-2xl text-foreground">Complete outfit discovery</h2>
-            <p className="mt-4">FitMuse is built around full looks, not closet storage or single-brand selling.</p>
+            <h2 className="text-2xl text-foreground">Brief first. Board second.</h2>
+            <p className="mt-4">
+              FitMuse starts with the look you need for a real plan, then builds the board around
+              budget, stores, colors, and fit.
+            </p>
           </div>
         </div>
       </section>

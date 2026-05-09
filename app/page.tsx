@@ -130,11 +130,13 @@ const whyDifferentPoints = [
 export default function HomePage() {
   const featuredLooks = outfits.slice(0, 3);
   const heroChips = [
+    "Brief-to-board planning",
     "Complete outfit boards",
-    "Budget-aware styling",
+    "No closet upload",
+    "Budget-aware planning",
     "Preferred stores",
     "Color avoid logic",
-    "No full closet upload",
+    "Retailer candidates where available",
   ];
 
   return (
@@ -152,13 +154,14 @@ export default function HomePage() {
                   <div className="space-y-4 sm:space-y-5">
                     <span className="pill">For shoppers who want full looks without the closet-upload chore</span>
                     <div className="space-y-4 sm:space-y-5">
-                      <p className="eyebrow">Premium digital styling</p>
+                      <p className="eyebrow">Brief-to-board outfit planning</p>
                       <h1 className="max-w-4xl text-[2.9rem] leading-[0.92] text-foreground sm:text-6xl lg:text-7xl">
-                        Build complete outfits that actually fit your budget, style, and life.
+                        Turn a style brief into ready-to-shop outfit boards, no closet upload required.
                       </h1>
                       <p className="max-w-2xl text-base leading-7 sm:text-lg sm:leading-8">
-                        Describe your vibe, budget, occasion, preferred stores, colors, and fit.
-                        FitMuse turns it into full outfit boards in minutes <span aria-hidden="true">&mdash;</span> no full closet upload required.
+                        Describe the vibe, budget, occasion, preferred stores, colors, and fit you
+                        want the board to solve. FitMuse turns that brief into styled outfit boards
+                        and, where available, carefully labeled retailer candidates.
                       </p>
                     </div>
                   </div>
@@ -197,7 +200,10 @@ export default function HomePage() {
             <div className="mb-10 max-w-3xl">
               <p className="eyebrow">The problem</p>
               <h2 className="section-title text-foreground">What should I wear today?</h2>
-              <p className="mt-5 max-w-2xl">Most wardrobe apps start with cataloging. FitMuse starts with intent, budget, occasion, and the outfit you need right now.</p>
+              <p className="mt-5 max-w-2xl">
+                Most wardrobe apps start with cataloging. FitMuse starts with the brief behind the
+                outfit you need right now: your plan, budget, stores, colors, and fit.
+              </p>
             </div>
 
             <div className="grid gap-4 md:grid-cols-3">
@@ -245,7 +251,8 @@ export default function HomePage() {
                 <h2 className="section-title text-foreground">A faster, more practical alternative to closet-heavy styling apps.</h2>
               </div>
               <p className="max-w-md text-sm leading-6 text-muted">
-                The product is designed to feel premium, decisive, and shoppable from the very first brief.
+                FitMuse is built to feel useful early: clear brief inputs, complete outfit boards,
+                and honest shopping context.
               </p>
             </div>
 
@@ -295,7 +302,9 @@ export default function HomePage() {
             <div className="mb-10 flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
               <div className="max-w-3xl">
                 <p className="eyebrow">Sample looks</p>
-                <h2 className="section-title text-foreground">Complete looks, not random product picks.</h2>
+                <h2 className="section-title text-foreground">
+                  Complete boards, not random product picks.
+                </h2>
               </div>
               <Link href="/results" className="cta-secondary">
                 View all looks
@@ -337,10 +346,12 @@ export default function HomePage() {
             <div className="mb-10 flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
               <div className="max-w-3xl">
                 <p className="eyebrow">Pricing</p>
-                <h2 className="section-title text-foreground">Simple plans for everyday styling and premium outfit packs.</h2>
+                <h2 className="section-title text-foreground">
+                  Current access now, future packaging later.
+                </h2>
               </div>
               <Link href="/pricing" className="cta-secondary">
-                View pricing
+                View access details
               </Link>
             </div>
 
@@ -361,11 +372,11 @@ export default function HomePage() {
               <div className="mt-4 grid gap-8 lg:grid-cols-[1fr_auto] lg:items-center">
                 <div>
                   <h2 className="text-4xl leading-tight text-white sm:text-5xl">
-                    Dress better with less stress.
+                    Start with the brief, then compare the boards.
                   </h2>
                   <p className="mt-4 max-w-2xl text-white/78">
-                    Create your style brief once and get complete looks built around your body,
-                    budget, and plans.
+                    Create your style brief once and get complete outfit boards built around your
+                    fit, budget, stores, and plans.
                   </p>
                 </div>
                 <Link
