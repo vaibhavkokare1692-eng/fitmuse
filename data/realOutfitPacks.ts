@@ -14,6 +14,7 @@ const DEFAULT_LAST_UPDATED = "2026-04-30";
 const MAY_1_LAST_UPDATED = "2026-05-01";
 const MAY_2_LAST_UPDATED = "2026-05-02";
 const MAY_6_LAST_UPDATED = "2026-05-06";
+const MAY_8_LAST_UPDATED = "2026-05-08";
 
 type RealShoppingBrief = Partial<
   Pick<QuizAnswers, "stylePreference" | "aesthetic" | "occasion" | "budgetRange">
@@ -324,6 +325,46 @@ export const realOutfitPacks: RealOutfitPack[] = [
     notes:
       "All main product pages were verified on 2026-05-06, but the pack must stay in needs-manual-verification mode until launch-time price, stock, size, final shirt color, and loafers color checks are completed on the retailer sites.",
     lastUpdated: MAY_6_LAST_UPDATED,
+    shopReady: true,
+    verificationStatus: "needs_manual_verification",
+  },
+  {
+    id: "real-pack-masculine-clean-airport-fit",
+    name: "Clean Airport Fit",
+    targetStylePreference: "masculine",
+    aesthetic: "clean minimal",
+    aestheticAliases: ["travel"],
+    occasion: "travel",
+    budgetRange: "$100-$200",
+    productIds: [
+      "real-uniqlo-airism-cotton-tshirt-airport-neutral",
+      "real-uniqlo-ultra-stretch-active-jogger-pants-airport-neutral",
+      "real-hm-loose-fit-hoodie-basics-dark-gray",
+      "real-target-billy-lace-up-sneakers-white",
+    ],
+    totalPrice: 110.79,
+    budgetLabel: "Within budget",
+    fitNote:
+      "A breathable tee, stretch joggers, dark gray hoodie, and clean white sneakers build a polished airport outfit that stays comfortable through a long travel day.",
+    whyItWorks:
+      "This board keeps airport dressing comfortable without looking sloppy. The AIRism tee and stretch joggers keep the base breathable and easy to move in, the hoodie adds a soft travel layer, and the clean sneakers keep the overall look minimal, neutral, and modern.",
+    smartSwaps: [
+      {
+        label: "Cap add-on",
+        note: "Add the Uniqlo UV Protection Cap as an optional travel accessory when you want a more functional airport finish; it lifts the estimated total to $140.69.",
+      },
+      {
+        label: "Lighter layer",
+        note: "Skip the hoodie when you want the leanest warm-weather version of the same clean airport formula.",
+      },
+      {
+        label: "Cooler flight swap",
+        note: "Keep the hoodie on hand as your airplane layer and wear the tee-and-jogger base through check-in, security, and boarding.",
+      },
+    ],
+    notes:
+      "All main product pages were verified on 2026-05-08, but the board must stay in needs-manual-verification mode until launch-time price, stock, size, and final color checks are completed on the retailer sites. The H&M hoodie uses a researched sale price, so treat it as a retailer candidate price that still requires manual verification before purchase. The optional Uniqlo cap is a stretch accessory only and is not included in the main $110.79 total.",
+    lastUpdated: MAY_8_LAST_UPDATED,
     shopReady: true,
     verificationStatus: "needs_manual_verification",
   },
