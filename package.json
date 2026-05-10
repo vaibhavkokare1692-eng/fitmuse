@@ -9,6 +9,7 @@
     "lint": "node ./node_modules/eslint/bin/eslint.js .",
     "typecheck": "node ./node_modules/typescript/bin/tsc --noEmit",
     "check:style-rules": "node --experimental-strip-types ./scripts/checkStyleRules.ts",
+    "check:real-board-matching": "node --experimental-strip-types ./scripts/checkRealBoardMatching.ts",
     "check:real-products": "node --experimental-strip-types ./scripts/checkRealProductFreshness.ts",
     "check:recommendations": "node --experimental-strip-types ./scripts/checkRecommendationScenarios.ts"
   },
