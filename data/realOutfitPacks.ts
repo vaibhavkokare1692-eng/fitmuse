@@ -15,6 +15,7 @@ const MAY_1_LAST_UPDATED = "2026-05-01";
 const MAY_2_LAST_UPDATED = "2026-05-02";
 const MAY_6_LAST_UPDATED = "2026-05-06";
 const MAY_8_LAST_UPDATED = "2026-05-08";
+const MAY_9_LAST_UPDATED = "2026-05-09";
 
 type RealShoppingBrief = Partial<
   Pick<QuizAnswers, "stylePreference" | "aesthetic" | "occasion" | "budgetRange">
@@ -376,31 +377,36 @@ export const realOutfitPacks: RealOutfitPack[] = [
     occasion: "photoshoot",
     budgetRange: "$100-$200",
     productIds: [
-      "real-asos-boxy-tee-charcoal",
-      "real-asos-utility-overshirt-sage",
-      "real-asos-relaxed-cargo-pant-stone",
-      "real-asos-clean-court-sneaker-white",
-      "real-asos-chain-necklace-silver",
+      "real-asos-design-essentials-oversized-tshirt-stone",
+      "real-hm-relaxed-fit-cargo-pants-washed-black",
+      "real-hm-cargo-jacket-khaki-green",
+      "real-target-goodfellow-collin-slip-on-sneakers-white",
     ],
-    totalPrice: 132,
+    totalPrice: 176.97,
     budgetLabel: "Within budget",
-    fitNote: "The relaxed tee and cargo base create volume, while the overshirt and clean sneakers keep the outfit editorial instead of sloppy.",
+    fitNote:
+      "An oversized stone tee, washed-black cargos, khaki cargo jacket, and clean white slip-ons create an editorial streetwear look without relying on loud graphics.",
     whyItWorks:
-      "This board gives creator energy through shape and layering rather than loud graphics, making it easier to wear and easier to style on budget.",
+      "This board gives creator energy through silhouette, contrast, and utility texture. The oversized tee keeps the base simple, the cargo pants and jacket add shape for photos, and the clean white slip-ons keep the outfit grounded enough for real-life wear.",
     smartSwaps: [
       {
-        label: "Cleaner swap",
-        note: "Drop the chain and use the court sneaker plus overshirt combo for a quieter minimalist-streetwear version.",
+        label: "Lighter shoot swap",
+        note: "Skip the cargo jacket for warm-weather shoots while keeping the oversized tee, cargos, and white sneakers as the core streetwear base.",
       },
       {
-        label: "Travel swap",
-        note: "Swap the cargo for the Uniqlo smart ankle trouser when you want the same layering energy with less utility weight.",
+        label: "Cleaner swap",
+        note: "Replace the cargo jacket with a plain overshirt you already own when you want a quieter minimalist-streetwear version.",
+      },
+      {
+        label: "Accessory note",
+        note: "Do not add the ASOS necklace/category-page accessory yet; wait for a specific product page so the board stays trust-safe.",
       },
     ],
     notes:
-      "This is still a placeholder-only future candidate pack. Keep it hidden from the live curated real-shopping section until real retailer candidate products and manual verification status are added.",
-    lastUpdated: DEFAULT_LAST_UPDATED,
-    shopReady: false,
+      "All four core product pages were manually checked on 2026-05-09, but this pack must stay in needs-manual-verification mode until launch-time price, stock, size, and final color checks are completed on retailer sites. Do not treat listed prices as live or guaranteed, and do not add the ASOS necklace/category-page accessory until a specific product page is verified.",
+    lastUpdated: MAY_9_LAST_UPDATED,
+    shopReady: true,
+    verificationStatus: "needs_manual_verification",
   },
 ];
 
