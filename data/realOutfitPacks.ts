@@ -3,8 +3,8 @@ import {
   getShopReadyRealProducts,
   hasRealRetailerCandidateProductLink,
   realProductLookup,
-} from "@/data/realProducts";
-import type { BudgetRange, QuizAnswers, RealOutfitPack, RealProduct } from "@/types";
+} from "./realProducts.ts";
+import type { BudgetRange, QuizAnswers, RealOutfitPack, RealProduct } from "../types/index.ts";
 
 // These outfit packs are manually curated MVP placeholders.
 // They intentionally use placeholder product links until the team replaces them by hand.

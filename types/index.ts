@@ -241,6 +241,14 @@ export type RealProductSourceType =
 
 export type RealVerificationStatus = "needs_manual_verification" | "manually_verified";
 
+export type RealProductConfidenceLevel = "high" | "medium" | "low";
+
+export type RealProductFreshnessStatus =
+  | "fresh"
+  | "review_soon"
+  | "stale"
+  | "blocked";
+
 export type RealOutfitPackSmartSwap = {
   label: string;
   note: string;
@@ -253,6 +261,13 @@ export type RealProduct = {
   brand: string;
   currentPrice: number;
   originalPrice?: number;
+  priceNote?: string;
+  availabilityNote?: string;
+  replacementNeeded?: boolean;
+  replacementReason?: string;
+  confidenceLevel?: RealProductConfidenceLevel;
+  nextCheckDate?: string;
+  isSalePrice?: boolean;
   currency: string;
   category: RealProductCategory;
   subcategory: string;

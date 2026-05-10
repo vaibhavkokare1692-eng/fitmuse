@@ -193,6 +193,12 @@ export const realProducts: RealProduct[] = [
     brand: "H&M",
     currentPrice: 12.49,
     originalPrice: 14.99,
+    priceNote:
+      "Markdown candidate price from the last manual check; verify current price before purchase.",
+    availabilityNote:
+      "Manual verification still required for color, size, stock, and final price before purchase.",
+    confidenceLevel: "medium",
+    isSalePrice: true,
     currency: DEFAULT_CURRENCY,
     category: "outer layer",
     subcategory: "cardigan",
@@ -361,6 +367,12 @@ export const realProducts: RealProduct[] = [
     brand: "H&M",
     currentPrice: 19.99,
     originalPrice: 39.99,
+    priceNote:
+      "Markdown candidate price from the last manual check; verify current price before purchase.",
+    availabilityNote:
+      "Manual verification still required for color, size, stock, and final price before purchase.",
+    confidenceLevel: "medium",
+    isSalePrice: true,
     currency: DEFAULT_CURRENCY,
     category: "bottom",
     subcategory: "wide-leg trousers",
@@ -1459,6 +1471,12 @@ export const realProducts: RealProduct[] = [
     store: "H&M",
     brand: "H&M",
     currentPrice: 20.99,
+    priceNote:
+      "Sale-price candidate from the latest manual research; verify the current price before purchase.",
+    availabilityNote:
+      "Manual verification still required for dark gray color, sizes, stock, and final sale status before purchase.",
+    confidenceLevel: "medium",
+    isSalePrice: true,
     currency: DEFAULT_CURRENCY,
     category: "outer layer",
     subcategory: "hoodie",
