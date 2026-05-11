@@ -91,7 +91,7 @@ function buildBundle(seed: BundleSeed) {
       image: `mock-${seed.id}-${item.category}`,
       visualType: item.visualType,
       url: `/mock-products/${seed.id}/${item.category}`,
-      affiliateReady: true,
+      affiliateReady: false,
     } satisfies Product;
   });
 }
