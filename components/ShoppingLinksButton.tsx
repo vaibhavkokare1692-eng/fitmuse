@@ -36,8 +36,8 @@ export function ShoppingLinksButton({
         >
           <p className="mini-label">MVP note</p>
           <p className="mt-2 text-xs leading-5 text-foreground">
-            These sample links show how a future shopping flow could work. They are not live
-            retailer or affiliate links.
+            These example shopping links preview how a future shopping flow could work. They are
+            not live retailer or affiliate links.
           </p>
         </div>
       ) : null}

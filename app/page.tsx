@@ -184,7 +184,7 @@ export default function HomePage() {
                         destination: "#sample-looks",
                       }}
                     >
-                      View Sample Looks
+                      Preview sample boards
                     </TrackedLink>
                   </div>
 
@@ -311,7 +311,7 @@ export default function HomePage() {
           <div className="shell">
             <div className="mb-10 flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
               <div className="max-w-3xl">
-                <p className="eyebrow">Sample looks</p>
+                <p className="eyebrow">Example board previews</p>
                 <h2 className="section-title text-foreground">
                   Complete boards, not random product picks.
                 </h2>
@@ -322,7 +322,7 @@ export default function HomePage() {
                 analyticsEvent="homepage_cta_clicked"
                 analyticsProperties={{ source: "sample_looks", destination: "/results" }}
               >
-                View all looks
+                Explore sample results
               </TrackedLink>
             </div>
 

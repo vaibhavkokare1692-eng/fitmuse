@@ -1403,11 +1403,11 @@ export function ResultsView({ searchParamsObject = {} }: ResultsViewProps) {
                     <div>
                       <p className="eyebrow !mb-0">Curated real shopping looks</p>
                       <h3 className="mt-3 text-3xl text-foreground">
-                        Manually curated packs for this brief.
+                        Retailer-candidate boards for this brief.
                       </h3>
                       <p className="mt-3 max-w-2xl text-sm leading-6 text-muted">
                         These packs use manually curated retailer candidates for a small set of
-                        briefs so FitMuse can test real-shopping workflows carefully.
+                        briefs. Prices and availability still need verification before purchase.
                       </p>
                     </div>
                     <span className="pill">{curatedRealOutfitPacks.length} curated packs</span>
@@ -1512,7 +1512,7 @@ export function ResultsView({ searchParamsObject = {} }: ResultsViewProps) {
                               onClick={() => handleOpenRealPack(pack)}
                               className="cta-primary w-full"
                             >
-                              Shop Full Look
+                              Review retailer candidates
                             </button>
                             <p className="micro-note px-1">
                               Open the full pack to review retailer candidates and manual
@@ -1528,9 +1528,9 @@ export function ResultsView({ searchParamsObject = {} }: ResultsViewProps) {
 
               <div className="rounded-[1.4rem] border border-line/70 bg-white/74 px-5 py-4">
                 <p className="text-sm leading-6 text-muted">
-                  FitMuse currently uses two layers: sample recommendation boards for style
-                  matching, and retailer-candidate boards that still require manual verification
-                  before purchase.
+                  Sample recommendation boards are style examples. Retailer-candidate boards are
+                  manually curated and still require price and availability verification before
+                  purchase.
                 </p>
               </div>
             </>
