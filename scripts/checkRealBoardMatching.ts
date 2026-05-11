@@ -179,6 +179,18 @@ const scenarios: MatchScenario[] = [
     expectedExcludes: [polishedOffice, polishedTravel, classicOldMoneyDate],
   },
   {
+    id: "creator-photoshoot-board-discovery",
+    label: "Creator/photoshoot board discovery",
+    brief: {
+      stylePreference: "mixed / open to all",
+      aesthetic: "creator/photoshoot",
+      occasion: "photoshoot",
+      budgetRange: "$100-$200",
+    },
+    expectedIncludes: [streetwearPhotoshoot],
+    expectedExcludes: [polishedOffice, polishedTravel, classicOldMoneyDate],
+  },
+  {
     id: "masculine-streetwear-photoshoot",
     label: "Masculine streetwear photoshoot",
     brief: {
@@ -217,19 +229,6 @@ const scenarios: MatchScenario[] = [
 ];
 
 const currentGapScenarios: DiscoverabilityGapScenario[] = [
-  {
-    id: "creator-photoshoot-without-streetwear",
-    label: "Creator/photoshoot aesthetic without streetwear",
-    brief: {
-      stylePreference: "mixed / open to all",
-      aesthetic: "creator/photoshoot",
-      occasion: "photoshoot",
-      budgetRange: "$100-$200",
-    },
-    boardId: streetwearPhotoshoot,
-    note:
-      "Current matcher requires streetwear aesthetic, so creator/photoshoot does not surface Streetwear Photoshoot yet.",
-  },
   {
     id: "casual-urban-daily-wear",
     label: "Casual urban daily wear",

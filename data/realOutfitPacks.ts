@@ -374,6 +374,7 @@ export const realOutfitPacks: RealOutfitPack[] = [
     name: "Streetwear Photoshoot",
     targetStylePreference: "mixed / open to all",
     aesthetic: "streetwear",
+    aestheticAliases: ["creator/photoshoot"],
     occasion: "photoshoot",
     budgetRange: "$100-$200",
     productIds: [
