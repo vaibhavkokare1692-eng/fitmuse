@@ -13,12 +13,15 @@ export default function ContactPage() {
         <div className="order-2 space-y-6 lg:order-1">
           <SectionHeading
             eyebrow="Contact"
-            title="Talk to FitMuse about pilots, collabs, or creator partnerships"
-            description="A simple contact flow for feedback, waitlists, and sponsor conversations."
+            title="Send real feedback before FitMuse goes wider"
+            description="Tell us what you tried, what felt useful, what felt confusing, and what board you want next."
           />
           <div className="hidden soft-card sm:block">
             <h2 className="text-2xl text-foreground">Who this is for</h2>
-            <p className="mt-4">Creators, early users, brand partners, and anyone interested in the product.</p>
+            <p className="mt-4">
+              Early users, creators, friends testing the product, and anyone with honest notes on
+              the brief-to-board flow.
+            </p>
           </div>
         </div>
 

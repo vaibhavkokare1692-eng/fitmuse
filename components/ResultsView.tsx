@@ -73,6 +73,22 @@ type ResultsFilters = {
   colorFamily: ColorFamily | "";
 };
 
+const feedbackEmail = "hello.fitmuse@gmail.com";
+const feedbackSubject = "FitMuse feedback";
+const feedbackBody = [
+  "What were you trying to dress for?",
+  "",
+  "Did the outfit board feel useful?",
+  "",
+  "What felt confusing or fake?",
+  "",
+  "What board/style should FitMuse add next?",
+].join("\n");
+
+const feedbackMailtoHref = `mailto:${feedbackEmail}?subject=${encodeURIComponent(
+  feedbackSubject
+)}&body=${encodeURIComponent(feedbackBody)}`;
+
 type SavedLookVisualItem = {
   category: "top" | "bottom" | "shoes" | "accessory" | "outerwear";
   name: string;
@@ -1527,11 +1543,16 @@ export function ResultsView({ searchParamsObject = {} }: ResultsViewProps) {
               ) : null}
 
               <div className="rounded-[1.4rem] border border-line/70 bg-white/74 px-5 py-4">
-                <p className="text-sm leading-6 text-muted">
-                  Sample recommendation boards are style examples. Retailer-candidate boards are
-                  manually curated and still require price and availability verification before
-                  purchase.
-                </p>
+                <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+                  <p className="max-w-3xl text-sm leading-6 text-muted">
+                    Sample recommendation boards are style examples. Retailer-candidate boards are
+                    manually curated and still require price and availability verification before
+                    purchase.
+                  </p>
+                  <a href={feedbackMailtoHref} className="cta-secondary w-full text-center sm:w-auto">
+                    Send feedback
+                  </a>
+                </div>
               </div>
             </>
           )}

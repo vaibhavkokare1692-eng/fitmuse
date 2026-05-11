@@ -1,6 +1,22 @@
 import Link from "next/link";
 import { brandName, brandTagline, headerTagline, navLinks } from "@/data/mock-data";
 
+const feedbackEmail = "hello.fitmuse@gmail.com";
+const feedbackSubject = "FitMuse feedback";
+const feedbackBody = [
+  "What were you trying to dress for?",
+  "",
+  "Did the outfit board feel useful?",
+  "",
+  "What felt confusing or fake?",
+  "",
+  "What board/style should FitMuse add next?",
+].join("\n");
+
+const feedbackMailtoHref = `mailto:${feedbackEmail}?subject=${encodeURIComponent(
+  feedbackSubject
+)}&body=${encodeURIComponent(feedbackBody)}`;
+
 export function Footer() {
   const primaryLinks = navLinks.slice(0, 4);
   const secondaryLinks = navLinks.slice(4);
@@ -56,6 +72,19 @@ export function Footer() {
               reviewed retailer-candidate boards. Retailer candidates still require manual
               verification before purchase.
             </p>
+            <div className="mt-5 rounded-[1.35rem] border border-line/70 bg-white/78 p-4">
+              <p className="mini-label">Feedback</p>
+              <p className="mt-2 text-sm leading-6 text-muted">
+                Trying FitMuse with a real brief? Send what worked, what felt confusing, and
+                what board should come next.
+              </p>
+              <a
+                href={feedbackMailtoHref}
+                className="mt-4 inline-flex text-sm font-semibold text-accent-2 underline-offset-4 hover:text-accent hover:underline"
+              >
+                Email feedback
+              </a>
+            </div>
           </div>
         </div>
       </div>
