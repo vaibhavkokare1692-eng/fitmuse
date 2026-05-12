@@ -100,6 +100,40 @@ type ResolvedRealOutfitPack = RealOutfitPack & {
   budgetSummary: string;
 };
 
+const realBoardVisualSubtitle = "Style preview, not exact product photos";
+
+const realBoardVisualColorAliases: Array<{ match: string[]; color: string }> = [
+  { match: ["gold"], color: "gold" },
+  { match: ["navy"], color: "navy" },
+  { match: ["blue"], color: "blue" },
+  { match: ["washed black", "black"], color: "black" },
+  { match: ["dark gray", "light gray", "gray", "grey"], color: "grey" },
+  { match: ["charcoal", "graphite"], color: "charcoal" },
+  { match: ["khaki", "olive", "green"], color: "olive" },
+  { match: ["cognac", "tan"], color: "tan" },
+  { match: ["brown"], color: "chocolate" },
+  { match: ["stone"], color: "stone" },
+  { match: ["cream"], color: "cream" },
+  { match: ["off white", "white"], color: "white" },
+  { match: ["ivory"], color: "ivory" },
+  { match: ["natural", "ecru"], color: "ecru" },
+  { match: ["beige"], color: "beige" },
+  { match: ["sage"], color: "sage" },
+  { match: ["camel"], color: "camel" },
+  { match: ["espresso"], color: "espresso" },
+  { match: ["plum"], color: "plum" },
+];
+
+const realBoardVisualFallbackPalette = ["cream", "stone", "charcoal", "taupe"];
+
+const realBoardVisualCategoryRank: Record<SavedLookVisualItem["category"], number> = {
+  outerwear: 0,
+  top: 1,
+  bottom: 2,
+  shoes: 3,
+  accessory: 4,
+};
+
 const allAestheticOptions = Array.from(
   new Set([
     ...aestheticOptions,
@@ -395,6 +429,78 @@ function getSavedLookStores(savedLook: Partial<SavedLookSnapshot> | null | undef
   return Array.isArray(savedLook?.stores)
     ? savedLook.stores.filter((store): store is string => Boolean(store)).slice(0, 2)
     : [];
+}
+
+function mapRealProductCategoryToVisualCategory(
+  category: RealProduct["category"],
+): SavedLookVisualItem["category"] {
+  if (category === "bottom") {
+    return "bottom";
+  }
+
+  if (category === "shoes") {
+    return "shoes";
+  }
+
+  if (category === "outer layer") {
+    return "outerwear";
+  }
+
+  if (category === "bag" || category === "accessory") {
+    return "accessory";
+  }
+
+  return "top";
+}
+
+function getRealBoardVisualColor(color: string) {
+  const normalizedColor = color.toLowerCase();
+  const matchedColor = realBoardVisualColorAliases.find(({ match }) =>
+    match.some((alias) => normalizedColor.includes(alias)),
+  );
+
+  return matchedColor?.color ?? null;
+}
+
+function getRealBoardVisualPalette(pack: ResolvedRealOutfitPack) {
+  const palette = pack.products
+    .flatMap((product) => product.colors)
+    .map(getRealBoardVisualColor)
+    .filter((color): color is string => Boolean(color));
+  const uniquePalette = Array.from(new Set(palette)).slice(0, 4);
+
+  return uniquePalette.length > 0 ? uniquePalette : realBoardVisualFallbackPalette;
+}
+
+function getRealBoardVisualItems(pack: ResolvedRealOutfitPack): SavedLookVisualItem[] {
+  const seenCategories = new Set<SavedLookVisualItem["category"]>();
+  const visualItems = pack.products
+    .map((product) => ({
+      category: mapRealProductCategoryToVisualCategory(product.category),
+      name: product.name,
+    }))
+    .filter((item) => {
+      if (seenCategories.has(item.category)) {
+        return false;
+      }
+
+      seenCategories.add(item.category);
+      return true;
+    })
+    .sort(
+      (left, right) =>
+        realBoardVisualCategoryRank[left.category] - realBoardVisualCategoryRank[right.category],
+    );
+
+  if (visualItems.length > 0) {
+    return visualItems;
+  }
+
+  return [
+    { category: "top", name: "Retailer candidate top" },
+    { category: "bottom", name: "Retailer candidate bottom" },
+    { category: "shoes", name: "Retailer candidate shoes" },
+  ];
 }
 
 function getSavedLookItemSummary(
@@ -1460,6 +1566,16 @@ export function ResultsView({ searchParamsObject = {} }: ResultsViewProps) {
                           </div>
                         </div>
 
+                        <OutfitVisual
+                          title={pack.name}
+                          subtitle={realBoardVisualSubtitle}
+                          palette={getRealBoardVisualPalette(pack)}
+                          items={getRealBoardVisualItems(pack)}
+                          stores={pack.stores}
+                          compact
+                          className="mt-4"
+                        />
+
                         <div className="mt-4 flex flex-wrap gap-2">
                           {pack.stores.map((store) => (
                             <span key={`${pack.id}-${store}`} className="pill">
@@ -1882,6 +1998,17 @@ export function ResultsView({ searchParamsObject = {} }: ResultsViewProps) {
               {selectedRealPack.verificationStatus === "needs_manual_verification" ? (
                 <span className="chip">Needs manual verification</span>
               ) : null}
+            </div>
+
+            <div className="mt-6">
+              <OutfitVisual
+                title={selectedRealPack.name}
+                subtitle={realBoardVisualSubtitle}
+                palette={getRealBoardVisualPalette(selectedRealPack)}
+                items={getRealBoardVisualItems(selectedRealPack)}
+                stores={selectedRealPack.stores}
+                className="min-h-[24rem]"
+              />
             </div>
 
             <div className="trust-panel mt-6">
