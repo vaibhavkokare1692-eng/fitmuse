@@ -128,10 +128,12 @@ export function OutfitVisual({
   const accessory = accentItems.find((item) => item.category === "accessory");
   const outerwear = accentItems.find((item) => item.category === "outerwear");
   const wardrobe = [top, bottom, shoes, accessory].filter(Boolean) as VisualItem[];
+  const containerPadding = compact ? "p-3 sm:p-4" : "p-4";
+  const visualMinHeight = compact ? "min-h-32 sm:min-h-48 md:min-h-52" : "min-h-52";
 
   return (
     <div
-      className={`relative overflow-hidden rounded-[2rem] border border-white/70 p-4 text-white shadow-[0_24px_70px_rgba(27,21,19,0.12)] ${className}`}
+      className={`relative overflow-hidden rounded-[2rem] border border-white/70 ${containerPadding} text-white shadow-[0_24px_70px_rgba(27,21,19,0.12)] ${className}`}
       style={{
         background: `linear-gradient(145deg, ${colors[0]} 0%, ${colors[1]} 34%, ${colors[2]} 68%, ${colors[3]} 100%)`,
       }}
@@ -140,21 +142,23 @@ export function OutfitVisual({
       <div className="absolute -right-10 top-4 h-28 w-28 rounded-full bg-white/22 blur-3xl" />
       <div className="absolute bottom-0 left-1/4 h-24 w-24 rounded-full bg-black/10 blur-2xl" />
 
-      <div className="relative flex flex-col gap-4">
+      <div className="relative flex flex-col gap-3 sm:gap-4">
         <div className="flex items-start justify-between gap-3">
           <div>
             <p className="text-[10px] font-semibold uppercase tracking-[0.28em] text-white/66">
               {subtitle}
             </p>
-            <p className="mt-2 text-base font-semibold text-white sm:text-lg">{title}</p>
+            <p className={`${compact ? "hidden sm:block" : "block"} mt-2 text-base font-semibold text-white sm:text-lg`}>
+              {title}
+            </p>
           </div>
           <span className="rounded-full bg-white/14 p-2 text-white/88">
             <Layers3 size={compact ? 15 : 16} />
           </span>
         </div>
 
-        <div className={`grid gap-4 ${compact ? "md:grid-cols-[0.88fr_1.12fr]" : "md:grid-cols-[0.96fr_1.04fr]"}`}>
-          <div className="relative flex min-h-52 items-end justify-center rounded-[1.7rem] border border-white/16 bg-white/10 p-4 backdrop-blur-md">
+        <div className={`grid gap-3 sm:gap-4 ${compact ? "md:grid-cols-[0.88fr_1.12fr]" : "md:grid-cols-[0.96fr_1.04fr]"}`}>
+          <div className={`relative flex ${visualMinHeight} items-end justify-center rounded-[1.7rem] border border-white/16 bg-white/10 p-4 backdrop-blur-md`}>
             <div className="absolute inset-x-4 top-4 h-px bg-white/16" />
             <div className="absolute bottom-4 left-4 right-4 flex gap-1">
               {colors.map((color, index) => (
@@ -200,7 +204,7 @@ export function OutfitVisual({
             </div>
           </div>
 
-          <div className="grid gap-3">
+          <div className={`${compact ? "hidden sm:grid" : "grid"} gap-3`}>
             {wardrobe.map((item) => (
               <div
                 key={`${item.category}-${item.name}`}
@@ -215,7 +219,7 @@ export function OutfitVisual({
           </div>
         </div>
 
-        <div className="flex flex-wrap items-center justify-between gap-3">
+        <div className={`${compact ? "hidden sm:flex" : "flex"} flex-wrap items-center justify-between gap-3`}>
           <div className="flex flex-wrap gap-2">
             {accentItems.map((item) => (
               <span

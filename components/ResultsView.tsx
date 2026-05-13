@@ -1520,22 +1520,22 @@ export function ResultsView({ searchParamsObject = {} }: ResultsViewProps) {
               </div>
 
               {curatedRealOutfitPacks.length > 0 ? (
-                <div className="hero-card p-5 sm:p-6">
+                <div className="hero-card p-4 sm:p-6">
                   <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
                     <div>
                       <p className="eyebrow !mb-0">Curated real shopping looks</p>
-                      <h3 className="mt-3 text-3xl text-foreground">
+                      <h3 className="mt-2 text-2xl text-foreground sm:mt-3 sm:text-3xl">
                         Retailer-candidate boards for this brief.
                       </h3>
-                      <p className="mt-3 max-w-2xl text-sm leading-6 text-muted">
-                        These packs use manually curated retailer candidates for a small set of
-                        briefs. Prices and availability still need verification before purchase.
+                      <p className="mt-2 max-w-2xl text-sm leading-6 text-muted sm:mt-3">
+                        Manually curated retailer candidates. Verify price and availability before
+                        purchase.
                       </p>
                     </div>
                     <span className="pill">{curatedRealOutfitPacks.length} curated packs</span>
                   </div>
 
-                  <div className="mt-6 grid gap-4 xl:grid-cols-2">
+                  <div className="mt-4 grid gap-4 sm:mt-6 xl:grid-cols-2">
                     {curatedRealOutfitPacks.map((pack) => (
                       <div
                         key={pack.id}
@@ -1552,7 +1552,7 @@ export function ResultsView({ searchParamsObject = {} }: ResultsViewProps) {
                           ) : null}
                         </div>
 
-                        <div className="mt-4 flex items-start justify-between gap-4">
+                        <div className="mt-3 flex items-start justify-between gap-3 sm:mt-4 sm:gap-4">
                           <div>
                             <p className="mini-label">
                               {pack.verificationStatus === "needs_manual_verification"
@@ -1566,6 +1566,20 @@ export function ResultsView({ searchParamsObject = {} }: ResultsViewProps) {
                           </div>
                         </div>
 
+                        <div className="mt-3 flex flex-col gap-2 lg:hidden">
+                          <p className="mini-label px-1">Retailer candidates</p>
+                          <button
+                            type="button"
+                            onClick={() => handleOpenRealPack(pack)}
+                            className="cta-primary w-full"
+                          >
+                            Review retailer candidates
+                          </button>
+                          <p className="micro-note px-1">
+                            Review products, retailer links, and verification notes.
+                          </p>
+                        </div>
+
                         <OutfitVisual
                           title={pack.name}
                           subtitle={realBoardVisualSubtitle}
@@ -1573,10 +1587,10 @@ export function ResultsView({ searchParamsObject = {} }: ResultsViewProps) {
                           items={getRealBoardVisualItems(pack)}
                           stores={pack.stores}
                           compact
-                          className="mt-4"
+                          className="mt-3 sm:mt-4"
                         />
 
-                        <div className="mt-4 flex flex-wrap gap-2">
+                        <div className="mt-3 flex flex-wrap gap-2 sm:mt-4">
                           {pack.stores.map((store) => (
                             <span key={`${pack.id}-${store}`} className="pill">
                               {store}
@@ -1584,7 +1598,7 @@ export function ResultsView({ searchParamsObject = {} }: ResultsViewProps) {
                           ))}
                         </div>
 
-                        <div className="trust-panel mt-5">
+                        <div className="trust-panel mt-4 sm:mt-5">
                           <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
                             <div className="max-w-2xl">
                               <p className="mini-label">Shop status</p>
@@ -1615,11 +1629,11 @@ export function ResultsView({ searchParamsObject = {} }: ResultsViewProps) {
                           </div>
                         </div>
 
-                        <div className="mt-5 grid gap-3">
+                        <div className="mt-4 grid gap-2.5 sm:mt-5 sm:gap-3">
                           {pack.products.map((product) => (
                             <div
                               key={product.id}
-                              className="flex items-center justify-between gap-3 rounded-[1.2rem] border border-line/70 bg-background/72 px-4 py-3"
+                              className="flex items-center justify-between gap-3 rounded-[1.2rem] border border-line/70 bg-background/72 px-3.5 py-2.5 sm:px-4 sm:py-3"
                             >
                               <div>
                                 <p className="mini-label">{formatOptionLabel(product.category)}</p>
@@ -1632,12 +1646,12 @@ export function ResultsView({ searchParamsObject = {} }: ResultsViewProps) {
                           ))}
                         </div>
 
-                        <div className="mt-5 grid gap-4 lg:grid-cols-[1fr_auto]">
-                          <div className="rounded-[1.4rem] border border-line/70 bg-background/68 p-4">
+                        <div className="mt-4 grid gap-3 sm:mt-5 sm:gap-4 lg:grid-cols-[1fr_auto]">
+                          <div className="order-2 rounded-[1.4rem] border border-line/70 bg-background/68 p-4 lg:order-1">
                             <p className="mini-label">Why it works</p>
-                            <p className="mt-3 text-sm leading-6 text-muted">{pack.whyItWorks}</p>
+                            <p className="mt-2 text-sm leading-6 text-muted sm:mt-3">{pack.whyItWorks}</p>
                           </div>
-                          <div className="flex flex-col gap-2 lg:min-w-[15rem]">
+                          <div className="order-1 hidden flex-col gap-2 lg:order-2 lg:flex lg:min-w-[15rem]">
                             <p className="mini-label px-1">Retailer candidates</p>
                             <button
                               type="button"
@@ -1647,8 +1661,7 @@ export function ResultsView({ searchParamsObject = {} }: ResultsViewProps) {
                               Review retailer candidates
                             </button>
                             <p className="micro-note px-1">
-                              Open the full pack to review retailer candidates and manual
-                              verification notes.
+                              Review products, retailer links, and verification notes.
                             </p>
                           </div>
                         </div>
@@ -1971,7 +1984,7 @@ export function ResultsView({ searchParamsObject = {} }: ResultsViewProps) {
                 </h2>
                 <p className="mt-3 max-w-2xl text-sm leading-6 text-muted">
                   {selectedRealPack.verificationStatus === "needs_manual_verification"
-                    ? "Candidate board. Needs manual verification. Verify current price and availability on retailer site. FitMuse may earn a commission from some links in a future version."
+                    ? "Retailer candidates for review. Verify price and availability before purchase."
                     : "Retailer candidates are manually curated for MVP testing."}
                 </p>
               </div>
@@ -2000,18 +2013,36 @@ export function ResultsView({ searchParamsObject = {} }: ResultsViewProps) {
               ) : null}
             </div>
 
-            <div className="mt-6">
+            <div className="mt-5 sm:mt-6">
               <OutfitVisual
                 title={selectedRealPack.name}
                 subtitle={realBoardVisualSubtitle}
                 palette={getRealBoardVisualPalette(selectedRealPack)}
                 items={getRealBoardVisualItems(selectedRealPack)}
                 stores={selectedRealPack.stores}
-                className="min-h-[24rem]"
+                compact
+                className="min-h-[14rem] sm:min-h-[22rem]"
               />
             </div>
 
-            <div className="trust-panel mt-6">
+            <div className="trust-panel mt-4 grid gap-3 sm:hidden">
+              <div className="rounded-[1.35rem] border border-white/70 bg-white/80 p-4">
+                <p className="mini-label">Retailer candidates</p>
+                <p className="mt-2 text-lg font-semibold text-foreground">
+                  {formatCurrency(selectedRealPack.totalPrice)} {selectedRealPack.budgetSummary}
+                </p>
+                {selectedRealPack.verificationStatus === "needs_manual_verification" ? (
+                  <p className="mt-2 micro-note">
+                    Price last checked: {formatManualCheckDate(selectedRealPack.lastUpdated)}
+                  </p>
+                ) : null}
+                <p className="mt-2 text-sm leading-6 text-muted">
+                  Verify price and availability before purchase.
+                </p>
+              </div>
+            </div>
+
+            <div className="trust-panel mt-5 hidden sm:block sm:mt-6">
               <div className="grid gap-4 lg:grid-cols-[0.95fr_1.05fr]">
                 <div className="grid gap-3 sm:grid-cols-2">
                   <div className="rounded-[1.35rem] border border-white/70 bg-white/80 p-4">
@@ -2048,19 +2079,19 @@ export function ResultsView({ searchParamsObject = {} }: ResultsViewProps) {
                   <div className="rounded-[1.35rem] border border-white/70 bg-white/80 p-4">
                     <p className="mini-label">Verification note</p>
                     <p className="mt-2 text-sm leading-6 text-foreground">
-                      Verify current price and availability on retailer site before launch. FitMuse may
-                      earn a commission from some links in a future version.
+                      Verify current price and availability before purchase. FitMuse may earn a
+                      commission from some links in a future version.
                     </p>
                   </div>
                 ) : null}
               </div>
             </div>
 
-            <div className="mt-6 grid gap-4">
+            <div className="mt-5 grid gap-3 sm:mt-6 sm:gap-4">
               {selectedRealPack.products.map((product) => (
                 <div
                   key={`real-pack-${selectedRealPack.id}-${product.id}`}
-                  className="rounded-[1.5rem] border border-line/70 bg-white/78 p-5"
+                  className="rounded-[1.5rem] border border-line/70 bg-white/78 p-4 sm:p-5"
                 >
                   <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
                     <div>
@@ -2118,7 +2149,7 @@ export function ResultsView({ searchParamsObject = {} }: ResultsViewProps) {
               ))}
             </div>
 
-            <div className="mt-6 grid gap-4 md:grid-cols-2">
+            <div className="mt-5 grid gap-3 sm:mt-6 sm:gap-4 md:grid-cols-2">
               <div className="rounded-[1.5rem] border border-line/70 bg-white/78 p-5">
                 <p className="mini-label">Fit note</p>
                 <p className="mt-3 text-sm leading-6 text-foreground">{selectedRealPack.fitNote}</p>

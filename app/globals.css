@@ -101,7 +101,7 @@
   }
 
   .section-space {
-    @apply py-14 sm:py-20 lg:py-28;
+    @apply py-10 sm:py-20 lg:py-28;
   }
 
   .eyebrow {

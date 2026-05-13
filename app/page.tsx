@@ -130,38 +130,34 @@ const whyDifferentPoints = [
 export default function HomePage() {
   const featuredLooks = outfits.slice(0, 3);
   const heroChips = [
-    "Brief-to-board planning",
-    "Complete outfit boards",
     "No closet upload",
-    "Budget-aware planning",
-    "Preferred stores",
-    "Color avoid logic",
-    "Retailer candidates where available",
+    "Budget-aware",
+    "Store-aware",
+    "Retailer candidates",
   ];
 
   return (
     <>
       <MotionReveal>
-        <section className="section-space pb-10 pt-6 sm:pb-14 sm:pt-8">
+        <section className="section-space pb-8 pt-4 sm:pb-14 sm:pt-8">
           <div className="shell">
-            <div className="relative overflow-hidden rounded-[3rem] border border-white/75 bg-white/66 px-4 py-5 shadow-[0_32px_140px_rgba(27,21,19,0.11)] backdrop-blur-xl sm:px-8 sm:py-8 lg:px-10 lg:py-10">
+            <div className="relative overflow-hidden rounded-[2rem] border border-white/75 bg-white/66 px-4 py-4 shadow-[0_32px_140px_rgba(27,21,19,0.11)] backdrop-blur-xl sm:rounded-[3rem] sm:px-8 sm:py-8 lg:px-10 lg:py-10">
               <div className="absolute -left-16 top-10 h-56 w-56 rounded-full bg-accent-3/30 blur-3xl" />
               <div className="absolute right-0 top-0 h-60 w-60 rounded-full bg-accent-2/10 blur-3xl" />
               <div className="absolute bottom-0 left-1/3 h-48 w-48 rounded-full bg-accent/10 blur-3xl" />
 
-              <div className="relative grid gap-8 lg:gap-10 xl:grid-cols-[0.96fr_1.04fr] xl:items-center xl:gap-12">
-                <div className="space-y-5 sm:space-y-6">
-                  <div className="space-y-4 sm:space-y-5">
-                    <span className="pill">For shoppers who want full looks without the closet-upload chore</span>
-                    <div className="space-y-4 sm:space-y-5">
+              <div className="relative grid gap-5 sm:gap-8 lg:gap-10 xl:grid-cols-[0.96fr_1.04fr] xl:items-center xl:gap-12">
+                <div className="space-y-4 sm:space-y-6">
+                  <div className="space-y-3 sm:space-y-5">
+                    <span className="pill hidden sm:inline-flex">No closet upload. Full outfit boards.</span>
+                    <div className="space-y-3 sm:space-y-5">
                       <p className="eyebrow">Brief-to-board outfit planning</p>
                       <h1 className="max-w-4xl text-[2.9rem] leading-[0.92] text-foreground sm:text-6xl lg:text-7xl">
-                        Turn a style brief into ready-to-shop outfit boards, no closet upload required.
+                        Outfit boards from your style brief, no closet upload.
                       </h1>
                       <p className="max-w-2xl text-base leading-7 sm:text-lg sm:leading-8">
-                        Describe the vibe, budget, occasion, preferred stores, colors, and fit you
-                        want the board to solve. FitMuse turns that brief into styled outfit boards
-                        and, where available, carefully labeled retailer candidates.
+                        Set the occasion, budget, stores, colors, and fit. FitMuse turns it into
+                        complete outfit boards.
                       </p>
                     </div>
                   </div>
@@ -188,7 +184,7 @@ export default function HomePage() {
                     </TrackedLink>
                   </div>
 
-                  <div className="flex flex-wrap gap-2">
+                  <div className="hidden flex-wrap gap-2 sm:flex">
                     {heroChips.map((chip) => (
                       <span key={chip} className="chip">
                         {chip}
@@ -207,12 +203,12 @@ export default function HomePage() {
       <MotionReveal delay={0.06}>
         <section className="section-space pt-0">
           <div className="shell">
-            <div className="mb-10 max-w-3xl">
+            <div className="mb-6 max-w-3xl sm:mb-10">
               <p className="eyebrow">The problem</p>
               <h2 className="section-title text-foreground">What should I wear today?</h2>
               <p className="mt-5 max-w-2xl">
-                Most wardrobe apps start with cataloging. FitMuse starts with the brief behind the
-                outfit you need right now: your plan, budget, stores, colors, and fit.
+                FitMuse starts with the brief behind the outfit you need now: plan, budget, stores,
+                colors, and fit.
               </p>
             </div>
 
@@ -234,7 +230,7 @@ export default function HomePage() {
       <MotionReveal delay={0.08}>
         <section className="section-space pt-0">
           <div className="shell">
-            <div className="mb-10 max-w-3xl">
+            <div className="mb-6 max-w-3xl sm:mb-10">
               <p className="eyebrow">How it works</p>
               <h2 className="section-title text-foreground">Four quick steps. Full boards, fast.</h2>
             </div>
@@ -255,14 +251,13 @@ export default function HomePage() {
       <MotionReveal delay={0.1}>
         <section className="section-space pt-0">
           <div className="shell">
-            <div className="mb-10 flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
+            <div className="mb-6 flex flex-col gap-4 sm:mb-10 lg:flex-row lg:items-end lg:justify-between">
               <div className="max-w-3xl">
                 <p className="eyebrow">Feature showcase</p>
-                <h2 className="section-title text-foreground">A faster, more practical alternative to closet-heavy styling apps.</h2>
+                <h2 className="section-title text-foreground">Faster than closet-first styling apps.</h2>
               </div>
               <p className="max-w-md text-sm leading-6 text-muted">
-                FitMuse is built to feel useful early: clear brief inputs, complete outfit boards,
-                and honest shopping context.
+                Clear brief inputs, complete boards, and honest shopping context.
               </p>
             </div>
 
@@ -287,8 +282,8 @@ export default function HomePage() {
             <div className="max-w-3xl">
               <p className="eyebrow">App preview</p>
               <h2 className="section-title text-foreground">See how FitMuse turns a brief into a board.</h2>
-              <p className="mt-5 max-w-2xl">
-                The flow is built for believable outfit boards, not a noisy e-commerce grid or a closet catalog.
+              <p className="mt-4 max-w-2xl sm:mt-5">
+                Believable outfit boards, not a noisy e-commerce grid or closet catalog.
               </p>
             </div>
 
@@ -309,7 +304,7 @@ export default function HomePage() {
       <MotionReveal delay={0.14}>
         <section id="sample-looks" className="section-space pt-0">
           <div className="shell">
-            <div className="mb-10 flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
+            <div className="mb-6 flex flex-col gap-4 sm:mb-10 lg:flex-row lg:items-end lg:justify-between">
               <div className="max-w-3xl">
                 <p className="eyebrow">Example board previews</p>
                 <h2 className="section-title text-foreground">
@@ -338,9 +333,9 @@ export default function HomePage() {
       <MotionReveal delay={0.16}>
         <section className="section-space pt-0">
           <div className="shell">
-            <div className="mb-10 max-w-3xl">
+            <div className="mb-6 max-w-3xl sm:mb-10">
               <p className="eyebrow">Why FitMuse feels different</p>
-              <h2 className="section-title text-foreground">Why FitMuse feels more practical than a closet-first app.</h2>
+              <h2 className="section-title text-foreground">Why it feels practical.</h2>
             </div>
 
             <div className="grid gap-4 md:grid-cols-3">
@@ -358,7 +353,7 @@ export default function HomePage() {
       <MotionReveal delay={0.18}>
         <section className="section-space pt-0">
           <div className="shell">
-            <div className="mb-10 flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
+            <div className="mb-6 flex flex-col gap-4 sm:mb-10 lg:flex-row lg:items-end lg:justify-between">
               <div className="max-w-3xl">
                 <p className="eyebrow">Pricing</p>
                 <h2 className="section-title text-foreground">
@@ -385,11 +380,11 @@ export default function HomePage() {
       </MotionReveal>
 
       <MotionReveal delay={0.2}>
-        <section className="pb-20">
+        <section className="pb-12 sm:pb-20">
           <div className="shell">
-            <div className="dark-panel overflow-hidden p-8 sm:p-10">
+            <div className="dark-panel overflow-hidden p-6 sm:p-10">
               <p className="eyebrow !mb-0 text-accent-3">Final CTA</p>
-              <div className="mt-4 grid gap-8 lg:grid-cols-[1fr_auto] lg:items-center">
+              <div className="mt-4 grid gap-5 sm:gap-8 lg:grid-cols-[1fr_auto] lg:items-center">
                 <div>
                   <h2 className="text-4xl leading-tight text-white sm:text-5xl">
                     Start with the brief, then compare the boards.

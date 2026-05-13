@@ -16,7 +16,7 @@ export function HeroPreview({ outfit }: HeroPreviewProps) {
       <div className="absolute -right-8 top-8 h-28 w-28 rounded-full bg-accent-2/12 blur-3xl" />
       <div className="absolute -bottom-10 right-4 h-32 w-32 rounded-full bg-accent-3/30 blur-3xl" />
 
-      <div className="relative rounded-[2.8rem] border border-white/70 bg-white/68 p-3 shadow-[0_28px_120px_rgba(27,21,19,0.12)] backdrop-blur-xl sm:p-4">
+      <div className="relative rounded-[2rem] border border-white/70 bg-white/68 p-2.5 shadow-[0_28px_120px_rgba(27,21,19,0.12)] backdrop-blur-xl sm:rounded-[2.8rem] sm:p-4">
         <div className="grid gap-4 sm:grid-cols-[0.72fr_0.28fr]">
           <div className="rounded-[2.1rem] border border-white/70 bg-white/88 p-3 shadow-[0_18px_40px_rgba(27,21,19,0.07)]">
             <div className="rounded-[1.7rem] bg-foreground px-4 py-3 text-white">
@@ -33,7 +33,7 @@ export function HeroPreview({ outfit }: HeroPreviewProps) {
               </div>
             </div>
 
-            <div className="gradient-visual mt-3 h-48 p-5 text-white sm:h-56">
+            <div className="gradient-visual mt-3 h-44 p-4 text-white sm:h-56 sm:p-5">
               <div className="flex h-full items-end justify-between">
                 <div className="rounded-[1.5rem] bg-white/12 px-4 py-3 backdrop-blur-md">
                   <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-white/70">
@@ -50,15 +50,15 @@ export function HeroPreview({ outfit }: HeroPreviewProps) {
               </div>
             </div>
 
-            <div className="space-y-5 p-3 pb-2 pt-5">
+            <div className="space-y-3 p-3 pb-2 pt-4 sm:space-y-5 sm:pt-5">
               <div className="flex items-start justify-between gap-4">
                 <div>
                   <p className="mini-label">Outfit</p>
-                  <h3 className="mt-2 text-3xl text-foreground">{outfit.name}</h3>
+                  <h3 className="mt-2 text-2xl text-foreground sm:text-3xl">{outfit.name}</h3>
                 </div>
                 <button
                   type="button"
-                  className="rounded-full border border-line/70 bg-background/90 px-4 py-2 text-sm font-semibold text-foreground"
+                  className="hidden rounded-full border border-line/70 bg-background/90 px-4 py-2 text-sm font-semibold text-foreground sm:inline-flex"
                 >
                   <span className="flex items-center gap-2">
                     <Bookmark size={14} />
@@ -67,14 +67,14 @@ export function HeroPreview({ outfit }: HeroPreviewProps) {
                 </button>
               </div>
 
-              <div className="rounded-[1.4rem] bg-white/76 p-4">
+              <div className="hidden rounded-[1.4rem] bg-white/76 p-4 sm:block">
                 <p className="mini-label">Fit note</p>
                 <p className="mt-2 text-sm leading-6 text-foreground">
-                  Polished lines, easy layering, and a camera-friendly palette built around your brief.
+                  Polished lines and a camera-friendly palette built around your brief.
                 </p>
               </div>
 
-              <div>
+              <div className="hidden sm:block">
                 <p className="mini-label">Included</p>
                 <div className="mt-3 flex flex-wrap gap-2">
                   {quickItems.map((item) => (
@@ -85,7 +85,7 @@ export function HeroPreview({ outfit }: HeroPreviewProps) {
                 </div>
               </div>
 
-              <div className="rounded-[1.4rem] border border-line/70 bg-background/72 p-4">
+              <div className="hidden rounded-[1.4rem] border border-line/70 bg-background/72 p-4 sm:block">
                 <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                   <div>
                     <p className="mini-label">Preview action</p>
@@ -99,7 +99,7 @@ export function HeroPreview({ outfit }: HeroPreviewProps) {
             </div>
           </div>
 
-          <div className="flex flex-col gap-4">
+          <div className="hidden flex-col gap-4 sm:flex">
             <div className="rounded-[1.8rem] border border-white/70 bg-white/82 p-4 shadow-[0_16px_30px_rgba(27,21,19,0.06)]">
               <div className="flex items-center gap-3">
                 <span className="rounded-full bg-accent-4 p-2 text-accent-2">

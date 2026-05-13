@@ -413,8 +413,8 @@ export function QuizForm() {
 
   if (showSavedBriefPrompt) {
     return (
-      <div className="grid gap-6 xl:grid-cols-[0.84fr_1.16fr]">
-        <aside className="dark-panel flex flex-col gap-6 p-6 sm:p-8">
+      <div className="grid gap-5 xl:grid-cols-[0.84fr_1.16fr]">
+        <aside className="dark-panel flex flex-col gap-5 p-5 sm:gap-6 sm:p-8">
           <div>
             <p className="eyebrow !mb-0 text-accent-3">Saved brief found</p>
             <h2 className="mt-4 text-4xl leading-tight text-white sm:text-5xl">
@@ -425,7 +425,7 @@ export function QuizForm() {
             </p>
           </div>
 
-          <div className="rounded-[1.7rem] border border-white/12 bg-white/10 p-5">
+          <div className="rounded-[1.7rem] border border-white/12 bg-white/10 p-4 sm:p-5">
             <p className="mini-label !text-white/64">Saved summary</p>
             <div className="mt-4 flex flex-wrap gap-2">
               {[
@@ -449,29 +449,29 @@ export function QuizForm() {
           </div>
         </aside>
 
-        <div className="glass-panel p-6 sm:p-8">
-          <div className="grid gap-5 lg:grid-cols-2">
+        <div className="glass-panel p-4 sm:p-8">
+          <div className="grid gap-3 sm:gap-5 lg:grid-cols-2">
             <button
               type="button"
               onClick={continueSavedBrief}
-              className="rounded-[1.8rem] border border-line/70 bg-white/82 p-6 text-left transition hover:-translate-y-0.5 hover:border-accent hover:shadow-[0_18px_36px_rgba(27,21,19,0.08)]"
+              className="rounded-[1.8rem] border border-line/70 bg-white/82 p-4 text-left transition hover:-translate-y-0.5 hover:border-accent hover:shadow-[0_18px_36px_rgba(27,21,19,0.08)] sm:p-6"
             >
               <p className="mini-label">Recommended</p>
               <h3 className="mt-3 text-3xl text-foreground">Continue saved brief</h3>
               <p className="mt-3 text-sm leading-6 text-foreground">
-                Open the saved multi-step quiz with your previous answers already filled in.
+                Resume with your previous answers filled in.
               </p>
             </button>
 
             <button
               type="button"
               onClick={startNewBrief}
-              className="rounded-[1.8rem] border border-line/70 bg-background/84 p-6 text-left transition hover:-translate-y-0.5 hover:border-accent hover:shadow-[0_18px_36px_rgba(27,21,19,0.08)]"
+              className="rounded-[1.8rem] border border-line/70 bg-background/84 p-4 text-left transition hover:-translate-y-0.5 hover:border-accent hover:shadow-[0_18px_36px_rgba(27,21,19,0.08)] sm:p-6"
             >
               <p className="mini-label">Fresh start</p>
               <h3 className="mt-3 text-3xl text-foreground">Start new brief</h3>
               <p className="mt-3 text-sm leading-6 text-foreground">
-                Clear the saved quiz answers in this browser and begin a new styling brief.
+                Clear saved answers and begin a new brief.
               </p>
             </button>
           </div>
@@ -558,7 +558,10 @@ export function QuizForm() {
         ) : null}
       </aside>
 
-      <div ref={formSurfaceRef} className="order-1 glass-panel p-5 pb-32 sm:p-8 sm:pb-8 xl:order-2">
+      <div
+        ref={formSurfaceRef}
+        className="order-1 scroll-mt-32 glass-panel p-4 pb-28 sm:p-8 sm:pb-8 xl:order-2"
+      >
         <div className="max-w-3xl">
           <div className="flex flex-wrap items-center gap-3">
             <span className="rounded-full border border-line/70 bg-white/82 px-4 py-2 text-sm font-medium text-foreground">
@@ -578,7 +581,7 @@ export function QuizForm() {
             ) : null}
           </div>
 
-          <div className="mt-5">
+          <div className="mt-4 sm:mt-5">
             <p className="mini-label">Your style brief</p>
             <h3 className="mt-2 text-3xl text-foreground sm:text-5xl">
               {currentStepMeta.title}
@@ -589,8 +592,8 @@ export function QuizForm() {
           </div>
         </div>
 
-        <div className="mt-5 xl:hidden">
-          <div className="rounded-[1.5rem] border border-line/70 bg-background/72 p-4">
+        <div className="mt-4 xl:hidden">
+          <div className="rounded-[1.5rem] border border-line/70 bg-background/72 p-3.5 sm:p-4">
             <div className="flex items-center justify-between gap-3">
               <div className="flex items-center gap-3">
                 <span className="flex h-10 w-10 items-center justify-center rounded-full bg-accent-4 text-accent-2">
@@ -605,7 +608,7 @@ export function QuizForm() {
               </div>
               <p className="text-sm font-semibold text-foreground">{Math.round(progress)}%</p>
             </div>
-            <div className="progress-track mt-4 bg-line/45">
+            <div className="progress-track mt-3 bg-line/45 sm:mt-4">
               <div className="progress-fill" style={{ width: `${progress}%` }} />
             </div>
           </div>
@@ -614,7 +617,7 @@ export function QuizForm() {
         {stepError ? (
           <div
             aria-live="polite"
-            className="mt-6 rounded-[1.4rem] border border-accent/20 bg-accent/8 px-4 py-3 text-sm text-foreground"
+            className="mt-4 rounded-[1.4rem] border border-accent/20 bg-accent/8 px-4 py-3 text-sm text-foreground sm:mt-6"
           >
             {stepError}
           </div>
@@ -627,11 +630,11 @@ export function QuizForm() {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -12 }}
             transition={{ duration: 0.32, ease: [0.22, 1, 0.36, 1] }}
-            className="mt-6 sm:mt-7"
+            className="mt-5 sm:mt-7"
           >
             {currentStep === 0 ? (
               <div className="grid gap-4 md:grid-cols-2">
-                <div className="md:col-span-2 rounded-[1.6rem] border border-line/70 bg-background/74 p-5 sm:p-6">
+                <div className="md:col-span-2 rounded-[1.6rem] border border-line/70 bg-background/74 p-4 sm:p-6">
                   <div className="flex flex-wrap items-center justify-between gap-3">
                     <div>
                       <p className="mini-label">Quick-start templates</p>
@@ -642,19 +645,19 @@ export function QuizForm() {
                     </span>
                   </div>
                   <p className="mt-2 max-w-2xl text-sm leading-6 text-foreground">
-                    Start with a proven brief instead of building from zero. FitMuse will prefill the vibe, occasion, budget, and store direction for you.
+                    Pick one to prefill vibe, budget, and stores.
                   </p>
-                  <div className="mt-4 grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
+                  <div className="mt-3 grid gap-2.5 sm:mt-4 sm:grid-cols-2 sm:gap-3 xl:grid-cols-3">
                     {quickStartTemplates.map((template) => (
                       <button
                         key={template.id}
                         type="button"
                         onClick={() => applyQuickStartTemplate(template)}
-                        className="rounded-[1.35rem] border border-line/70 bg-white/86 p-4 text-left transition hover:-translate-y-0.5 hover:border-accent hover:shadow-[0_16px_30px_rgba(27,21,19,0.07)]"
+                        className="rounded-[1.35rem] border border-line/70 bg-white/86 p-3 text-left transition hover:-translate-y-0.5 hover:border-accent hover:shadow-[0_16px_30px_rgba(27,21,19,0.07)] sm:p-4"
                       >
                         <p className="mini-label">Prefill this brief</p>
                         <p className="text-sm font-semibold text-foreground">{template.label}</p>
-                        <p className="mt-2 text-xs leading-5 text-muted">{template.description}</p>
+                        <p className="mt-2 hidden text-xs leading-5 text-muted sm:block">{template.description}</p>
                       </button>
                     ))}
                   </div>
@@ -663,7 +666,7 @@ export function QuizForm() {
                 <div className="md:col-span-2">
                   <p className="mini-label">Start with the profile basics</p>
                   <p className="mt-2 max-w-2xl text-sm">
-                    This becomes the saved profile FitMuse uses on future visits. You do not need to upload a full wardrobe first.
+                    Saved for later. No wardrobe upload required.
                   </p>
                 </div>
 
@@ -1091,7 +1094,7 @@ export function QuizForm() {
           </motion.div>
         </AnimatePresence>
 
-        <div className="fixed inset-x-4 bottom-4 z-40 flex flex-col gap-3 rounded-[1.35rem] border border-line/70 bg-[rgba(252,247,242,0.92)] p-3.5 shadow-[0_16px_30px_rgba(27,21,19,0.12)] backdrop-blur-md sm:static sm:mt-8 sm:flex-row sm:items-center sm:justify-between sm:rounded-none sm:border-t sm:border-x-0 sm:border-b-0 sm:bg-transparent sm:p-0 sm:pt-6 sm:shadow-none sm:backdrop-blur-0">
+        <div className="fixed inset-x-4 bottom-3 z-40 flex flex-col gap-2 rounded-[1.35rem] border border-line/70 bg-[rgba(252,247,242,0.92)] p-3 shadow-[0_16px_30px_rgba(27,21,19,0.12)] backdrop-blur-md sm:static sm:mt-8 sm:flex-row sm:items-center sm:justify-between sm:rounded-none sm:border-t sm:border-x-0 sm:border-b-0 sm:bg-transparent sm:p-0 sm:pt-6 sm:shadow-none sm:backdrop-blur-0">
           <button
             type="button"
             onClick={() => goToStep(currentStep - 1)}
