@@ -1019,9 +1019,12 @@ export function ResultsView({ searchParamsObject = {} }: ResultsViewProps) {
           <p className="mt-4 max-w-2xl">
             FitMuse needs your measurements, occasion, budget, and fit direction before it can rank complete outfits.
           </p>
-          <div className="mt-8">
+          <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:items-center">
             <Link href="/quiz" className="cta-primary">
               Take Style Quiz
+            </Link>
+            <Link href="/sample-looks" className="cta-secondary">
+              Browse sample looks
             </Link>
           </div>
         </div>

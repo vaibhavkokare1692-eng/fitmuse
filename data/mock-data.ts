@@ -16,7 +16,7 @@ export const brandTagline =
 export const navLinks: NavLink[] = [
   { label: "Home", href: "/" },
   { label: "How It Works", href: "/how-it-works" },
-  { label: "Sample Looks", href: "/#sample-looks" },
+  { label: "Sample Looks", href: "/sample-looks" },
   { label: "Style Quiz", href: "/quiz" },
 ];
 

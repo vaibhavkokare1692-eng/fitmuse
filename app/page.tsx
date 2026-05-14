@@ -172,12 +172,12 @@ export default function HomePage() {
                       Take the Style Quiz
                     </TrackedLink>
                     <TrackedLink
-                      href="#sample-looks"
+                      href="/sample-looks"
                       className="inline-flex items-center justify-center px-1 py-2 text-sm font-semibold text-accent-2 underline-offset-4 hover:text-accent hover:underline"
                       analyticsEvent="homepage_cta_clicked"
                       analyticsProperties={{
                         source: "hero_sample_looks",
-                        destination: "#sample-looks",
+                        destination: "/sample-looks",
                       }}
                     >
                       Preview sample boards
@@ -312,12 +312,12 @@ export default function HomePage() {
                 </h2>
               </div>
               <TrackedLink
-                href="/results"
+                href="/sample-looks"
                 className="cta-secondary"
                 analyticsEvent="homepage_cta_clicked"
-                analyticsProperties={{ source: "sample_looks", destination: "/results" }}
+                analyticsProperties={{ source: "sample_looks", destination: "/sample-looks" }}
               >
-                Explore sample results
+                Explore sample boards
               </TrackedLink>
             </div>
 
