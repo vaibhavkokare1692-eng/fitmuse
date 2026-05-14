@@ -12,11 +12,16 @@ function TilePreview({ variant }: { variant: AppPreviewVariant }) {
   if (variant === "quiz") {
     return (
       <div className="rounded-[1.45rem] bg-white/92 p-4 shadow-[0_12px_28px_rgba(22,20,18,0.05)]">
-        <div className="h-2.5 w-20 rounded-full bg-foreground/12" />
+        <div className="h-2.5 w-20 rounded-full bg-accent-2/24" />
         <div className="mt-4 grid gap-3">
-          <div className="h-11 rounded-[1rem] bg-foreground/6" />
-          <div className="h-11 rounded-[1rem] bg-foreground/6" />
-          <div className="h-11 rounded-[1rem] bg-accent-2/12" />
+          {["Occasion", "Budget", "Stores"].map((label) => (
+            <div
+              key={label}
+              className="rounded-[1rem] border border-line/60 bg-background/74 px-3 py-2 text-xs font-semibold uppercase tracking-[0.14em] text-foreground/68"
+            >
+              {label}
+            </div>
+          ))}
         </div>
       </div>
     );
@@ -39,10 +44,16 @@ function TilePreview({ variant }: { variant: AppPreviewVariant }) {
     return (
       <div className="rounded-[1.45rem] bg-white/92 p-4 shadow-[0_12px_28px_rgba(22,20,18,0.05)]">
         <div className="grid grid-cols-2 gap-3">
-          <div className="h-20 rounded-[1rem] bg-foreground/6" />
-          <div className="h-20 rounded-[1rem] bg-foreground/6" />
-          <div className="h-20 rounded-[1rem] bg-foreground/6" />
-          <div className="h-20 rounded-[1rem] bg-accent-3/35" />
+          {["Date", "Travel", "Office", "Shoot"].map((label) => (
+            <div
+              key={label}
+              className="flex h-20 items-end rounded-[1rem] border border-line/60 bg-gradient-to-br from-foreground/6 to-accent-3/24 p-3"
+            >
+              <span className="text-[10px] font-semibold uppercase tracking-[0.14em] text-foreground/68">
+                {label}
+              </span>
+            </div>
+          ))}
         </div>
       </div>
     );
@@ -58,7 +69,9 @@ function TilePreview({ variant }: { variant: AppPreviewVariant }) {
         ))}
       </div>
       <div className="mt-4 h-10 rounded-[1rem] bg-foreground/6" />
-      <div className="mt-3 h-10 rounded-[1rem] bg-foreground/6" />
+      <div className="mt-3 rounded-[1rem] border border-line/70 bg-background/82 px-3 py-2 text-xs font-semibold uppercase tracking-[0.14em] text-foreground/68">
+        Store match
+      </div>
     </div>
   );
 }

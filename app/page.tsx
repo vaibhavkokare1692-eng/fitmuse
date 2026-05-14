@@ -100,22 +100,22 @@ const featureCards = [
 
 const appPreviewTiles = [
   {
-    label: "Style quiz preview",
+    label: "Style brief",
     title: "Share a clean style brief once.",
     variant: "quiz" as const,
   },
   {
-    label: "Outfit result card",
+    label: "Board preview",
     title: "See complete looks at a glance.",
     variant: "result" as const,
   },
   {
-    label: "Saved looks preview",
+    label: "Saved ideas",
     title: "Keep your best options in one place.",
     variant: "saved" as const,
   },
   {
-    label: "Filter panel preview",
+    label: "Refine your board",
     title: "Refine by vibe, fit, and budget.",
     variant: "filters" as const,
   },
@@ -280,7 +280,7 @@ export default function HomePage() {
         <section className="section-space pt-0">
           <div className="shell grid gap-8 xl:grid-cols-[0.88fr_1.12fr] xl:items-start">
             <div className="max-w-3xl">
-              <p className="eyebrow">App preview</p>
+              <p className="eyebrow">Product flow</p>
               <h2 className="section-title text-foreground">See how FitMuse turns a brief into a board.</h2>
               <p className="mt-4 max-w-2xl sm:mt-5">
                 Believable outfit boards, not a noisy e-commerce grid or closet catalog.
@@ -306,7 +306,7 @@ export default function HomePage() {
           <div className="shell">
             <div className="mb-6 flex flex-col gap-4 sm:mb-10 lg:flex-row lg:items-end lg:justify-between">
               <div className="max-w-3xl">
-                <p className="eyebrow">Example board previews</p>
+                <p className="eyebrow">Sample outfit boards</p>
                 <h2 className="section-title text-foreground">
                   Complete boards, not random product picks.
                 </h2>
@@ -383,7 +383,7 @@ export default function HomePage() {
         <section className="pb-12 sm:pb-20">
           <div className="shell">
             <div className="dark-panel overflow-hidden p-6 sm:p-10">
-              <p className="eyebrow !mb-0 text-accent-3">Final CTA</p>
+              <p className="eyebrow !mb-0 text-accent-3">Start your brief</p>
               <div className="mt-4 grid gap-5 sm:gap-8 lg:grid-cols-[1fr_auto] lg:items-center">
                 <div>
                   <h2 className="text-4xl leading-tight text-white sm:text-5xl">

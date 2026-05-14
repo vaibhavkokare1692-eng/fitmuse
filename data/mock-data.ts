@@ -11,13 +11,16 @@ import type {
 export const brandName = "FitMuse";
 export const headerTagline = "Brief-to-Board Outfit Planner";
 export const brandTagline =
-  "Turn a style brief into ready-to-shop outfit boards, no closet upload required.";
+  "Turn a style brief into complete outfit boards, no closet upload required.";
 
 export const navLinks: NavLink[] = [
   { label: "Home", href: "/" },
   { label: "How It Works", href: "/how-it-works" },
+  { label: "Sample Looks", href: "/#sample-looks" },
   { label: "Style Quiz", href: "/quiz" },
-  { label: "Looks", href: "/results" },
+];
+
+export const footerLinks: NavLink[] = [
   { label: "Pricing", href: "/pricing" },
   { label: "Difference", href: "/difference" },
   { label: "About", href: "/about" },

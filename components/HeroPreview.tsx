@@ -9,6 +9,12 @@ type HeroPreviewProps = {
 
 export function HeroPreview({ outfit }: HeroPreviewProps) {
   const quickItems = [outfit.items.top, outfit.items.bottom, outfit.items.shoes].slice(0, 3);
+  const savedIdeas = [
+    { label: "Date night", className: "bg-gradient-to-br from-foreground/8 to-accent-3/22" },
+    { label: "Airport", className: "bg-gradient-to-br from-accent-4/55 to-white/70" },
+    { label: "Creator shoot", className: "bg-gradient-to-br from-accent-2/12 to-foreground/8" },
+    { label: "Old money", className: "bg-gradient-to-br from-accent-3/35 to-white/80" },
+  ];
 
   return (
     <div className="relative mx-auto w-full max-w-[34rem]">
@@ -62,7 +68,7 @@ export function HeroPreview({ outfit }: HeroPreviewProps) {
                 >
                   <span className="flex items-center gap-2">
                     <Bookmark size={14} />
-                    Save preview
+                    Save idea
                   </span>
                 </button>
               </div>
@@ -88,7 +94,7 @@ export function HeroPreview({ outfit }: HeroPreviewProps) {
               <div className="hidden rounded-[1.4rem] border border-line/70 bg-background/72 p-4 sm:block">
                 <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                   <div>
-                    <p className="mini-label">Preview action</p>
+                    <p className="mini-label">Next step</p>
                     <p className="mt-2 text-sm leading-6 text-foreground">
                       Explore the sample flow now, then save your real shortlist after the quiz.
                     </p>
@@ -122,10 +128,16 @@ export function HeroPreview({ outfit }: HeroPreviewProps) {
             <div className="rounded-[1.8rem] border border-white/70 bg-white/82 p-4 shadow-[0_16px_30px_rgba(27,21,19,0.06)]">
               <p className="mini-label">Saved looks</p>
               <div className="mt-4 grid grid-cols-2 gap-3">
-                <div className="h-20 rounded-[1.1rem] bg-foreground/6" />
-                <div className="h-20 rounded-[1.1rem] bg-accent-3/35" />
-                <div className="h-20 rounded-[1.1rem] bg-foreground/6" />
-                <div className="h-20 rounded-[1.1rem] bg-foreground/6" />
+                {savedIdeas.map((idea) => (
+                  <div
+                    key={idea.label}
+                    className={`flex h-20 items-end rounded-[1.1rem] border border-line/60 p-3 ${idea.className}`}
+                  >
+                    <span className="text-[11px] font-semibold uppercase tracking-[0.16em] text-foreground/74">
+                      {idea.label}
+                    </span>
+                  </div>
+                ))}
               </div>
             </div>
           </div>

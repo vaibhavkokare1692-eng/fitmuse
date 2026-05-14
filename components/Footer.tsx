@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { brandName, brandTagline, headerTagline, navLinks } from "@/data/mock-data";
+import { brandName, brandTagline, footerLinks, headerTagline, navLinks } from "@/data/mock-data";
 
 const feedbackEmail = "hello.fitmuse@gmail.com";
 const feedbackSubject = "FitMuse feedback";
@@ -18,8 +18,8 @@ const feedbackMailtoHref = `mailto:${feedbackEmail}?subject=${encodeURIComponent
 )}&body=${encodeURIComponent(feedbackBody)}`;
 
 export function Footer() {
-  const primaryLinks = navLinks.slice(0, 4);
-  const secondaryLinks = navLinks.slice(4);
+  const primaryLinks = navLinks;
+  const secondaryLinks = footerLinks;
 
   return (
     <footer className="pb-6 pt-6 sm:pb-8 sm:pt-10">
@@ -65,7 +65,7 @@ export function Footer() {
 
           <div>
             <p className="mb-3 text-sm font-semibold uppercase tracking-[0.24em] text-muted sm:mb-4">
-              MVP note
+              Shopping note
             </p>
             <p className="text-sm leading-6">
               FitMuse combines sample boards with manually reviewed retailer-candidate boards.

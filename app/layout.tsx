@@ -11,7 +11,7 @@ export const metadata: Metadata = {
     template: `%s | ${brandName}`,
   },
   description:
-    "Turn a style brief into ready-to-shop outfit boards without uploading your full closet first.",
+    "Turn a style brief into complete outfit boards without uploading your full closet first.",
 };
 
 export default function RootLayout({

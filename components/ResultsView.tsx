@@ -1606,7 +1606,7 @@ export function ResultsView({ searchParamsObject = {} }: ResultsViewProps) {
                                 {pack.verificationStatus === "needs_manual_verification"
                                   ? "Candidate board - needs manual verification"
                                   : pack.shopReady
-                                    ? "Manually curated for MVP review"
+                                    ? "Manually curated for review"
                                     : "Draft only"}
                               </p>
                               {pack.verificationStatus === "needs_manual_verification" ? (
@@ -1985,7 +1985,7 @@ export function ResultsView({ searchParamsObject = {} }: ResultsViewProps) {
                 <p className="mt-3 max-w-2xl text-sm leading-6 text-muted">
                   {selectedRealPack.verificationStatus === "needs_manual_verification"
                     ? "Retailer candidates for review. Verify price and availability before purchase."
-                    : "Retailer candidates are manually curated for MVP testing."}
+                    : "Retailer candidates are manually curated for review."}
                 </p>
               </div>
               <button
@@ -2064,7 +2064,7 @@ export function ResultsView({ searchParamsObject = {} }: ResultsViewProps) {
                       {selectedRealPack.verificationStatus === "needs_manual_verification"
                         ? "Candidate board - needs manual verification"
                         : selectedRealPack.shopReady
-                          ? "Manually curated for MVP review"
+                          ? "Manually curated for review"
                           : "Draft only"}
                     </p>
                     {selectedRealPack.verificationStatus === "needs_manual_verification" ? (

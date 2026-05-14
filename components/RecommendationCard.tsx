@@ -378,10 +378,10 @@ export function RecommendationCard({
         <div className="mt-5 rounded-[1.5rem] border border-line/70 bg-white/78 p-5">
           <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
             <div className="max-w-xl">
-              <p className="mini-label">Shopping links</p>
+              <p className="mini-label">Example links</p>
               <p className="mt-2 text-sm leading-6 text-muted">
-                Use this to preview the MVP shopping flow. These links are still mock
-                data while FitMuse prepares real retailer connections.
+                These links are examples only. Retailer-candidate boards are labeled separately
+                when manually reviewed links are available.
               </p>
             </div>
             <ShoppingLinksButton

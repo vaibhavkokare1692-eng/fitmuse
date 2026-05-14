@@ -24,7 +24,7 @@ export function ShoppingLinksButton({
         data-testid={testId}
       >
         <span className="flex items-center gap-2">
-          Shop look
+          View example links
           <ExternalLink size={14} />
         </span>
       </button>
@@ -34,10 +34,9 @@ export function ShoppingLinksButton({
           data-testid={`${testId}-message`}
           className="w-full max-w-sm rounded-[1.3rem] border border-line/70 bg-white/96 px-4 py-3 shadow-[0_16px_32px_rgba(27,21,19,0.08)]"
         >
-          <p className="mini-label">MVP note</p>
+          <p className="mini-label">Shopping note</p>
           <p className="mt-2 text-xs leading-5 text-foreground">
-            These example shopping links preview how a future shopping flow could work. They are
-            not live retailer or affiliate links.
+            These are example links only. They are not live retailer or affiliate links.
           </p>
         </div>
       ) : null}
