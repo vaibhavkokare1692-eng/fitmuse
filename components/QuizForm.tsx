@@ -481,7 +481,7 @@ export function QuizForm() {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="grid gap-6 xl:grid-cols-[0.82fr_1.18fr]">
+    <form onSubmit={handleSubmit} className="grid min-w-0 gap-6 xl:grid-cols-[0.82fr_1.18fr]">
       <aside className="order-2 hidden flex-col gap-8 overflow-hidden p-6 sm:p-8 xl:order-1 xl:flex dark-panel">
         <div>
           <p className="eyebrow !mb-0 text-accent-3">Style quiz</p>
@@ -560,7 +560,7 @@ export function QuizForm() {
 
       <div
         ref={formSurfaceRef}
-        className="order-1 scroll-mt-32 glass-panel p-4 pb-28 sm:p-8 sm:pb-8 xl:order-2"
+        className="order-1 min-w-0 scroll-mt-32 glass-panel p-4 pb-28 sm:p-8 sm:pb-8 xl:order-2"
       >
         <div className="max-w-3xl">
           <div className="flex flex-wrap items-center gap-3">
@@ -633,8 +633,8 @@ export function QuizForm() {
             className="mt-5 sm:mt-7"
           >
             {currentStep === 0 ? (
-              <div className="grid gap-4 md:grid-cols-2">
-                <div className="md:col-span-2 rounded-[1.6rem] border border-line/70 bg-background/74 p-4 sm:p-6">
+              <div className="grid min-w-0 gap-4 md:grid-cols-2">
+                <div className="min-w-0 md:col-span-2 rounded-[1.6rem] border border-line/70 bg-background/74 p-4 sm:p-6">
                   <div className="flex flex-wrap items-center justify-between gap-3">
                     <div>
                       <p className="mini-label">Quick-start templates</p>
@@ -647,13 +647,13 @@ export function QuizForm() {
                   <p className="mt-2 max-w-2xl text-sm leading-6 text-foreground">
                     Pick one to prefill vibe, budget, and stores.
                   </p>
-                  <div className="mt-3 grid gap-2.5 sm:mt-4 sm:grid-cols-2 sm:gap-3 xl:grid-cols-3">
+                  <div className="-mx-4 mt-3 flex w-auto min-w-0 max-w-[calc(100%+2rem)] snap-x gap-2.5 overflow-x-auto px-4 pb-1 sm:mx-0 sm:mt-4 sm:grid sm:max-w-none sm:grid-cols-2 sm:gap-3 sm:overflow-visible sm:px-0 sm:pb-0 xl:grid-cols-3">
                     {quickStartTemplates.map((template) => (
                       <button
                         key={template.id}
                         type="button"
                         onClick={() => applyQuickStartTemplate(template)}
-                        className="rounded-[1.35rem] border border-line/70 bg-white/86 p-3 text-left transition hover:-translate-y-0.5 hover:border-accent hover:shadow-[0_16px_30px_rgba(27,21,19,0.07)] sm:p-4"
+                        className="min-w-[12.5rem] snap-start rounded-[1.2rem] border border-line/70 bg-white/86 p-3 text-left transition hover:-translate-y-0.5 hover:border-accent hover:shadow-[0_16px_30px_rgba(27,21,19,0.07)] sm:min-w-0 sm:rounded-[1.35rem] sm:p-4"
                       >
                         <p className="mini-label">Prefill this brief</p>
                         <p className="text-sm font-semibold text-foreground">{template.label}</p>
@@ -1094,11 +1094,11 @@ export function QuizForm() {
           </motion.div>
         </AnimatePresence>
 
-        <div className="fixed inset-x-4 bottom-3 z-40 flex flex-col gap-2 rounded-[1.35rem] border border-line/70 bg-[rgba(252,247,242,0.92)] p-3 shadow-[0_16px_30px_rgba(27,21,19,0.12)] backdrop-blur-md sm:static sm:mt-8 sm:flex-row sm:items-center sm:justify-between sm:rounded-none sm:border-t sm:border-x-0 sm:border-b-0 sm:bg-transparent sm:p-0 sm:pt-6 sm:shadow-none sm:backdrop-blur-0">
+        <div className="fixed inset-x-4 bottom-3 z-40 flex flex-row items-center gap-2 rounded-[1.35rem] border border-line/70 bg-[rgba(252,247,242,0.94)] p-2.5 shadow-[0_16px_30px_rgba(27,21,19,0.12)] backdrop-blur-md sm:static sm:mt-8 sm:items-center sm:justify-between sm:rounded-none sm:border-t sm:border-x-0 sm:border-b-0 sm:bg-transparent sm:p-0 sm:pt-6 sm:shadow-none sm:backdrop-blur-0">
           <button
             type="button"
             onClick={() => goToStep(currentStep - 1)}
-            className="cta-secondary w-full sm:w-auto"
+            className="cta-secondary flex-1 px-4 sm:flex-none sm:px-6"
             data-testid="quiz-back-button"
             disabled={currentStep === 0}
           >
@@ -1109,7 +1109,7 @@ export function QuizForm() {
             <button
               type="button"
               onClick={handleNext}
-              className="cta-primary w-full sm:w-auto"
+              className="cta-primary flex-1 px-4 sm:flex-none sm:px-6"
               data-testid="quiz-next-button"
             >
               <span className="flex items-center gap-2">
@@ -1120,7 +1120,7 @@ export function QuizForm() {
           ) : (
             <button
               type="submit"
-              className="cta-primary min-w-56 w-full sm:w-auto"
+              className="cta-primary min-w-0 flex-1 px-4 sm:min-w-56 sm:flex-none sm:px-6"
               data-testid="quiz-submit-button"
               disabled={isPending}
             >

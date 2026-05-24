@@ -199,7 +199,7 @@ export default function SampleLooksPage() {
           <div className="dark-panel overflow-hidden p-6 sm:p-10">
             <div className="max-w-4xl">
               <p className="eyebrow !mb-0 text-accent-3">Public examples</p>
-              <h1 className="mt-4 text-5xl leading-[0.95] text-white sm:text-6xl lg:text-7xl">
+              <h1 className="mt-4 max-w-[16rem] break-words text-[2.65rem] leading-[0.98] text-white sm:max-w-4xl sm:text-6xl sm:leading-[0.95] lg:text-7xl">
                 Sample outfit boards
               </h1>
               <p className="mt-5 max-w-2xl text-base leading-7 text-white/76 sm:text-lg sm:leading-8">

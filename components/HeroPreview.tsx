@@ -17,13 +17,13 @@ export function HeroPreview({ outfit }: HeroPreviewProps) {
   ];
 
   return (
-    <div className="relative mx-auto w-full max-w-[34rem]">
+    <div className="relative mx-auto w-full max-w-[42rem] xl:ml-auto xl:max-w-none">
       <div className="absolute -left-10 top-12 h-36 w-36 rounded-full bg-accent/14 blur-3xl" />
       <div className="absolute -right-8 top-8 h-28 w-28 rounded-full bg-accent-2/12 blur-3xl" />
       <div className="absolute -bottom-10 right-4 h-32 w-32 rounded-full bg-accent-3/30 blur-3xl" />
 
       <div className="relative rounded-[2rem] border border-white/70 bg-white/68 p-2.5 shadow-[0_28px_120px_rgba(27,21,19,0.12)] backdrop-blur-xl sm:rounded-[2.8rem] sm:p-4">
-        <div className="grid gap-4 sm:grid-cols-[0.72fr_0.28fr]">
+        <div className="grid gap-4 sm:grid-cols-[minmax(0,0.68fr)_minmax(11rem,0.32fr)]">
           <div className="rounded-[2.1rem] border border-white/70 bg-white/88 p-3 shadow-[0_18px_40px_rgba(27,21,19,0.07)]">
             <div className="rounded-[1.7rem] bg-foreground px-4 py-3 text-white">
               <div className="flex items-center justify-between gap-3">
@@ -127,13 +127,13 @@ export function HeroPreview({ outfit }: HeroPreviewProps) {
 
             <div className="rounded-[1.8rem] border border-white/70 bg-white/82 p-4 shadow-[0_16px_30px_rgba(27,21,19,0.06)]">
               <p className="mini-label">Saved looks</p>
-              <div className="mt-4 grid grid-cols-2 gap-3">
+              <div className="mt-4 grid grid-cols-2 gap-2">
                 {savedIdeas.map((idea) => (
                   <div
                     key={idea.label}
-                    className={`flex h-20 items-end rounded-[1.1rem] border border-line/60 p-3 ${idea.className}`}
+                    className={`flex min-h-16 items-end rounded-[1.1rem] border border-line/60 p-2.5 ${idea.className}`}
                   >
-                    <span className="text-[11px] font-semibold uppercase tracking-[0.16em] text-foreground/74">
+                    <span className="max-w-full text-[10px] font-semibold leading-tight text-foreground/76">
                       {idea.label}
                     </span>
                   </div>

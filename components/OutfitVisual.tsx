@@ -129,7 +129,7 @@ export function OutfitVisual({
   const outerwear = accentItems.find((item) => item.category === "outerwear");
   const wardrobe = [top, bottom, shoes, accessory].filter(Boolean) as VisualItem[];
   const containerPadding = compact ? "p-3 sm:p-4" : "p-4";
-  const visualMinHeight = compact ? "min-h-32 sm:min-h-48 md:min-h-52" : "min-h-52";
+  const visualMinHeight = compact ? "min-h-44 sm:min-h-48 md:min-h-52" : "min-h-52";
 
   return (
     <div
@@ -185,13 +185,13 @@ export function OutfitVisual({
 
               {top ? (
                 <div
-                  className={`mb-20 border border-white/18 bg-white/18 shadow-[0_14px_28px_rgba(0,0,0,0.08)] backdrop-blur-sm ${getShapeClasses("top", compact)}`}
+                  className={`${compact ? "mb-14 sm:mb-20" : "mb-20"} border border-white/18 bg-white/18 shadow-[0_14px_28px_rgba(0,0,0,0.08)] backdrop-blur-sm ${getShapeClasses("top", compact)}`}
                 />
               ) : null}
 
               {bottom ? (
                 <div
-                  className={`absolute bottom-12 left-1/2 -translate-x-1/2 border border-white/18 bg-black/12 shadow-[0_14px_28px_rgba(0,0,0,0.08)] backdrop-blur-sm ${getShapeClasses("bottom", compact)}`}
+                  className={`absolute ${compact ? "bottom-10 sm:bottom-12" : "bottom-12"} left-1/2 -translate-x-1/2 border border-white/18 bg-black/12 shadow-[0_14px_28px_rgba(0,0,0,0.08)] backdrop-blur-sm ${getShapeClasses("bottom", compact)}`}
                 />
               ) : null}
 
@@ -221,9 +221,9 @@ export function OutfitVisual({
 
         <div className={`${compact ? "hidden sm:flex" : "flex"} flex-wrap items-center justify-between gap-3`}>
           <div className="flex flex-wrap gap-2">
-            {accentItems.map((item) => (
+            {accentItems.map((item, index) => (
               <span
-                key={`${item.category}-label`}
+                key={`${item.category}-${item.name}-${index}-label`}
                 className="rounded-full bg-black/12 px-3 py-2 text-[11px] font-semibold uppercase tracking-[0.18em] text-white/88"
               >
                 {formatOptionLabel(item.category)}

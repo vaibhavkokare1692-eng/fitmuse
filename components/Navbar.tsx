@@ -12,11 +12,11 @@ export function Navbar() {
   return (
     <header className="sticky top-0 z-50 bg-background/75 pt-3 backdrop-blur-xl sm:pt-4">
       <div className="shell">
-        <div className="hero-card flex items-center justify-between gap-4 px-4 py-3 sm:px-6">
-          <Link href="/" className="flex items-center gap-3" onClick={() => setIsOpen(false)}>
-            <div>
+        <div className="hero-card flex items-center justify-between gap-2 px-3 py-3 sm:gap-4 sm:px-6">
+          <Link href="/" className="flex min-w-0 items-center gap-3" onClick={() => setIsOpen(false)}>
+            <div className="min-w-0">
               <p className="text-xl font-semibold text-foreground">{brandName}</p>
-              <p className="text-[11px] uppercase tracking-[0.28em] text-muted">
+              <p className="truncate text-[10px] uppercase tracking-[0.18em] text-muted sm:text-[11px] sm:tracking-[0.28em]">
                 {headerTagline}
               </p>
             </div>
@@ -42,18 +42,18 @@ export function Navbar() {
             })}
           </nav>
 
-          <div className="flex items-center gap-3">
+          <div className="flex shrink-0 items-center gap-3">
             <Link href="/quiz" className="cta-primary hidden lg:inline-flex">
               Take Quiz
             </Link>
             <button
               type="button"
-              className="inline-flex h-11 items-center gap-2 rounded-full border border-line bg-white/86 px-3 text-foreground shadow-[0_12px_24px_rgba(27,21,19,0.05)] xl:hidden"
+              className="inline-flex h-11 shrink-0 items-center gap-1.5 rounded-full border border-line bg-white/86 px-2.5 text-foreground shadow-[0_12px_24px_rgba(27,21,19,0.05)] sm:gap-2 sm:px-3 xl:hidden"
               onClick={() => setIsOpen((current) => !current)}
               aria-expanded={isOpen}
               aria-label="Toggle navigation menu"
             >
-              <span className="text-[11px] font-semibold uppercase tracking-[0.24em] text-muted">
+              <span className="text-[10px] font-semibold uppercase tracking-[0.16em] text-muted sm:text-[11px] sm:tracking-[0.24em]">
                 {isOpen ? "Close" : "Menu"}
               </span>
               <span className="relative h-4 w-4" aria-hidden="true">

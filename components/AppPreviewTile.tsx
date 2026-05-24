@@ -47,9 +47,9 @@ function TilePreview({ variant }: { variant: AppPreviewVariant }) {
           {["Date", "Travel", "Office", "Shoot"].map((label) => (
             <div
               key={label}
-              className="flex h-20 items-end rounded-[1rem] border border-line/60 bg-gradient-to-br from-foreground/6 to-accent-3/24 p-3"
+              className="flex min-h-16 items-end rounded-[1rem] border border-line/60 bg-gradient-to-br from-foreground/6 to-accent-3/24 p-2.5 sm:min-h-20 sm:p-3"
             >
-              <span className="text-[10px] font-semibold uppercase tracking-[0.14em] text-foreground/68">
+              <span className="text-[10px] font-semibold leading-tight text-foreground/70 sm:uppercase sm:tracking-[0.14em]">
                 {label}
               </span>
             </div>
